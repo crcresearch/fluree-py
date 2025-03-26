@@ -1,46 +1,37 @@
 from dataclasses import dataclass, replace
-from typing import Any, Dict, List, Optional, Protocol
+from typing import Any
 
 import httpx
 
-from fluree_py.http.mixin.context import SupportsContext, WithContextMixin
-
-
-class SupportsHistory(Protocol):
-    def history(self) -> "HistoryBuilder": ...
-
-
-class HistoryBuilder(SupportsContext, Protocol):
-    def with_history(self, history: List[str]) -> "HistoryBuilder": ...
-    def with_t(self, t: int) -> "HistoryBuilder": ...
-    def with_commit_details(self, commit_details: bool) -> "HistoryBuilder": ...
-    def request(self) -> httpx.Request: ...
-    def commit(self) -> Dict[str, Any]: ...
+from fluree_py.http.mixin.context import WithContextMixin
 
 
 @dataclass(frozen=True, kw_only=True)
 class HistoryBuilderImpl(WithContextMixin):
     endpoint: str
     ledger: str
-    history: Optional[List[str]] = None
-    t: Optional[int] = None
-    commit_details: Optional[bool] = None
+    history: list[str] | None = None
+    t: dict[str, Any] | None = None
+    commit_details: bool | None = None
 
-    def with_context(self, context: Dict[str, Any]) -> "HistoryBuilderImpl":
+    def with_context(self, context: dict[str, Any]) -> "HistoryBuilderImpl":
         return replace(self, context=context)
 
-    def with_history(self, history: List[str]) -> "HistoryBuilderImpl":
+    def with_history(self, history: list[str | None]) -> "HistoryBuilderImpl":
         return replace(self, history=history)
 
-    def with_t(self, t: int) -> "HistoryBuilderImpl":
+    def with_t(self, t: dict[str, Any]) -> "HistoryBuilderImpl":
         return replace(self, t=t)
 
+    def with_commit_details(self, commit_details: bool) -> "HistoryBuilderImpl":
+        return replace(self, commit_details=commit_details)
+
     @property
-    def commit_details_json(self) -> Dict[str, Any]:
+    def commit_details_json(self) -> dict[str, Any]:
         return {"commitDetails": self.commit_details} if self.commit_details else {}
 
     @property
-    def json(self) -> Dict[str, Any]:
+    def json(self) -> dict[str, Any]:
         return (
             self.context_json
             | {"from": self.ledger, "history": self.history, "t": self.t}
@@ -54,7 +45,7 @@ class HistoryBuilderImpl(WithContextMixin):
             json=self.json,
         )
 
-    def commit(self) -> Dict[str, Any]:
+    def commit(self) -> dict[str, Any]:
         response = httpx.post(self.endpoint, json=self.json)
         response.raise_for_status()
         return response.json()
