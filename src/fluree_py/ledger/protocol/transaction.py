@@ -1,6 +1,6 @@
 from typing import Any, Protocol
 
-from fluree_py.ledger.protocol.commit import SupportsCommit
+from fluree_py.ledger.protocol.commit import SupportsCommitable
 from fluree_py.ledger.protocol.context import SupportsContext
 from fluree_py.ledger.protocol.request import SupportsRequestCreation
 
@@ -10,7 +10,7 @@ class SupportsTransaction(Protocol):
 
 
 class TransactionBuilder(
-    SupportsContext, SupportsRequestCreation, SupportsCommit, Protocol
+    SupportsContext, SupportsRequestCreation, SupportsCommitable, Protocol
 ):
     def with_insert(self, data: dict[str, Any]) -> "TransactionBuilder": ...
     def with_delete(self, data: dict[str, Any]) -> "TransactionBuilder": ...
