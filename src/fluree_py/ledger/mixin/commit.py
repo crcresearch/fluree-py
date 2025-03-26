@@ -25,5 +25,5 @@ class AsyncCommitMixin(Generic[T]):
         return response.json()
 
 
-class Commitable(CommitMixin[T], AsyncCommitMixin[T], Generic[T]):
+class CommitableMixin(CommitMixin[T], AsyncCommitMixin[T], Generic[T]):
     pass

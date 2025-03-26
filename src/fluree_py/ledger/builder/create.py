@@ -2,7 +2,7 @@ from dataclasses import dataclass, replace
 from typing import Any
 
 
-from fluree_py.ledger.mixin import Commitable, WithContextMixin, WithRequestMixin
+from fluree_py.ledger.mixin import CommitableMixin, WithContextMixin, RequestMixin
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -25,7 +25,7 @@ class CreateBuilderImpl(WithContextMixin):
 
 
 @dataclass(frozen=True, kw_only=True)
-class CreateReadyToCommitImpl(WithRequestMixin, WithContextMixin, Commitable):
+class CreateReadyToCommitImpl(RequestMixin, WithContextMixin, CommitableMixin):
     endpoint: str
     ledger: str
     data: list[dict[str, Any]] | dict[str, Any]
