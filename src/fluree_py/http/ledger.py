@@ -6,7 +6,7 @@ from fluree_py.http.endpoint import (
     QueryBuilderImpl, 
     TransactionBuilderImpl,
 )
-from fluree_py.http.protocol import (
+from fluree_py.http.protocol.endpoint import (
     CreateBuilder,
     HistoryBuilder,
     QueryBuilder,

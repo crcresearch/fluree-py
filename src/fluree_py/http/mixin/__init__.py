@@ -1,11 +1,11 @@
-from fluree_py.http.mixin.commit import CommitMixin, AsyncCommitMixin, Commitable
+from fluree_py.http.mixin.commit import CommitMixin, AsyncCommitMixin, CommitableMixin
 from fluree_py.http.mixin.context import WithContextMixin
-from fluree_py.http.mixin.request import WithRequestMixin
+from fluree_py.http.mixin.request import RequestMixin
 
 __all__ = [
     "CommitMixin",
     "AsyncCommitMixin",
-    "Commitable",
+    "CommitableMixin",
     "WithContextMixin",
-    "WithRequestMixin",
+    "RequestMixin",
 ]

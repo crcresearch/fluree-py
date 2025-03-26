@@ -5,10 +5,6 @@ from fluree_py.http.protocol.mixin.context import SupportsContext
 from fluree_py.http.protocol.mixin.request import SupportsRequestCreation
 
 
-class SupportsHistory(Protocol):
-    def history(self) -> "HistoryBuilder": ...
-
-
 class HistoryBuilder(
     SupportsContext, SupportsRequestCreation, SupportsCommitable, Protocol
 ):

@@ -5,7 +5,7 @@ from httpx import Request
 
 
 @dataclass(frozen=True, kw_only=True)
-class WithRequestMixin(ABC):
+class RequestMixin(ABC):
     def get_request(self) -> Request:
         return Request(
             method="POST",

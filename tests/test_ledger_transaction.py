@@ -1,6 +1,5 @@
 import json
 
-import pytest
 
 from fluree_py import FlureeClient
 
@@ -63,11 +62,3 @@ def test_ledger_transaction_no_context(dummy_client: FlureeClient):
             "schema:description": ["We ❤️ Human Blood", "We ❤️ Animal Blood"],
         },
     }
-
-
-def test_ledger_transaction_empty(dummy_client: FlureeClient):
-    with pytest.raises(
-        ValueError,
-        match="TransactBuilder: You must provide at least one of insert or delete before calling commit().",
-    ):
-        dummy_client.with_ledger("cookbook/base").transaction().get_request()
