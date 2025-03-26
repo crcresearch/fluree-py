@@ -1,2 +1,3 @@
-def hello() -> str:
-    return "Hello from fluree-py!"
+from fluree_py.http.client import FlureeClient
+
+__all__ = ["FlureeClient"]
