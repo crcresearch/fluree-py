@@ -1,6 +1,8 @@
 from typing import Any, Protocol
 
-from fluree_py.http.protocol.mixin import SupportsCommit, SupportsContext, SupportsRequestCreation
+from fluree_py.http.protocol.mixin import SupportsCommitable
+from fluree_py.http.protocol.mixin.context import SupportsContext
+from fluree_py.http.protocol.mixin.request import SupportsRequestCreation 
 
 
 class SupportsTransaction(Protocol):
@@ -8,7 +10,7 @@ class SupportsTransaction(Protocol):
 
 
 class TransactionBuilder(
-    SupportsContext, SupportsRequestCreation, SupportsCommit, Protocol
+    SupportsContext, SupportsRequestCreation, SupportsCommitable, Protocol
 ):
     def with_insert(self, data: dict[str, Any]) -> "TransactionBuilder": ...
     def with_delete(self, data: dict[str, Any]) -> "TransactionBuilder": ...

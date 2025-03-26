@@ -1,9 +1,14 @@
 from typing import Any, Protocol
 
-from fluree_py.http.protocol.mixin import SupportsCommit, SupportsContext, SupportsRequestCreation
+
+from fluree_py.http.protocol.mixin import SupportsCommitable
+from fluree_py.http.protocol.mixin.context import SupportsContext 
+from fluree_py.http.protocol.mixin.request import SupportsRequestCreation
 
 
-class QueryBuilder(SupportsContext, SupportsRequestCreation, SupportsCommit, Protocol):
+class QueryBuilder(
+    SupportsContext, SupportsRequestCreation, SupportsCommitable, Protocol
+):
     def with_where(self, conditions: dict[str, Any]) -> "QueryBuilder": ...
     def with_group_by(self, fields: list[str]) -> "QueryBuilder": ...
     def with_having(self, condition: dict[str, Any]) -> "QueryBuilder": ...

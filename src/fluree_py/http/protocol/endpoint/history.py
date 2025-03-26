@@ -1,6 +1,8 @@
 from typing import Any, Protocol
 
-from fluree_py.http.protocol.mixin import SupportsCommit, SupportsContext, SupportsRequestCreation
+from fluree_py.http.protocol.mixin import SupportsCommitable 
+from fluree_py.http.protocol.mixin.context import SupportsContext
+from fluree_py.http.protocol.mixin.request import SupportsRequestCreation
 
 
 class SupportsHistory(Protocol):
@@ -8,7 +10,7 @@ class SupportsHistory(Protocol):
 
 
 class HistoryBuilder(
-    SupportsContext, SupportsRequestCreation, SupportsCommit, Protocol
+    SupportsContext, SupportsRequestCreation, SupportsCommitable, Protocol
 ):
     def with_history(self, history: list[str | None]) -> "HistoryBuilder": ...
     def with_t(self, t: dict[str, Any]) -> "HistoryBuilder": ...
