@@ -1,15 +1,17 @@
 from typing import Any, Protocol
 
-from fluree_py.http.protocol.mixin import SupportsCommitable 
-from fluree_py.http.protocol.mixin.context import SupportsContext
-from fluree_py.http.protocol.mixin.request import SupportsRequestCreation
+from fluree_py.http.protocol.endpoint.base import BaseBuilder, BaseReadyToCommit
 
 
-class CreateBuilder(SupportsContext, Protocol):
+class CreateBuilder(BaseBuilder, Protocol):
+    """Protocol for create builders."""
+
     def with_insert(
         self, data: list[dict[str, Any]] | dict[str, Any]
     ) -> "CreateReadyToCommit": ...
 
 
-class CreateReadyToCommit(SupportsRequestCreation, SupportsCommitable, Protocol):
+class CreateReadyToCommit(BaseReadyToCommit, Protocol):
+    """Protocol for create builders that are ready to commit."""
+
     pass

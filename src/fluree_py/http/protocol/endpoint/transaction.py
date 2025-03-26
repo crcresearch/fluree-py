@@ -1,19 +1,19 @@
 from typing import Any, Protocol
 
-from fluree_py.http.protocol.mixin import SupportsCommitable
-from fluree_py.http.protocol.mixin.context import SupportsContext
-from fluree_py.http.protocol.mixin.request import SupportsRequestCreation 
+from fluree_py.http.protocol.endpoint.base import BaseBuilder, BaseReadyToCommit
 
 
-class TransactionBuilder(SupportsContext, Protocol):
+class TransactionBuilder(BaseBuilder, Protocol):
+    """Protocol for transaction builders."""
+
     def with_insert(self, data: dict[str, Any]) -> "TransactionReadyToCommit": ...
     def with_delete(self, data: dict[str, Any]) -> "TransactionReadyToCommit": ...
     def with_where(self, clause: dict[str, Any]) -> "TransactionBuilder": ...
 
 
-class TransactionReadyToCommit(
-    SupportsContext, SupportsRequestCreation, SupportsCommitable, Protocol
-):
+class TransactionReadyToCommit(BaseBuilder, BaseReadyToCommit, Protocol):
+    """Protocol for transaction builders that are ready to commit."""
+
     def with_insert(self, data: dict[str, Any]) -> "TransactionReadyToCommit": ...
     def with_delete(self, data: dict[str, Any]) -> "TransactionReadyToCommit": ...
     def with_where(self, clause: dict[str, Any]) -> "TransactionReadyToCommit": ...
