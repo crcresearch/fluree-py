@@ -1,6 +1,6 @@
 from typing import Any, Protocol
 
-from fluree_py.ledger.protocol.commit import SupportsCommit
+from fluree_py.ledger.protocol.commit import SupportsCommitable
 from fluree_py.ledger.protocol.context import SupportsContext
 from fluree_py.ledger.protocol.request import SupportsRequestCreation
 
@@ -15,5 +15,5 @@ class CreateBuilder(SupportsContext, Protocol):
     ) -> "CreateReadyToCommit": ...
 
 
-class CreateReadyToCommit(SupportsRequestCreation, SupportsCommit, Protocol):
+class CreateReadyToCommit(SupportsRequestCreation, SupportsCommitable, Protocol):
     pass

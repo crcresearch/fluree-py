@@ -1,13 +1,13 @@
 from dataclasses import dataclass, replace
 from typing import Any
 
-from fluree_py.ledger.mixin.commit import CommitMixin
+from fluree_py.ledger.mixin.commit import Commitable
 from fluree_py.ledger.mixin.context import WithContextMixin
 from fluree_py.ledger.mixin.request_builder import WithRequestMixin
 
 
 @dataclass(frozen=True, kw_only=True)
-class QueryBuilderImpl(WithRequestMixin, WithContextMixin, CommitMixin):
+class QueryBuilderImpl(WithRequestMixin, WithContextMixin, Commitable):
     endpoint: str
     ledger: str
     where: dict[str, Any] | None = None
