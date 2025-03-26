@@ -30,7 +30,7 @@ class QueryBuilderImpl(RequestMixin, WithContextMixin, CommitableMixin):
     def with_opts(self, opts: dict[str, Any]) -> "QueryBuilderImpl":
         return replace(self, opts=opts)
 
-    def select(self, fields: dict[str, Any] | list[str]) -> "QueryBuilderImpl":
+    def with_select(self, fields: dict[str, Any] | list[str]) -> "QueryBuilderImpl":
         return replace(self, select_fields=fields)
 
     def get_url(self) -> str:
