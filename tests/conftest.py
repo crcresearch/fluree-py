@@ -25,7 +25,7 @@ def fluree_url():
 
 @pytest.fixture(scope="session")
 def fluree_client(fluree_url):
-    return FlureeClient(fluree_url)
+    return FlureeClient(base_url=fluree_url)
 
 
 @pytest.fixture(scope="session")
