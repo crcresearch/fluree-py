@@ -8,7 +8,3 @@ class WithContextMixin:
 
     def with_context(self, context: dict[str, Any]) -> Self:
         return replace(self, context=context)
-
-    @property
-    def context_json(self) -> dict[str, Any]:
-        return {"@context": self.context} if self.context else {}
