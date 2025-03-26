@@ -2,9 +2,7 @@ from dataclasses import dataclass, replace
 from typing import Any
 
 
-from fluree_py.http.mixin.commit import Commitable
-from fluree_py.http.mixin.context import WithContextMixin
-from fluree_py.http.mixin.request import WithRequestMixin
+from fluree_py.http.mixin import Commitable, WithContextMixin, WithRequestMixin
 
 
 @dataclass(frozen=True, kw_only=True)

@@ -1,13 +1,17 @@
 from dataclasses import dataclass
 
-from fluree_py.http.endpoint.create import CreateBuilderImpl
-from fluree_py.http.endpoint.history import HistoryBuilderImpl
-from fluree_py.http.endpoint.query import QueryBuilderImpl
-from fluree_py.http.endpoint.transact import TransactionBuilderImpl
-from fluree_py.http.protocol.endpoint.create import CreateBuilder
-from fluree_py.http.protocol.endpoint.history import HistoryBuilder
-from fluree_py.http.protocol.endpoint.query import QueryBuilder
-from fluree_py.http.protocol.endpoint.transaction import TransactionBuilder
+from fluree_py.http.endpoint import (
+    CreateBuilderImpl,
+    HistoryBuilderImpl,
+    QueryBuilderImpl, 
+    TransactionBuilderImpl,
+)
+from fluree_py.http.protocol import (
+    CreateBuilder,
+    HistoryBuilder,
+    QueryBuilder,
+    TransactionBuilder,
+)
 
 
 @dataclass(frozen=True, kw_only=True)
