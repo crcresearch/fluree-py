@@ -1,13 +1,17 @@
 from dataclasses import dataclass
 
-from fluree_py.ledger.builder.create import CreateBuilderImpl
-from fluree_py.ledger.builder.history import HistoryBuilderImpl
-from fluree_py.ledger.builder.query import QueryBuilderImpl
-from fluree_py.ledger.builder.transaction import TransactionBuilderImpl
-from fluree_py.ledger.protocol.create import CreateBuilder
-from fluree_py.ledger.protocol.history import HistoryBuilder
-from fluree_py.ledger.protocol.query import QueryBuilder
-from fluree_py.ledger.protocol.transaction import TransactionBuilder
+from fluree_py.ledger.builder import (
+    CreateBuilderImpl,
+    HistoryBuilderImpl,
+    QueryBuilderImpl,
+    TransactionBuilderImpl,
+)
+from fluree_py.ledger.protocol import (
+    CreateBuilder,
+    HistoryBuilder,
+    QueryBuilder,
+    TransactionBuilder,
+)
 
 
 @dataclass(frozen=True, kw_only=True)
