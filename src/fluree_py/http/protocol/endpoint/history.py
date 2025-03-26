@@ -1,15 +1,15 @@
 from typing import Any, Protocol
 
-from fluree_py.http.protocol.mixin.context import SupportsContext
-from fluree_py.http.protocol.mixin.request import SupportsRequestCreation
+from fluree_py.http.protocol.mixin import SupportsCommit, SupportsContext, SupportsRequestCreation
 
 
 class SupportsHistory(Protocol):
     def history(self) -> "HistoryBuilder": ...
 
 
-class HistoryBuilder(SupportsContext, SupportsRequestCreation, Protocol):
+class HistoryBuilder(
+    SupportsContext, SupportsRequestCreation, SupportsCommit, Protocol
+):
     def with_history(self, history: list[str | None]) -> "HistoryBuilder": ...
     def with_t(self, t: dict[str, Any]) -> "HistoryBuilder": ...
     def with_commit_details(self, commit_details: bool) -> "HistoryBuilder": ...
-    def commit(self) -> dict[str, Any]: ...

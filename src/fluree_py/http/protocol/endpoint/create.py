@@ -1,7 +1,6 @@
 from typing import Any, Protocol
 
-from fluree_py.http.protocol.mixin.context import SupportsContext
-from fluree_py.http.protocol.mixin.request import SupportsRequestCreation
+from fluree_py.http.protocol.mixin import SupportsCommit, SupportsContext, SupportsRequestCreation
 
 
 class SupportsCreate(Protocol):
@@ -14,5 +13,5 @@ class CreateBuilder(SupportsContext, Protocol):
     ) -> "CreateReadyToCommit": ...
 
 
-class CreateReadyToCommit(SupportsRequestCreation, Protocol):
-    def commit(self) -> dict[str, Any]: ...
+class CreateReadyToCommit(SupportsRequestCreation, SupportsCommit, Protocol):
+    pass
