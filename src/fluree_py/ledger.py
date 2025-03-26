@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 
-from fluree_py.create import CreateBuilderImpl
-from fluree_py.history import HistoryBuilderImpl
-from fluree_py.query import QueryBuilderImpl
-from fluree_py.transaction import TransactionBuilderImpl
+from fluree_py.create import CreateBuilder, CreateBuilderImpl
+from fluree_py.history import HistoryBuilder, HistoryBuilderImpl
+from fluree_py.query import QueryBuilder, QueryBuilderImpl
+from fluree_py.transaction import TransactionBuilder, TransactionBuilderImpl
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -11,22 +11,22 @@ class LedgerSelected:
     base_url: str
     ledger: str
 
-    def create(self) -> "CreateBuilderImpl":
+    def create(self) -> "CreateBuilder":
         return CreateBuilderImpl(
             endpoint=f"{self.base_url}/fluree/create", ledger=self.ledger
         )
 
-    def transaction(self) -> "TransactionBuilderImpl":
+    def transaction(self) -> "TransactionBuilder":
         return TransactionBuilderImpl(
             endpoint=f"{self.base_url}/fluree/transact", ledger=self.ledger
         )
 
-    def query(self) -> "QueryBuilderImpl":
+    def query(self) -> "QueryBuilder":
         return QueryBuilderImpl(
             endpoint=f"{self.base_url}/fluree/query", ledger=self.ledger
         )
 
-    def history(self) -> "HistoryBuilderImpl":
+    def history(self) -> "HistoryBuilder":
         return HistoryBuilderImpl(
             endpoint=f"{self.base_url}/fluree/history", ledger=self.ledger
         )
