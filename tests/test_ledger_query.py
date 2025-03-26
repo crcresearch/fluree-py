@@ -9,7 +9,7 @@ def test_ledger_query(dummy_client: FlureeClient):
         .query()
         .with_context({"ex": "http://example.org/", "schema": "http://schema.org/"})
         .with_where({"@id": "?s", "schema:name": "?name"})
-        .select({"?s": ["*"]})
+        .with_select({"?s": ["*"]})
         .get_request()
     )
 
