@@ -10,7 +10,7 @@ def test_ledger_history(dummy_client: FlureeClient):
         .with_context({"schema": "http://schema.org/"})
         .with_history([None, "schema:name"])
         .with_t({"from": 1})
-        .request()
+        .get_request()
     )
 
     assert request.method == "POST"

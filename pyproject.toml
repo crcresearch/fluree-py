@@ -29,7 +29,7 @@ lint = [
 default-groups = ["dev", "lint"]
 
 [tool.pytest.ini_options]
-addopts = "--import-mode=importlib --verbose --cov=src/fluree_py --cov-report=term-missing"
+addopts = "--import-mode=importlib --verbose"
 testpaths = ["tests"]
 python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test*"]

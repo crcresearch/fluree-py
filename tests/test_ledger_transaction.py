@@ -18,7 +18,7 @@ def test_ledger_transaction(dummy_client: FlureeClient):
                 "schema:description": ["We ❤️ Human Blood", "We ❤️ Animal Blood"],
             }
         )
-        .request()
+        .get_request()
     )
 
     assert request.method == "POST"
@@ -48,7 +48,7 @@ def test_ledger_transaction_no_context(dummy_client: FlureeClient):
                 "schema:description": ["We ❤️ Human Blood", "We ❤️ Animal Blood"],
             }
         )
-        .request()
+        .get_request()
     )
 
     assert request.method == "POST"
@@ -70,4 +70,4 @@ def test_ledger_transaction_empty(dummy_client: FlureeClient):
         ValueError,
         match="TransactBuilder: You must provide at least one of insert or delete before calling commit().",
     ):
-        dummy_client.with_ledger("cookbook/base").transaction().request()
+        dummy_client.with_ledger("cookbook/base").transaction().get_request()
