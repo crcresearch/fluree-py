@@ -24,7 +24,7 @@ def test_create_ledger(dummy_client: FlureeClient) -> None:
                 }
             ]
         )
-        .request()
+        .get_request()
     )
 
     assert request.method == "POST"

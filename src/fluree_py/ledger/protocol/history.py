@@ -1,17 +1,15 @@
 from typing import Any, Protocol
 
-import httpx
-
 from fluree_py.ledger.protocol.context import SupportsContext
+from fluree_py.ledger.protocol.request import SupportsRequestCreation
 
 
 class SupportsHistory(Protocol):
     def history(self) -> "HistoryBuilder": ...
 
 
-class HistoryBuilder(SupportsContext, Protocol):
+class HistoryBuilder(SupportsContext, SupportsRequestCreation, Protocol):
     def with_history(self, history: list[str | None]) -> "HistoryBuilder": ...
     def with_t(self, t: dict[str, Any]) -> "HistoryBuilder": ...
     def with_commit_details(self, commit_details: bool) -> "HistoryBuilder": ...
-    def request(self) -> httpx.Request: ...
     def commit(self) -> dict[str, Any]: ...
