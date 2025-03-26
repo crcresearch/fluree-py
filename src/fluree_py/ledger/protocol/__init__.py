@@ -1,3 +1,4 @@
+from fluree_py.ledger.protocol.base import BaseBuilder, BaseReadyToCommit
 from fluree_py.ledger.protocol.commit import SupportsCommitable
 from fluree_py.ledger.protocol.context import SupportsContext
 from fluree_py.ledger.protocol.create import CreateBuilder
@@ -8,6 +9,8 @@ from fluree_py.ledger.protocol.transaction import TransactionBuilder
 from fluree_py.ledger.protocol.ledger import SupportsLedgerOperations
 
 __all__ = [
+    "BaseBuilder",
+    "BaseReadyToCommit",
     "CreateBuilder",
     "HistoryBuilder",
     "QueryBuilder",
