@@ -7,7 +7,9 @@ authors = [
     { name = "James Sweet", email = "jsweet@nd.edu" }
 ]
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "httpx>=0.28.1",
+]
 
 [build-system]
 requires = ["hatchling"]
