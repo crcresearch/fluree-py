@@ -2,11 +2,11 @@ from dataclasses import dataclass, replace
 from typing import Any
 
 
-from fluree_py.ledger.mixin import Commitable, WithContextMixin, WithRequestMixin
+from fluree_py.ledger.mixin import CommitableMixin, WithContextMixin, RequestMixin
 
 
 @dataclass(frozen=True, kw_only=True)
-class HistoryBuilderImpl(WithRequestMixin, WithContextMixin, Commitable):
+class HistoryBuilderImpl(RequestMixin, WithContextMixin, CommitableMixin):
     endpoint: str
     ledger: str
     history: list[str] | None = None

@@ -2,35 +2,62 @@ from dataclasses import dataclass, replace
 from typing import Any
 
 
-from fluree_py.ledger.mixin import Commitable, WithContextMixin, WithRequestMixin
+from fluree_py.ledger.mixin import CommitableMixin, WithContextMixin, RequestMixin
 
 
 @dataclass(frozen=True, kw_only=True)
-class TransactionBuilderImpl(WithRequestMixin, WithContextMixin, Commitable):
+class TransactionBuilderImpl(WithContextMixin):
     endpoint: str
     ledger: str
     insert_data: dict[str, Any] | None = None
     delete_data: dict[str, Any] | None = None
     where_clause: dict[str, Any] | None = None
 
-    def with_insert(self, data: dict[str, Any]) -> "TransactionBuilderImpl":
-        return replace(self, insert_data=data)
+    def with_insert(self, data: dict[str, Any]) -> "TransactionReadyToCommitImpl":
+        return TransactionReadyToCommitImpl(
+            endpoint=self.endpoint,
+            ledger=self.ledger,
+            insert_data=data,
+            delete_data=self.delete_data,
+            where_clause=self.where_clause,
+            context=self.context,
+        )
 
-    def with_delete(self, data: dict[str, Any]) -> "TransactionBuilderImpl":
-        return replace(self, delete_data=data)
+    def with_delete(self, data: dict[str, Any]) -> "TransactionReadyToCommitImpl":
+        return TransactionReadyToCommitImpl(
+            endpoint=self.endpoint,
+            ledger=self.ledger,
+            insert_data=self.insert_data,
+            delete_data=data,
+            where_clause=self.where_clause,
+            context=self.context,
+        )
 
     def with_where(self, clause: dict[str, Any]) -> "TransactionBuilderImpl":
+        return replace(self, where_clause=clause)
+
+
+@dataclass(frozen=True, kw_only=True)
+class TransactionReadyToCommitImpl(RequestMixin, WithContextMixin, CommitableMixin):
+    endpoint: str
+    ledger: str
+    insert_data: dict[str, Any] | None = None
+    delete_data: dict[str, Any] | None = None
+    where_clause: dict[str, Any] | None = None
+
+    def with_insert(self, data: dict[str, Any]) -> "TransactionReadyToCommitImpl":
+        return replace(self, insert_data=data)
+
+    def with_delete(self, data: dict[str, Any]) -> "TransactionReadyToCommitImpl":
+        return replace(self, delete_data=data)
+
+    def with_where(self, clause: dict[str, Any]) -> "TransactionReadyToCommitImpl":
         return replace(self, where_clause=clause)
 
     def get_url(self) -> str:
         return self.endpoint
 
     def build_request_payload(self) -> dict[str, Any]:
-        if not self.insert_data and not self.delete_data:
-            raise ValueError(
-                "TransactBuilder: You must provide at least one of insert or delete before calling commit()."
-            )
-
         result = {}
         if self.context:
             result["@context"] = self.context
