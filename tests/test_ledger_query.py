@@ -10,7 +10,7 @@ def test_ledger_query(dummy_client: FlureeClient):
         .with_context({"ex": "http://example.org/", "schema": "http://schema.org/"})
         .with_where({"@id": "?s", "schema:name": "?name"})
         .select({"?s": ["*"]})
-        .request()
+        .get_request()
     )
 
     assert request.method == "POST"

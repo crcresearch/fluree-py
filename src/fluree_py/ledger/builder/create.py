@@ -4,6 +4,7 @@ from typing import Any
 import httpx
 
 from fluree_py.ledger.mixin.context import WithContextMixin
+from fluree_py.ledger.mixin.request_builder import WithRequestMixin
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -26,28 +27,24 @@ class CreateBuilderImpl(WithContextMixin):
 
 
 @dataclass(frozen=True, kw_only=True)
-class CreateReadyToCommitImpl:
+class CreateReadyToCommitImpl(WithRequestMixin, WithContextMixin):
     endpoint: str
     ledger: str
     data: list[dict[str, Any]] | dict[str, Any]
-    context: dict[str, Any] | None = None
 
-    @property
-    def json(self) -> dict[str, Any]:
-        return (
-            {"ledger": self.ledger, "insert": self.data} | {"@context": self.context}
-            if self.context
-            else {}
-        )
+    def get_url(self) -> str:
+        return self.endpoint
 
-    def request(self) -> httpx.Request:
-        return httpx.Request(
-            "POST",
-            self.endpoint,
-            json=self.json,
-        )
+    def build_request_payload(self) -> dict[str, Any]:
+        result = {}
+        if self.context:
+            result["@context"] = self.context
+        result |= {"ledger": self.ledger, "insert": self.data}
+        return result
 
     def commit(self) -> dict[str, Any]:
-        response = httpx.post(self.endpoint, json=self.json)
+        request = self.get_request()
+        with httpx.Client() as client:
+            response = client.send(request)
         response.raise_for_status()
         return response.json()
