@@ -1,14 +1,14 @@
 from dataclasses import dataclass, replace
 from typing import Any
 
-import httpx
 
+from fluree_py.ledger.mixin.commit import CommitMixin
 from fluree_py.ledger.mixin.context import WithContextMixin
 from fluree_py.ledger.mixin.request_builder import WithRequestMixin
 
 
 @dataclass(frozen=True, kw_only=True)
-class TransactionBuilderImpl(WithRequestMixin, WithContextMixin):
+class TransactionBuilderImpl(WithRequestMixin, WithContextMixin, CommitMixin):
     endpoint: str
     ledger: str
     insert_data: dict[str, Any] | None = None
@@ -44,10 +44,3 @@ class TransactionBuilderImpl(WithRequestMixin, WithContextMixin):
         if self.where_clause:
             result["where"] = self.where_clause
         return result
-
-    def commit(self) -> dict[str, Any]:
-        request = self.get_request()
-        with httpx.Client() as client:
-            response = client.send(request)
-        response.raise_for_status()
-        return response.json()

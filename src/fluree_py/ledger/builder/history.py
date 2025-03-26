@@ -1,14 +1,14 @@
 from dataclasses import dataclass, replace
 from typing import Any
 
-import httpx
 
+from fluree_py.ledger.mixin.commit import CommitMixin
 from fluree_py.ledger.mixin.context import WithContextMixin
 from fluree_py.ledger.mixin.request_builder import WithRequestMixin
 
 
 @dataclass(frozen=True, kw_only=True)
-class HistoryBuilderImpl(WithRequestMixin, WithContextMixin):
+class HistoryBuilderImpl(WithRequestMixin, WithContextMixin, CommitMixin):
     endpoint: str
     ledger: str
     history: list[str] | None = None
@@ -35,10 +35,3 @@ class HistoryBuilderImpl(WithRequestMixin, WithContextMixin):
         if self.commit_details:
             result["commitDetails"] = self.commit_details
         return result
-
-    def commit(self) -> dict[str, Any]:
-        request = self.get_request()
-        with httpx.Client() as client:
-            response = client.send(request)
-        response.raise_for_status()
-        return response.json()
