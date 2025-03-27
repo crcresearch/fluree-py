@@ -13,7 +13,11 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = ["ruff>=0.11.2", { include-group = "test" }]
-test = ["pytest>=8.3.5", "testcontainers[generic]>=4.9.2"]
+test = [
+  "polyfactory>=2.20.0",
+  "pytest>=8.3.5",
+  "testcontainers[generic]>=4.9.2",
+]
 
 [tool.pytest.ini_options]
 addopts = "--import-mode=importlib --verbose"
