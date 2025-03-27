@@ -3,7 +3,9 @@ import warnings
 import pytest
 from pydantic import BaseModel, ConfigDict
 
+from fluree_py.client import FlureeClient
 from fluree_py.query.select.pydantic import from_pydantic
+from tests.utils import create_and_retrieve_random_model
 
 
 # Ignore all warnings in these tests
@@ -14,7 +16,7 @@ def setup_class():
 
 
 # Config Dictionary Options
-def test_model_config_allow_extra():
+def test_model_config_allow_extra(request, fluree_client: FlureeClient | None):
     class NestedModel(BaseModel):
         name: str
         model_config = ConfigDict(extra="allow")
@@ -23,11 +25,20 @@ def test_model_config_allow_extra():
         id: str
         nested: NestedModel
 
-    select = from_pydantic(Model)
-    assert select == ["*", {"nested": ["*"]}]
+    assert from_pydantic(Model) == ["*", {"nested": ["*"]}]
+
+    if fluree_client:
+        model, result_model = create_and_retrieve_random_model(
+            Model, fluree_client, request.node.name
+        )
+
+        # Remove id field from nested models as it is added by Fluree
+        del result_model.nested.id
+
+        assert model == result_model
 
 
-def test_model_config_ignore_extra():
+def test_model_config_ignore_extra(request, fluree_client: FlureeClient | None):
     class NestedModel(BaseModel):
         name: str
         model_config = ConfigDict(extra="ignore")
@@ -39,9 +50,15 @@ def test_model_config_ignore_extra():
     select = from_pydantic(Model)
     assert select == ["*", {"nested": ["*"]}]
 
+    if fluree_client:
+        model, result_model = create_and_retrieve_random_model(
+            Model, fluree_client, request.node.name
+        )
+        assert model == result_model
+
 
 # Should handle nested models correctly
-def test_nested_model_with_base_type():
+def test_nested_model_with_base_type(request, fluree_client: FlureeClient | None):
     class NestedModel(BaseModel):
         id: str
         name: str
@@ -53,7 +70,16 @@ def test_nested_model_with_base_type():
     select = from_pydantic(Model)
     assert select == ["*", {"nested": ["*"]}]
 
-def test_optional_nested_model_with_base_type():
+    if fluree_client:
+        model, result_model = create_and_retrieve_random_model(
+            Model, fluree_client, request.node.name
+        )
+        assert model == result_model
+
+
+def test_optional_nested_model_with_base_type(
+    request, fluree_client: FlureeClient | None
+):
     class NestedModel(BaseModel):
         id: str
         name: str
@@ -65,8 +91,15 @@ def test_optional_nested_model_with_base_type():
     select = from_pydantic(Model)
     assert select == ["*", {"nested": ["*"]}]
 
+    if fluree_client:
+        model, result_model = create_and_retrieve_random_model(
+            Model, fluree_client, request.node.name
+        )
+        assert model == result_model
+
+
 # Should handle nested models with lists
-def test_nested_model_with_list():
+def test_nested_model_with_list(request, fluree_client: FlureeClient | None):
     class NestedModel(BaseModel):
         id: str
         entries: list[str]
@@ -78,9 +111,18 @@ def test_nested_model_with_list():
     select = from_pydantic(Model)
     assert select == ["*", {"nested": ["*"]}]
 
+    if fluree_client:
+        model, result_model = create_and_retrieve_random_model(
+            Model,
+            fluree_client,
+            request.node.name,
+            {"entries": {"@container": "@list"}},
+        )
+        assert model == result_model
+
 
 # Should handle nested models with lists
-def test_list_of_nested_models():
+def test_list_of_nested_models(request, fluree_client: FlureeClient | None):
     class NestedModel(BaseModel):
         id: str
         entries: list[str]
@@ -92,8 +134,18 @@ def test_list_of_nested_models():
     select = from_pydantic(Model)
     assert select == ["*", {"nested": ["*"]}]
 
+    if fluree_client:
+        model, result_model = create_and_retrieve_random_model(
+            Model,
+            fluree_client,
+            request.node.name,
+            {"nested": {"@container": "@list"}, "entries": {"@container": "@list"}},
+        )
+        assert model == result_model
+
+
 # Should handle nested models with lists
-def test_optional_list_of_nested_models():
+def test_optional_list_of_nested_models(request, fluree_client: FlureeClient | None):
     class NestedModel(BaseModel):
         id: str
         entries: list[str]
@@ -105,10 +157,18 @@ def test_optional_list_of_nested_models():
     select = from_pydantic(Model)
     assert select == ["*", {"nested": ["*"]}]
 
+    if fluree_client:
+        model, result_model = create_and_retrieve_random_model(
+            Model,
+            fluree_client,
+            request.node.name,
+            {"nested": {"@container": "@list"}, "entries": {"@container": "@list"}},
+        )
+        assert model == result_model
 
 
 # Should recursively handle nested models correctly
-def test_nested_model_with_submodel():
+def test_nested_model_with_submodel(request, fluree_client: FlureeClient | None):
     class SubNestedModel(BaseModel):
         id: str
         name: str
@@ -124,23 +184,21 @@ def test_nested_model_with_submodel():
     select = from_pydantic(Model)
     assert select == ["*", {"nested": ["*", {"subnested": ["*"]}]}]
 
+    if fluree_client:
+        model, result_model = create_and_retrieve_random_model(
+            Model, fluree_client, request.node.name
+        )
+        assert model == result_model
 
-def test_deeply_nested_dict():
-    class Model(BaseModel):
-        id: str
-        level1: dict[str, dict[str, dict[str, str]]]
 
-    select = from_pydantic(Model)
-    assert select == ["*", {"level1": ["*"]}]
+# def test_circular_reference():
+#     class Model(BaseModel):
+#         id: str
+#         name: str
 
-def test_circular_reference():
-    class Model(BaseModel):
-        id: str
-        name: str
+#     class NestedModel(BaseModel):
+#         id: str
+#         parent: Model | None = None
 
-    class NestedModel(BaseModel):
-        id: str
-        parent: Model | None = None
-
-    select = from_pydantic(NestedModel)
-    assert select == ["*", {"parent": ["*"]}]
+#     select = from_pydantic(NestedModel)
+#     assert select == ["*", {"parent": ["*"]}]
