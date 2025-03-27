@@ -38,3 +38,23 @@ def test_nested_model_no_id_forbid_extra():
 
     with pytest.raises(ValueError):
         from_pydantic(Model)
+
+
+# Should raise a error if a deeply nested dict is used because we can't infer the names of the keys
+def test_deeply_nested_dict():
+    class Model(BaseModel):
+        id: str
+        level1: dict[str, dict[str, dict[str, str]]]
+
+    with pytest.raises(ValueError):
+        from_pydantic(Model)
+
+
+# Should raise an error if a list of tuples are used as a field type
+def test_list_of_tuple_field():
+    class Model(BaseModel):
+        id: str
+        nested: list[tuple[str, str]]
+
+    with pytest.raises(ValueError):
+        from_pydantic(Model)

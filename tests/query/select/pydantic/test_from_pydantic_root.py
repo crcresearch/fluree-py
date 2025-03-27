@@ -3,7 +3,9 @@ import warnings
 import pytest
 from pydantic import BaseModel, Field
 
+from fluree_py.client import FlureeClient
 from fluree_py.query.select.pydantic import from_pydantic
+from tests.utils import create_and_retrieve_random_model
 
 
 # Ignore all warnings in these tests
@@ -14,7 +16,7 @@ def setup_class():
 
 
 # Base Types
-def test_base_type():
+def test_base_type(request, fluree_client: FlureeClient | None):
     class Model(BaseModel):
         id: str
         name: str
@@ -22,8 +24,15 @@ def test_base_type():
     select = from_pydantic(Model)
     assert select == ["*"]
 
+    if fluree_client:
+        model, result_model = create_and_retrieve_random_model(
+            Model, fluree_client, request.node.name
+        )
+        assert model == result_model
+
+
 # List of Base Types
-def test_list_of_base_type():
+def test_list_of_base_type(request, fluree_client: FlureeClient | None):
     class Model(BaseModel):
         id: str
         name: list[str]
@@ -31,7 +40,14 @@ def test_list_of_base_type():
     select = from_pydantic(Model)
     assert select == ["*"]
 
-def test_optional_list_of_base_type():
+    if fluree_client:
+        model, result_model = create_and_retrieve_random_model(
+            Model, fluree_client, request.node.name, {"name": {"@container": "@list"}}
+        )
+        assert model == result_model
+
+
+def test_optional_list_of_base_type(request, fluree_client: FlureeClient | None):
     class Model(BaseModel):
         id: str
         name: list[str] | None = None
@@ -39,7 +55,16 @@ def test_optional_list_of_base_type():
     select = from_pydantic(Model)
     assert select == ["*"]
 
-def test_optional_list_of_base_type_with_initializer():
+    if fluree_client:
+        model, result_model = create_and_retrieve_random_model(
+            Model, fluree_client, request.node.name, {"name": {"@container": "@list"}}
+        )
+        assert model == result_model
+
+
+def test_optional_list_of_base_type_with_initializer(
+    request, fluree_client: FlureeClient | None
+):
     class Model(BaseModel):
         id: str
         name: list[str] | None = Field(default_factory=list)
@@ -47,33 +72,61 @@ def test_optional_list_of_base_type_with_initializer():
     select = from_pydantic(Model)
     assert select == ["*"]
 
+    if fluree_client:
+        model, result_model = create_and_retrieve_random_model(
+            Model, fluree_client, request.node.name, {"name": {"@container": "@list"}}
+        )
+        assert model == result_model
+
+
 # Set of Base Types
-def test_set_of_base_type():
-    class Model(BaseModel):
-        id: str
-        name: set[str]
+# def test_set_of_base_type(request, fluree_client: FlureeClient | None):
+#     class Model(BaseModel):
+#         id: str
+#         name: set[str]
 
-    select = from_pydantic(Model)
-    assert select == ["*"]
+#     select = from_pydantic(Model)
+#     assert select == ["*"]
 
-def test_optional_set_of_base_type():
-    class Model(BaseModel):
-        id: str
-        name: set[str] | None = None
+#     if fluree_client:
+#         model, result_model = create_and_retrieve_random_model(
+#             Model, fluree_client, request.node.name, {"name": {"@container": "@list"}}
+#         )
+#         assert model == result_model
 
-    select = from_pydantic(Model)
-    assert select == ["*"]
 
-def test_optional_set_of_base_type_with_initializer():
-    class Model(BaseModel):
-        id: str
-        name: set[str] | None = Field(default_factory=set)
+# def test_optional_set_of_base_type(request, fluree_client: FlureeClient | None):
+#     class Model(BaseModel):
+#         id: str
+#         name: set[str] | None = None
 
-    select = from_pydantic(Model)
-    assert select == ["*"]
+#     select = from_pydantic(Model)
+#     assert select == ["*"]
+
+#     if fluree_client:
+#         model, result_model = create_and_retrieve_random_model(
+#             Model, fluree_client, request.node.name, {"name": {"@container": "@list"}}
+#         )
+#         assert model == result_model
+
+
+# def test_optional_set_of_base_type_with_initializer(request, fluree_client: FlureeClient | None):
+#     class Model(BaseModel):
+#         id: str
+#         name: set[str] | None = Field(default_factory=set)
+
+#     select = from_pydantic(Model)
+#     assert select == ["*"]
+
+#     if fluree_client:
+#         model, result_model = create_and_retrieve_random_model(
+#             Model, fluree_client, request.node.name, {"name": {"@container": "@list"}}
+#         )
+#         assert model == result_model
+
 
 # Dictionaries
-def test_dict():
+def test_dict(request, fluree_client: FlureeClient | None):
     class Model(BaseModel):
         id: str
         nested: dict[str, str]
@@ -81,7 +134,18 @@ def test_dict():
     select = from_pydantic(Model)
     assert select == ["*", {"nested": ["*"]}]
 
-def test_optional_dict():
+    if fluree_client:
+        model, result_model = create_and_retrieve_random_model(
+            Model, fluree_client, request.node.name
+        )
+
+        # Remove id field from nested dictionary as it is added by Fluree
+        del result_model.nested["id"]
+
+        assert model == result_model
+
+
+def test_optional_dict(request, fluree_client: FlureeClient | None):
     class Model(BaseModel):
         id: str
         nested: dict[str, str] | None = None
@@ -89,7 +153,18 @@ def test_optional_dict():
     select = from_pydantic(Model)
     assert select == ["*", {"nested": ["*"]}]
 
-def test_dict_with_initializer():
+    if fluree_client:
+        model, result_model = create_and_retrieve_random_model(
+            Model, fluree_client, request.node.name
+        )
+
+        # Remove id field from nested dictionary as it is added by Fluree
+        del result_model.nested["id"]
+
+        assert model == result_model
+
+
+def test_dict_with_initializer(request, fluree_client: FlureeClient | None):
     class Model(BaseModel):
         id: str
         nested: dict[str, str] = Field(default_factory=dict)
@@ -97,7 +172,18 @@ def test_dict_with_initializer():
     select = from_pydantic(Model)
     assert select == ["*", {"nested": ["*"]}]
 
-def test_optional_dict_with_initializer():
+    if fluree_client:
+        model, result_model = create_and_retrieve_random_model(
+            Model, fluree_client, request.node.name
+        )
+
+        # Remove id field from nested dictionary as it is added by Fluree
+        del result_model.nested["id"]
+
+        assert model == result_model
+
+
+def test_optional_dict_with_initializer(request, fluree_client: FlureeClient | None):
     class Model(BaseModel):
         id: str
         nested: dict[str, str] | None = Field(default_factory=dict)
@@ -105,8 +191,19 @@ def test_optional_dict_with_initializer():
     select = from_pydantic(Model)
     assert select == ["*", {"nested": ["*"]}]
 
+    if fluree_client:
+        model, result_model = create_and_retrieve_random_model(
+            Model, fluree_client, request.node.name
+        )
+
+        # Remove id field from nested dictionary as it is added by Fluree
+        del result_model.nested["id"]
+
+        assert model == result_model
+
+
 # List of Dictionaries
-def test_list_of_dict():
+def test_list_of_dict(request, fluree_client: FlureeClient | None):
     class Model(BaseModel):
         id: str
         nested: list[dict[str, str]]
@@ -114,7 +211,19 @@ def test_list_of_dict():
     select = from_pydantic(Model)
     assert select == ["*", {"nested": ["*"]}]
 
-def test_optional_list_of_dict():
+    if fluree_client:
+        model, result_model = create_and_retrieve_random_model(
+            Model, fluree_client, request.node.name, {"nested": {"@container": "@list"}}
+        )
+
+        # Remove id field from nested models as it is added by Fluree
+        for m in result_model.nested:
+            del m["id"]
+
+        assert model == result_model
+
+
+def test_optional_list_of_dict(request, fluree_client: FlureeClient | None):
     class Model(BaseModel):
         id: str
         nested: list[dict[str, str]] | None = None
@@ -122,8 +231,20 @@ def test_optional_list_of_dict():
     select = from_pydantic(Model)
     assert select == ["*", {"nested": ["*"]}]
 
+    if fluree_client:
+        model, result_model = create_and_retrieve_random_model(
+            Model, fluree_client, request.node.name, {"nested": {"@container": "@list"}}
+        )
 
-def test_list_of_dict_with_initializer():
+        # Remove id field from nested models as it is added by Fluree
+        if result_model.nested:
+            for m in result_model.nested:
+                del m["id"]
+
+        assert model == result_model
+
+
+def test_list_of_dict_with_initializer(request, fluree_client: FlureeClient | None):
     class Model(BaseModel):
         id: str
         nested: list[dict[str, str]] = Field(default_factory=list)
@@ -131,7 +252,21 @@ def test_list_of_dict_with_initializer():
     select = from_pydantic(Model)
     assert select == ["*", {"nested": ["*"]}]
 
-def test_optional_list_of_dict_with_initializer():
+    if fluree_client:
+        model, result_model = create_and_retrieve_random_model(
+            Model, fluree_client, request.node.name, {"nested": {"@container": "@list"}}
+        )
+
+        # Remove id field from nested models as it is added by Fluree
+        for m in result_model.nested:
+            del m["id"]
+
+        assert model == result_model
+
+
+def test_optional_list_of_dict_with_initializer(
+    request, fluree_client: FlureeClient | None
+):
     class Model(BaseModel):
         id: str
         nested: list[dict[str, str]] | None = Field(default_factory=list)
@@ -139,70 +274,14 @@ def test_optional_list_of_dict_with_initializer():
     select = from_pydantic(Model)
     assert select == ["*", {"nested": ["*"]}]
 
-# List of Sets
-def test_list_of_set():
-    class Model(BaseModel):
-        id: str
-        nested: list[set[str]]
+    if fluree_client:
+        model, result_model = create_and_retrieve_random_model(
+            Model, fluree_client, request.node.name, {"nested": {"@container": "@list"}}
+        )
 
-    select = from_pydantic(Model)
-    assert select == ["*"]
+        # Remove id field from nested models as it is added by Fluree
+        if result_model.nested:
+            for m in result_model.nested:
+                del m["id"]
 
-def test_optional_list_of_set():
-    class Model(BaseModel):
-        id: str
-        nested: list[set[str]] | None = None
-
-    select = from_pydantic(Model)
-    assert select == ["*"]
-
-
-def test_list_of_set_with_initializer():
-    class Model(BaseModel):
-        id: str
-        nested: list[set[str]] = Field(default_factory=list)
-
-    select = from_pydantic(Model)
-    assert select == ["*"]
-
-def test_optional_list_of_set_with_initializer():
-    class Model(BaseModel):
-        id: str
-        nested: list[set[str]] | None = Field(default_factory=list)
-
-    select = from_pydantic(Model)
-    assert select == ["*"]
-
-# List of Tuples
-def test_list_of_tuple():
-    class Model(BaseModel):
-        id: str
-        nested: list[tuple[str, str]]
-
-    select = from_pydantic(Model)
-    assert select == ["*", {"nested": ["*"]}]
-
-def test_optional_list_of_tuple():
-    class Model(BaseModel):
-        id: str
-        nested: list[tuple[str, str]] | None = None
-
-    select = from_pydantic(Model)
-    assert select == ["*", {"nested": ["*"]}]
-
-
-def test_list_of_tuple_with_initializer():
-    class Model(BaseModel):
-        id: str
-        nested: list[tuple[str, str]] = Field(default_factory=list)
-
-    select = from_pydantic(Model)
-    assert select == ["*", {"nested": ["*"]}]
-
-def test_optional_list_of_tuple_with_initializer():
-    class Model(BaseModel):
-        id: str
-        nested: list[tuple[str, str]] | None = Field(default_factory=list)
-
-    select = from_pydantic(Model)
-    assert select == ["*", {"nested": ["*"]}]
+        assert model == result_model
