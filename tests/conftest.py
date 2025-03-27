@@ -1,3 +1,5 @@
+from typing import Generator
+
 import pytest
 from testcontainers.core.waiting_utils import wait_for_logs
 from testcontainers.generic import ServerContainer
@@ -6,11 +8,7 @@ from fluree_py import FlureeClient
 
 
 @pytest.fixture(scope="session")
-def fluree_url():
-    """
-    Fixture that starts a Fluree server container and returns its URL.
-    The container will be stopped after all tests are completed.
-    """
+def fluree_url() -> Generator[str, None, None]:
     container = ServerContainer(port=8090, image="fluree/server")
     container.start()
 
@@ -18,6 +16,10 @@ def fluree_url():
     wait_for_logs(container, "Starting Fluree server with profile")
 
     yield container._create_connection_url()
+
+    (out, err) = container.get_logs()
+    print(out.decode("utf-8"))
+    print(err.decode("utf-8"))
 
     # Cleanup
     container.stop()
