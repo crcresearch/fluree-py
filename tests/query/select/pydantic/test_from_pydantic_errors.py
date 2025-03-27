@@ -2,14 +2,18 @@
 import pytest
 from pydantic import BaseModel, ConfigDict
 
-from fluree_py.query.select.pydantic import from_pydantic
+from fluree_py.query.select.pydantic import (
+    DeeplyNestedStructureError,
+    MissingIdFieldError,
+    from_pydantic,
+)
 
 
 def test_no_root_id():
     class Model(BaseModel):
         name: str  # Model without id field
 
-    with pytest.raises(ValueError):
+    with pytest.raises(MissingIdFieldError):
         from_pydantic(Model)
 
 
@@ -22,7 +26,7 @@ def test_nested_model_no_id():
         id: str
         nested: NestedModel
 
-    with pytest.raises(ValueError):
+    with pytest.raises(MissingIdFieldError):
         from_pydantic(Model)
 
 
@@ -36,7 +40,7 @@ def test_nested_model_no_id_forbid_extra():
         id: str
         nested: NestedModel
 
-    with pytest.raises(ValueError):
+    with pytest.raises(MissingIdFieldError):
         from_pydantic(Model)
 
 
@@ -46,7 +50,7 @@ def test_deeply_nested_dict():
         id: str
         level1: dict[str, dict[str, dict[str, str]]]
 
-    with pytest.raises(ValueError):
+    with pytest.raises(DeeplyNestedStructureError):
         from_pydantic(Model)
 
 
@@ -56,5 +60,5 @@ def test_list_of_tuple_field():
         id: str
         nested: list[tuple[str, str]]
 
-    with pytest.raises(ValueError):
+    with pytest.raises(DeeplyNestedStructureError):
         from_pydantic(Model)
