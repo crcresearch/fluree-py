@@ -15,6 +15,7 @@ build-backend = "hatchling.build"
 dev = ["ruff>=0.11.2", { include-group = "test" }]
 test = [
   "polyfactory>=2.20.0",
+  "respx>=0.22.0",
   "pytest>=8.3.5",
   "pytest-icdiff>=0.9",
   "pytest-sugar>=1.0.0",
