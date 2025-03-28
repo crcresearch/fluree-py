@@ -1,4 +1,3 @@
-import json
 from typing import Any, Type, TypeVar
 
 from polyfactory.factories.pydantic_factory import ModelFactory as PydanticModelFactory
@@ -77,6 +76,6 @@ def create_and_retrieve_model(
     )
 
     # Parse the response into a model
-    result_model = model_instance.model_validate_json(json.dumps(resp[0]))
+    result_model = model_instance.model_validate_json(resp.content)
 
     return result_model
