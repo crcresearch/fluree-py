@@ -5,6 +5,7 @@ from httpx import Request
 
 from fluree_py.ledger.protocol.request import SupportsRequestCreation
 
+
 @dataclass(frozen=True, kw_only=True)
 class RequestMixin(ABC, SupportsRequestCreation):
     def get_request(self) -> Request:

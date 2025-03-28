@@ -1,35 +1,16 @@
-import json
 from typing import Generator
 
-from httpx import Response
 import pytest
-from respx import MockRouter
 import respx
+from httpx import Response
+from pytest import FixtureRequest
+from respx import MockRouter
 
 from fluree_py import FlureeClient
 
 
 @pytest.fixture
-def leger_creation_data() -> tuple[dict, list[dict]]:
-    return (
-        {
-            "ex": "http://example.org/",
-            "schema": "http://schema.org/",
-        },
-        [
-            {
-                "@id": "ex:freddy",
-                "@type": "ex:Yeti",
-                "schema:age": 4,
-                "schema:name": "Freddy",
-                "ex:verified": True,
-            }
-        ],
-    )
-
-
-@pytest.fixture
-def mocked_api(request) -> Generator[MockRouter, None, None]:
+def mocked_api(request: FixtureRequest) -> Generator[MockRouter, None, None]:
     with respx.mock(
         base_url="http://localhost:8090", assert_all_called=False
     ) as respx_mock:
@@ -49,16 +30,16 @@ def mocked_api(request) -> Generator[MockRouter, None, None]:
 
 
 @pytest.fixture
-def fluree_client_create(
-    request, fluree_client: FlureeClient
+def fluree_client(
+    request: FixtureRequest, fluree_client: FlureeClient
 ) -> Generator[FlureeClient, None, None]:
+    # If we're using a real Fluree server, yield the client and ignore the mocked API
     if request.config.getoption("--use-fluree-server"):
         yield fluree_client
         return
 
     # If we're not using a real Fluree server, mock the API
     mocked_api: MockRouter = request.getfixturevalue("mocked_api")
-    print(mocked_api.routes)
     yield fluree_client
 
     # Assert that the mocked API was called
@@ -69,15 +50,28 @@ def fluree_client_create(
 
 
 def test_create_ledger(
-    request,
-    fluree_client_create: FlureeClient,
-    leger_creation_data: tuple[dict, list[dict]],
+    request: FixtureRequest,
+    fluree_client: FlureeClient,
 ):
+    context = {
+        "ex": "http://example.org/",
+        "schema": "http://schema.org/",
+    }
+
+    data = [
+        {
+            "@id": "ex:freddy",
+            "@type": "ex:Yeti",
+            "schema:age": 4,
+            "schema:name": "Freddy",
+        }
+    ]
+
     resp = (
-        fluree_client_create.with_ledger(request.node.name)
+        fluree_client.with_ledger(request.node.name)
         .create()
-        .with_context(leger_creation_data[0])
-        .with_insert(leger_creation_data[1])
+        .with_context(context)
+        .with_insert(data)
         .commit()
     )
 
