@@ -19,6 +19,8 @@ build-backend = "hatchling.build"
 [dependency-groups]
 dev = [
     "polyfactory>=2.20.0",
+    "pytest-icdiff>=0.9",
+    "pytest-sugar>=1.0.0",
     "pytest>=8.3.5",
     "testcontainers[generic]>=4.9.2",
 ]
@@ -28,3 +30,7 @@ lint = [
 
 [tool.uv]
 default-groups = ["dev", "lint"]
+
+[tool.pytest.ini_options]
+addopts = "--import-mode=importlib --verbose"
+
