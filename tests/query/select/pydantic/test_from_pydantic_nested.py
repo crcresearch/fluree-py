@@ -15,7 +15,7 @@ def setup_class():
 
 
 # Config Dictionary Options
-def test_model_config_allow_extra(request, fluree_client: FlureeClient | None):
+def test_model_config_allow_extra(request: pytest.FixtureRequest, fluree_client: FlureeClient):
     class NestedModel(BaseModel):
         name: str
         model_config = ConfigDict(extra="allow")
@@ -26,7 +26,7 @@ def test_model_config_allow_extra(request, fluree_client: FlureeClient | None):
 
     assert from_pydantic(Model) == ["*", {"nested": ["*"]}]
 
-    if fluree_client:
+    if request.config.getoption("--use-fluree-server"):
         model, result_model = create_and_retrieve_random_model(Model, fluree_client, request.node.name)
 
         # Remove id field from nested models as it is added by Fluree
@@ -35,7 +35,7 @@ def test_model_config_allow_extra(request, fluree_client: FlureeClient | None):
         assert model == result_model
 
 
-def test_model_config_ignore_extra(request, fluree_client: FlureeClient | None):
+def test_model_config_ignore_extra(request: pytest.FixtureRequest, fluree_client: FlureeClient):
     class NestedModel(BaseModel):
         name: str
         model_config = ConfigDict(extra="ignore")
@@ -47,13 +47,13 @@ def test_model_config_ignore_extra(request, fluree_client: FlureeClient | None):
     select = from_pydantic(Model)
     assert select == ["*", {"nested": ["*"]}]
 
-    if fluree_client:
+    if request.config.getoption("--use-fluree-server"):
         model, result_model = create_and_retrieve_random_model(Model, fluree_client, request.node.name)
         assert model == result_model
 
 
 # Should handle nested models correctly
-def test_nested_model_with_base_type(request, fluree_client: FlureeClient | None):
+def test_nested_model_with_base_type(request: pytest.FixtureRequest, fluree_client: FlureeClient):
     class NestedModel(BaseModel):
         id: str
         name: str
@@ -65,12 +65,12 @@ def test_nested_model_with_base_type(request, fluree_client: FlureeClient | None
     select = from_pydantic(Model)
     assert select == ["*", {"nested": ["*"]}]
 
-    if fluree_client:
+    if request.config.getoption("--use-fluree-server"):
         model, result_model = create_and_retrieve_random_model(Model, fluree_client, request.node.name)
         assert model == result_model
 
 
-def test_optional_nested_model_with_base_type(request, fluree_client: FlureeClient | None):
+def test_optional_nested_model_with_base_type(request: pytest.FixtureRequest, fluree_client: FlureeClient):
     class NestedModel(BaseModel):
         id: str
         name: str
@@ -82,13 +82,13 @@ def test_optional_nested_model_with_base_type(request, fluree_client: FlureeClie
     select = from_pydantic(Model)
     assert select == ["*", {"nested": ["*"]}]
 
-    if fluree_client:
+    if request.config.getoption("--use-fluree-server"):
         model, result_model = create_and_retrieve_random_model(Model, fluree_client, request.node.name)
         assert model == result_model
 
 
 # Should handle nested models with lists
-def test_nested_model_with_list(request, fluree_client: FlureeClient | None):
+def test_nested_model_with_list(request: pytest.FixtureRequest, fluree_client: FlureeClient):
     class NestedModel(BaseModel):
         id: str
         entries: list[str]
@@ -100,7 +100,7 @@ def test_nested_model_with_list(request, fluree_client: FlureeClient | None):
     select = from_pydantic(Model)
     assert select == ["*", {"nested": ["*"]}]
 
-    if fluree_client:
+    if request.config.getoption("--use-fluree-server"):
         model, result_model = create_and_retrieve_random_model(
             Model,
             fluree_client,
@@ -111,7 +111,7 @@ def test_nested_model_with_list(request, fluree_client: FlureeClient | None):
 
 
 # Should handle nested models with lists
-def test_list_of_nested_models(request, fluree_client: FlureeClient | None):
+def test_list_of_nested_models(request: pytest.FixtureRequest, fluree_client: FlureeClient):
     class NestedModel(BaseModel):
         id: str
         entries: list[str]
@@ -123,7 +123,7 @@ def test_list_of_nested_models(request, fluree_client: FlureeClient | None):
     select = from_pydantic(Model)
     assert select == ["*", {"nested": ["*"]}]
 
-    if fluree_client:
+    if request.config.getoption("--use-fluree-server"):
         model, result_model = create_and_retrieve_random_model(
             Model,
             fluree_client,
@@ -134,7 +134,7 @@ def test_list_of_nested_models(request, fluree_client: FlureeClient | None):
 
 
 # Should handle nested models with lists
-def test_optional_list_of_nested_models(request, fluree_client: FlureeClient | None):
+def test_optional_list_of_nested_models(request: pytest.FixtureRequest, fluree_client: FlureeClient):
     class NestedModel(BaseModel):
         id: str
         entries: list[str]
@@ -146,7 +146,7 @@ def test_optional_list_of_nested_models(request, fluree_client: FlureeClient | N
     select = from_pydantic(Model)
     assert select == ["*", {"nested": ["*"]}]
 
-    if fluree_client:
+    if request.config.getoption("--use-fluree-server"):
         model, result_model = create_and_retrieve_random_model(
             Model,
             fluree_client,
@@ -157,7 +157,7 @@ def test_optional_list_of_nested_models(request, fluree_client: FlureeClient | N
 
 
 # Should recursively handle nested models correctly
-def test_nested_model_with_submodel(request, fluree_client: FlureeClient | None):
+def test_nested_model_with_submodel(request: pytest.FixtureRequest, fluree_client: FlureeClient):
     class SubNestedModel(BaseModel):
         id: str
         name: str
@@ -173,7 +173,7 @@ def test_nested_model_with_submodel(request, fluree_client: FlureeClient | None)
     select = from_pydantic(Model)
     assert select == ["*", {"nested": ["*", {"subnested": ["*"]}]}]
 
-    if fluree_client:
+    if request.config.getoption("--use-fluree-server"):
         model, result_model = create_and_retrieve_random_model(Model, fluree_client, request.node.name)
         assert model == result_model
 
