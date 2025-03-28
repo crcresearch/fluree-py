@@ -22,6 +22,7 @@ dev = [
     "pytest-icdiff>=0.9",
     "pytest-sugar>=1.0.0",
     "pytest>=8.3.5",
+    "respx>=0.22.0",
     "testcontainers[generic]>=4.9.2",
 ]
 lint = [
@@ -34,3 +35,13 @@ default-groups = ["dev", "lint"]
 [tool.pytest.ini_options]
 addopts = "--import-mode=importlib --verbose"
 
+[tool.hatch.build.targets.wheel]
+packages = ["src/fluree_py"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/fluree_py/**/*.py",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true

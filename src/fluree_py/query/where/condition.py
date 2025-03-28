@@ -24,4 +24,3 @@ class Condition:
             return {self.field: self.value}
         else:
             return {self.field: {f"${self.op}": self.value}}
-        
