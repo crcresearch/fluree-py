@@ -16,12 +16,13 @@ def pytest_addoption(parser):
         help="Run tests against a real Fluree server container",
     )
 
+
 @pytest.fixture(scope="session")
 def fluree_url(request) -> Generator[str | None, None, None]:
     if not request.config.getoption("--use-fluree-server"):
         yield None
         return
-    
+
     container = ServerContainer(port=8090, image="fluree/server")
     container.start()
 

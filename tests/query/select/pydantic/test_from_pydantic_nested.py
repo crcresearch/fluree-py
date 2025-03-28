@@ -33,7 +33,7 @@ def test_model_config_allow_extra(request, fluree_client: FlureeClient | None):
         )
 
         # Remove id field from nested models as it is added by Fluree
-        del result_model.nested.id
+        delattr(result_model.nested, "id")
 
         assert model == result_model
 
