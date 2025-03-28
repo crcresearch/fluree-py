@@ -2,7 +2,16 @@ from types import UnionType
 from pydantic import BaseModel
 
 
-from typing import Any, List, Type, TypeGuard, get_args, get_origin, get_type_hints
+from typing import (
+    Any,
+    List,
+    Type,
+    TypeGuard,
+    Union,
+    get_args,
+    get_origin,
+    get_type_hints,
+)
 
 
 class TypeChecker:
@@ -28,11 +37,9 @@ class TypeChecker:
         return hasattr(field_type, "__origin__") and field_type.__origin__ is tuple
 
     @classmethod
-    def is_primitive_type(
-        cls, field_type: Any
-    ) -> TypeGuard[Type[str | int | float | bool]]:
+    def is_primitive_type(cls, field_type: Any) -> bool:
         """Check if a type is a primitive type (str, int, float, bool)."""
-        return field_type in (str, int, float, bool)
+        return isinstance(field_type, type) and field_type in {str, int, float, bool}
 
     @classmethod
     def is_id_field(cls, field_name: str) -> bool:
@@ -42,17 +49,12 @@ class TypeChecker:
     @classmethod
     def dict_max_depth(cls, field_type: Any, depth: int = 0) -> int:
         """Recursively count dictionary nesting depth."""
-        if not TypeChecker.is_dict_type(field_type):
-            return depth
-
-        args = get_args(field_type)
-        if not args:
-            return depth
-
-        # Check the value type of the dictionary
-        value_type = args[1]
-        if TypeChecker.is_dict_type(value_type):
-            return cls.dict_max_depth(value_type, depth + 1)
+        while TypeChecker.is_dict_type(field_type):
+            args = get_args(field_type)
+            if not args or len(args) < 2:
+                break
+            field_type = args[1]  # Move to the value type
+            depth += 1
         return depth
 
     @classmethod
@@ -64,13 +66,10 @@ class TypeChecker:
     def get_real_type(cls, field_type: Any) -> Any:
         """Get the real type from a potentially optional/union type."""
         origin = get_origin(field_type)
-        if origin is UnionType:
-            types = [t for t in get_args(field_type) if t is not type(None)]  # noqa: E721
+        if origin in {Union, UnionType}:
+            types = [t for t in get_args(field_type) if t is not type(None)]
             if types:
-                for t in types:
-                    if cls.is_list_type(t):
-                        return t
-                return types[0]
+                return next((t for t in types if cls.is_list_type(t)), types[0])
         return field_type
 
     @classmethod
@@ -79,7 +78,7 @@ class TypeChecker:
         return "id" in get_type_hints(model, include_extras=True)
 
     @classmethod
-    def has_model_config(cls, model: Type[BaseModel]) -> TypeGuard[Type[BaseModel]]:
+    def has_model_config(cls, model: Type[BaseModel]) -> bool:
         """Check if a model has a model_config attribute."""
         return hasattr(model, "model_config")
 
@@ -89,7 +88,7 @@ class TypeChecker:
         if not cls.has_model_config(model):
             return True
 
-        config = getattr(model, "model_config", None)
+        config = model.model_config
         if not config:
             return True
 
