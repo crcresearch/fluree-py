@@ -8,7 +8,7 @@ from fluree_py.query.where.variable import Var
 class UnionClause:
     conditions: list[Condition]
 
-    def to_expr(self) -> list[str]: 
+    def to_expr(self) -> list[str]:
         return ["union"] + list(map(lambda c: c.to_expr(), self.conditions))
 
 
@@ -17,7 +17,7 @@ class FilterClause:
     expressions: list[Condition]
 
     def to_expr(self) -> list[str]:
-        return ["filter" ] + list(map(lambda e: e.to_expr(), self.expressions))
+        return ["filter"] + list(map(lambda e: e.to_expr(), self.expressions))
 
 
 @dataclass
