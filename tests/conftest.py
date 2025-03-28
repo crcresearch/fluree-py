@@ -46,3 +46,61 @@ def fluree_url(request) -> Generator[str, None, None]:
 @pytest.fixture(scope="session")
 def fluree_client(fluree_url: str) -> FlureeClient:
     return FlureeClient(base_url=fluree_url)
+
+
+@pytest.fixture
+def cookbook_client(
+    request: pytest.FixtureRequest, fluree_client: FlureeClient
+) -> Generator[FlureeClient, None, None]:
+    if not request.config.getoption("--use-fluree-server"):
+        yield fluree_client
+        return
+
+    # Only setup the ledger if we're using a real Fluree server
+    resp = (
+        fluree_client.with_ledger(ledger=request.node.name)
+        .create()
+        .with_context({"ex": "http://example.org/", "schema": "http://schema.org/"})
+        .with_insert(
+            [
+                {
+                    "@id": "ex:freddy",
+                    "@type": "ex:Yeti",
+                    "schema:age": 4,
+                    "schema:name": "Freddy",
+                    "ex:verified": True,
+                },
+                {
+                    "@id": "ex:letty",
+                    "@type": "ex:Yeti",
+                    "schema:age": 2,
+                    "ex:nickname": "Letty",
+                    "schema:name": "Leticia",
+                    "schema:follows": [{"@id": "ex:freddy"}],
+                },
+                {
+                    "@id": "ex:betty",
+                    "@type": "ex:Yeti",
+                    "schema:age": 82,
+                    "schema:name": "Betty",
+                    "schema:follows": [{"@id": "ex:freddy"}],
+                },
+                {
+                    "@id": "ex:andrew",
+                    "@type": "schema:Person",
+                    "schema:age": 35,
+                    "schema:name": "Andrew Johnson",
+                    "schema:follows": [
+                        {"@id": "ex:freddy"},
+                        {"@id": "ex:letty"},
+                        {"@id": "ex:betty"},
+                    ],
+                },
+            ]
+        )
+        .commit()
+    )
+
+    assert resp.status_code == 201
+
+    yield fluree_client

@@ -1,19 +1,20 @@
 from dataclasses import dataclass, replace
 from typing import Any
 
-
-from fluree_py.ledger.mixin import CommitableMixin, WithContextMixin, RequestMixin
+from fluree_py.ledger.mixin import CommitableMixin, RequestMixin, WithContextMixin
 
 
 @dataclass(frozen=True, kw_only=True)
 class TransactionBuilderImpl(WithContextMixin):
     endpoint: str
     ledger: str
-    insert_data: dict[str, Any] | None = None
+    insert_data: list[dict[str, Any]] | dict[str, Any] | None = None
     delete_data: dict[str, Any] | None = None
     where_clause: dict[str, Any] | None = None
 
-    def with_insert(self, data: dict[str, Any]) -> "TransactionReadyToCommitImpl":
+    def with_insert(
+        self, data: list[dict[str, Any]] | dict[str, Any]
+    ) -> "TransactionReadyToCommitImpl":
         return TransactionReadyToCommitImpl(
             endpoint=self.endpoint,
             ledger=self.ledger,
@@ -41,11 +42,13 @@ class TransactionBuilderImpl(WithContextMixin):
 class TransactionReadyToCommitImpl(RequestMixin, WithContextMixin, CommitableMixin):
     endpoint: str
     ledger: str
-    insert_data: dict[str, Any] | None = None
+    insert_data: list[dict[str, Any]] | dict[str, Any] | None = None
     delete_data: dict[str, Any] | None = None
     where_clause: dict[str, Any] | None = None
 
-    def with_insert(self, data: dict[str, Any]) -> "TransactionReadyToCommitImpl":
+    def with_insert(
+        self, data: list[dict[str, Any]] | dict[str, Any]
+    ) -> "TransactionReadyToCommitImpl":
         return replace(self, insert_data=data)
 
     def with_delete(self, data: dict[str, Any]) -> "TransactionReadyToCommitImpl":
