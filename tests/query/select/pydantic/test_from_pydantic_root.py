@@ -159,7 +159,8 @@ def test_optional_dict(request, fluree_client: FlureeClient | None):
         )
 
         # Remove id field from nested dictionary as it is added by Fluree
-        del result_model.nested["id"]
+        if result_model.nested and "id" in result_model.nested:
+            del result_model.nested["id"]
 
         assert model == result_model
 
@@ -178,7 +179,8 @@ def test_dict_with_initializer(request, fluree_client: FlureeClient | None):
         )
 
         # Remove id field from nested dictionary as it is added by Fluree
-        del result_model.nested["id"]
+        if result_model.nested and "id" in result_model.nested:
+            del result_model.nested["id"]
 
         assert model == result_model
 
@@ -197,7 +199,8 @@ def test_optional_dict_with_initializer(request, fluree_client: FlureeClient | N
         )
 
         # Remove id field from nested dictionary as it is added by Fluree
-        del result_model.nested["id"]
+        if result_model.nested and "id" in result_model.nested:
+            del result_model.nested["id"]
 
         assert model == result_model
 
