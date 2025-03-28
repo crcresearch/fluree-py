@@ -19,4 +19,3 @@ from pydantic import BaseModel
 # GroupBy defines the field to group the results by
 
 # Queries should validate the variables used in the query
-

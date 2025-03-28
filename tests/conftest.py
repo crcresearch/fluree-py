@@ -18,19 +18,23 @@ def pytest_addoption(parser):
 
 
 @pytest.fixture(scope="session")
-def fluree_url(request) -> Generator[str | None, None, None]:
+def fluree_url(request) -> Generator[str, None, None]:
+    # Return dummy address if --use-fluree-server is not set
     if not request.config.getoption("--use-fluree-server"):
-        yield None
+        yield "http://localhost:8090"
         return
 
+    # Start a new Fluree server container
     container = ServerContainer(port=8090, image="fluree/server")
     container.start()
 
     # Wait for the container to be ready
     wait_for_logs(container, "Starting Fluree server with profile")
 
+    # Return the container's connection URL
     yield container._create_connection_url()
 
+    # Print the container's logs
     (out, err) = container.get_logs()
     print(out.decode("utf-8"))
     print(err.decode("utf-8"))
@@ -40,12 +44,5 @@ def fluree_url(request) -> Generator[str | None, None, None]:
 
 
 @pytest.fixture(scope="session")
-def fluree_client(fluree_url) -> FlureeClient | None:
-    if fluree_url is None:
-        return None
+def fluree_client(fluree_url: str) -> FlureeClient:
     return FlureeClient(base_url=fluree_url)
-
-
-@pytest.fixture(scope="session")
-def dummy_client():
-    return FlureeClient(base_url="http://localhost:8090")

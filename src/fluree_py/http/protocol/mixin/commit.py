@@ -1,12 +1,14 @@
-from typing import Any, Protocol
+from typing import Protocol
+
+from httpx import Response
 
 
 class SupportsCommit(Protocol):
-    def commit(self) -> dict[str, Any]: ...
+    def commit(self) -> Response: ...
 
 
 class SupportsAsyncCommit(Protocol):
-    async def acommit(self) -> dict[str, Any]: ...
+    async def acommit(self) -> Response: ...
 
 
 class SupportsCommitable(SupportsCommit, SupportsAsyncCommit, Protocol):
