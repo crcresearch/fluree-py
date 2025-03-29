@@ -66,7 +66,7 @@ def test_ledger_history(request: FixtureRequest, cookbook_client: FlureeClient):
         cookbook_client.with_ledger(request.node.name)
         .history()
         .with_context(context)
-        .with_history([None, "schema:name"])
+        .with_history((None, "schema:name"))
         .with_t({"from": 1})
         .commit()
     )
