@@ -55,7 +55,9 @@ Examples:
 """
 
 import re
-from typing import Any, Dict, List, Literal, TypeAlias, TypeGuard, Union
+from typing import Any, Dict, List, TypeAlias, TypeGuard, Union
+
+from fluree_py.query.types import Predicate, Wildcard
 
 # A logic variable name in a FlureeQL query.
 # Logic variables are strings that begin with a question mark, ?, followed by
@@ -81,22 +83,6 @@ def is_logic_variable(var: str) -> TypeGuard[LogicVariable]:
     if not all(c.isprintable() for c in var):
         return False
     return LOGIC_VARIABLE_PATTERN.search(var) is not None
-
-
-# A predicate identifier in a FlureeQL query.
-# A predicate is a string that identifies a property or relationship in the database.
-#
-# Examples:
-#     "schema:name"
-#     "schema:age"
-#     "schema:friend"
-Predicate: TypeAlias = str
-
-
-# The wildcard symbol in a FlureeQL query.
-# The wildcard symbol, "*", represents all predicates of a subject.
-Wildcard: TypeAlias = Literal['*']
-
 
 # A select expression in a FlureeQL query.
 # Select expressions define what data to include in the query results.

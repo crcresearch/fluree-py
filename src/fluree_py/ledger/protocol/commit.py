@@ -1,14 +1,14 @@
 from typing import Protocol
 
-from httpx import Response
+from fluree_py.response import FlureeResponse
 
 
 class SupportsCommit(Protocol):
-    def commit(self) -> Response: ...
+    def commit(self) -> FlureeResponse: ...
 
 
 class SupportsAsyncCommit(Protocol):
-    async def acommit(self) -> Response: ...
+    async def acommit(self) -> FlureeResponse: ...
 
 
 class SupportsCommitable(SupportsCommit, SupportsAsyncCommit, Protocol):

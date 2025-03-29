@@ -143,3 +143,25 @@ def test_ledger_transaction_multiple_records(
     assert resp_json["commit"].startswith(f"fluree:file://{request.node.name}/commit/")
 
     assert "tx-id" in resp_json
+
+
+# Transaction Errors
+def test_transaction_on_missing_ledger(
+    request: FixtureRequest, fluree_client: FlureeClient
+):
+    resp = (
+        fluree_client.with_ledger(request.node.name)
+        .transaction()
+        .with_context({"ex": "http://example.org/", "schema": "http://schema.org/"})
+        .with_insert(
+            {
+                "@id": "ex:fluree",
+                "@type": "schema:Organization",
+                "schema:description": "We ❤️ Data",
+            }
+        )
+        .commit()
+    )
+
+    assert resp.status_code == 409
+    assert resp.json() == {"error": f"Ledger {request.node.name} does not exist!"}

@@ -1,13 +1,14 @@
-from typing import Any, Protocol
+from typing import Protocol
 
 from fluree_py.ledger.protocol.base import BaseBuilder, BaseReadyToCommit
+from fluree_py.types import JsonArray, JsonObject
 
 
 class CreateBuilder(BaseBuilder, Protocol):
     """Protocol for create builders."""
 
     def with_insert(
-        self, data: list[dict[str, Any]] | dict[str, Any]
+        self, data: JsonObject | JsonArray
     ) -> "CreateReadyToCommit": ...
 
 

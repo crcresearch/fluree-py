@@ -1,5 +1,7 @@
-from typing import Any, Protocol, Self
+from typing import Protocol, Self
+
+from fluree_py.types import JsonObject
 
 
 class SupportsContext(Protocol):
-    def with_context(self, context: dict[str, Any]) -> Self: ...
+    def with_context(self, context: JsonObject) -> Self: ...

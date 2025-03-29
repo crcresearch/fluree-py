@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Any
 
-
-from fluree_py.ledger.mixin import CommitableMixin, WithContextMixin, RequestMixin
+from fluree_py.ledger.mixin import CommitableMixin, RequestMixin, WithContextMixin
+from fluree_py.types import JsonArray, JsonObject
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -10,9 +10,7 @@ class CreateBuilderImpl(WithContextMixin):
     endpoint: str
     ledger: str
 
-    def with_insert(
-        self, data: list[dict[str, Any]] | dict[str, Any]
-    ) -> "CreateReadyToCommitImpl":
+    def with_insert(self, data: JsonObject | JsonArray) -> "CreateReadyToCommitImpl":
         return CreateReadyToCommitImpl(
             endpoint=self.endpoint,
             ledger=self.ledger,
@@ -25,7 +23,7 @@ class CreateBuilderImpl(WithContextMixin):
 class CreateReadyToCommitImpl(RequestMixin, WithContextMixin, CommitableMixin):
     endpoint: str
     ledger: str
-    data: list[dict[str, Any]] | dict[str, Any]
+    data: JsonObject | JsonArray
 
     def get_url(self) -> str:
         return self.endpoint
