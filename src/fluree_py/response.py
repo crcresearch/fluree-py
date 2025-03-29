@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import TypeVar, cast
 
-from httpx import Response
+from httpx import Headers, Response
 
 from fluree_py.types import JsonArray, JsonObject
 
@@ -27,9 +27,9 @@ class FlureeResponse:
         return self.response.content
 
     @property
-    def headers(self) -> dict[str, str]:
+    def headers(self) -> Headers:
         """Get the response headers."""
-        return dict(self.response.headers)
+        return self.response.headers
 
     @property
     def status_code(self) -> int:
