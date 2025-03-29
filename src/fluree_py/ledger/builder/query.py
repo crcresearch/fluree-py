@@ -1,22 +1,24 @@
 from dataclasses import dataclass, replace
 from typing import Any, Self
 
-from fluree_py.ledger.mixin import CommitableMixin, WithContextMixin, RequestMixin
-from fluree_py.ledger.protocol.query import QueryBuilder, WhereCondition, WhereQueryList
+from fluree_py.ledger.mixin import CommitableMixin, RequestMixin, WithContextMixin
+from fluree_py.ledger.protocol.query import QueryBuilder
+from fluree_py.query.select.types import SelectArray, SelectObject
+from fluree_py.query.where.types import WhereClause
 
 
 @dataclass(frozen=True, kw_only=True)
 class QueryBuilderImpl(QueryBuilder, RequestMixin, WithContextMixin, CommitableMixin):
     endpoint: str
     ledger: str
-    where: WhereCondition | WhereQueryList | None = None
+    where: WhereClause | None = None
     group_by: list[str] | None = None
     having: dict[str, Any] | None = None
     order_by: list[str] | None = None
     opts: dict[str, Any] | None = None
     select_fields: dict[str, Any] | list[str] | None = None
 
-    def with_where(self, conditions: WhereCondition | WhereQueryList) -> Self:
+    def with_where(self, conditions: WhereClause) -> Self:
         return replace(self, where=conditions)
 
     def with_group_by(self, fields: list[str]) -> Self:
@@ -31,7 +33,7 @@ class QueryBuilderImpl(QueryBuilder, RequestMixin, WithContextMixin, CommitableM
     def with_opts(self, opts: dict[str, Any]) -> Self:
         return replace(self, opts=opts)
 
-    def with_select(self, fields: dict[str, Any] | list[str]) -> Self:
+    def with_select(self, fields: SelectObject | SelectArray) -> Self:
         return replace(self, select_fields=fields)
 
     def get_url(self) -> str:
