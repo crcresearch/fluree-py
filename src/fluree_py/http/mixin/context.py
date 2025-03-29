@@ -1,12 +1,13 @@
 from dataclasses import dataclass, replace
-from typing import Any, Self
+from typing import Self
 
-from fluree_py.http.protocol.context import SupportsContext
+from fluree_py.http.protocol.mixin import SupportsContext
+from fluree_py.types.common import JsonObject
 
 
 @dataclass(frozen=True, kw_only=True)
 class WithContextMixin(SupportsContext):
-    context: dict[str, Any] | None = None
+    context: JsonObject | None = None
 
-    def with_context(self, context: dict[str, Any]) -> Self:
+    def with_context(self, context: JsonObject) -> Self:
         return replace(self, context=context)

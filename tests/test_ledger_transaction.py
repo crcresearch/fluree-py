@@ -34,6 +34,9 @@ def transact_side_effect(request: Request):
                 "tx-id": "48c46259a0912fb95d5266fbccf52f828670fb9fc5d60432b741a3e7e73302c3",
             },
         )
+    elif ledger == "test_transaction_on_missing_ledger":
+        return Response(409, json={"error": f"Ledger {ledger} does not exist!"})
+    
     return Response(404)
 
 
@@ -143,3 +146,25 @@ def test_ledger_transaction_multiple_records(
     assert resp_json["commit"].startswith(f"fluree:file://{request.node.name}/commit/")
 
     assert "tx-id" in resp_json
+
+
+# Transaction Errors
+def test_transaction_on_missing_ledger(
+    request: FixtureRequest, cookbook_client: FlureeClient
+):
+    resp = (
+        cookbook_client.with_ledger(request.node.name)
+        .transaction()
+        .with_context({"ex": "http://example.org/", "schema": "http://schema.org/"})
+        .with_insert(
+            {
+                "@id": "ex:fluree",
+                "@type": "schema:Organization",
+                "schema:description": "We ❤️ Data",
+            }
+        )
+        .commit()
+    )
+
+    assert resp.status_code == 409
+    assert resp.json() == {"error": f"Ledger {request.node.name} does not exist!"}

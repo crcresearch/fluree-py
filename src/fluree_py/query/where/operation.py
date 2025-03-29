@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from fluree_py.types.query.where.condition import Condition
-from fluree_py.types.query.where.variable import Var
+from fluree_py.query.where.condition import Condition
+from fluree_py.query.where.variable import Var
 
 
 @dataclass

@@ -1,4 +1,4 @@
-from fluree_py.types.query.where.condition import Condition
+from fluree_py.query.where.condition import Condition
 
 
 class Var:

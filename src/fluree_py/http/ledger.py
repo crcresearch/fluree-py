@@ -19,22 +19,22 @@ class LedgerSelected:
     base_url: str
     ledger: str
 
-    def create(self) -> "CreateBuilder":
+    def create(self) -> CreateBuilder:
         return CreateBuilderImpl(
             endpoint=f"{self.base_url}/fluree/create", ledger=self.ledger
         )
 
-    def transaction(self) -> "TransactionBuilder":
+    def transaction(self) -> TransactionBuilder:
         return TransactionBuilderImpl(
             endpoint=f"{self.base_url}/fluree/transact", ledger=self.ledger
         )
 
-    def query(self) -> "QueryBuilder":
+    def query(self) -> QueryBuilder:
         return QueryBuilderImpl(
             endpoint=f"{self.base_url}/fluree/query", ledger=self.ledger
         )
 
-    def history(self) -> "HistoryBuilder":
+    def history(self) -> HistoryBuilder:
         return HistoryBuilderImpl(
             endpoint=f"{self.base_url}/fluree/history", ledger=self.ledger
         )

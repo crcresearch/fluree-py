@@ -79,6 +79,8 @@ def test_create_ledger(
     assert resp.headers["Content-Type"] == "application/json;charset=utf-8"
 
     resp_json = resp.json()
+    assert isinstance(resp_json, dict)
+    
     assert "ledger" in resp_json
     assert resp_json["ledger"] == request.node.name
 
