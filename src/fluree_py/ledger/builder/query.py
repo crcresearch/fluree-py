@@ -2,24 +2,20 @@ from dataclasses import dataclass, replace
 from typing import Any, Self
 
 from fluree_py.ledger.mixin import CommitableMixin, RequestMixin, WithContextMixin
+from fluree_py.ledger.mixin.where import WithWhereMixin
 from fluree_py.ledger.protocol.query import GroupByClause, HavingClause, OrderByClause, QueryBuilder, ActiveIdentity
 from fluree_py.query.select.types import SelectArray, SelectObject
-from fluree_py.query.where.types import WhereClause
 
 
 @dataclass(frozen=True, kw_only=True)
-class QueryBuilderImpl(QueryBuilder, RequestMixin, WithContextMixin, CommitableMixin):
+class QueryBuilderImpl(QueryBuilder, RequestMixin, WithContextMixin, WithWhereMixin, CommitableMixin):
     endpoint: str
     ledger: str
-    where: WhereClause | None = None
     group_by: GroupByClause | None = None
     having: HavingClause | None = None
     order_by: OrderByClause | None = None
     opts: ActiveIdentity | None = None
     select_fields: dict[str, Any] | list[str] | None = None
-
-    def with_where(self, conditions: WhereClause) -> Self:
-        return replace(self, where=conditions)
 
     def with_group_by(self, fields: GroupByClause) -> Self:
         return replace(self, group_by=fields)

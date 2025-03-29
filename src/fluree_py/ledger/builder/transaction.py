@@ -2,17 +2,17 @@ from dataclasses import dataclass, replace
 from typing import Any
 
 from fluree_py.ledger.mixin import CommitableMixin, RequestMixin, WithContextMixin
+from fluree_py.ledger.mixin.where import WithWhereMixin
 from fluree_py.query.where.types import WhereClause
 from fluree_py.types import JsonArray, JsonObject
 
 
 @dataclass(frozen=True, kw_only=True)
-class TransactionBuilderImpl(WithContextMixin):
+class TransactionBuilderImpl(WithContextMixin, WithWhereMixin):
     endpoint: str
     ledger: str
     insert_data: JsonObject | JsonArray | None = None
     delete_data: JsonObject | JsonArray | None = None
-    where_clause: WhereClause | None = None
 
     def with_insert(
         self, data: JsonObject | JsonArray
@@ -22,7 +22,7 @@ class TransactionBuilderImpl(WithContextMixin):
             ledger=self.ledger,
             insert_data=data,
             delete_data=self.delete_data,
-            where_clause=self.where_clause,
+            where=self.where,
             context=self.context,
         )
 
@@ -32,22 +32,17 @@ class TransactionBuilderImpl(WithContextMixin):
             ledger=self.ledger,
             insert_data=self.insert_data,
             delete_data=data,
-            where_clause=self.where_clause,
+            where=self.where,
             context=self.context,
         )
 
-    def with_where(self, clause: WhereClause) -> "TransactionBuilderImpl":
-        return replace(self, where_clause=clause)
-
-
 @dataclass(frozen=True, kw_only=True)
-class TransactionReadyToCommitImpl(RequestMixin, WithContextMixin, CommitableMixin):
+class TransactionReadyToCommitImpl(RequestMixin, WithContextMixin, WithWhereMixin, CommitableMixin):
     endpoint: str
     ledger: str
     insert_data: JsonObject | JsonArray | None = None
-    delete_data: JsonObject | JsonArray | None = None
-    where_clause: WhereClause | None = None
-
+    delete_data: JsonObject | JsonArray | None = None   
+    
     def with_insert(
         self, data: JsonObject | JsonArray
     ) -> "TransactionReadyToCommitImpl":
@@ -55,9 +50,6 @@ class TransactionReadyToCommitImpl(RequestMixin, WithContextMixin, CommitableMix
 
     def with_delete(self, data: JsonObject | JsonArray) -> "TransactionReadyToCommitImpl":
         return replace(self, delete_data=data)
-
-    def with_where(self, clause: WhereClause) -> "TransactionReadyToCommitImpl":
-        return replace(self, where_clause=clause)
 
     def get_url(self) -> str:
         return self.endpoint
@@ -71,6 +63,6 @@ class TransactionReadyToCommitImpl(RequestMixin, WithContextMixin, CommitableMix
             result["insert"] = self.insert_data
         if self.delete_data:
             result["delete"] = self.delete_data
-        if self.where_clause:
-            result["where"] = self.where_clause
+        if self.where:
+            result["where"] = self.where
         return result
