@@ -84,6 +84,8 @@ def test_ledger_transaction_single_record(request: FixtureRequest, cookbook_clie
     assert resp.headers["Content-Type"] == "application/json;charset=utf-8"
 
     resp_json = resp.json()
+    assert isinstance(resp_json, dict)
+
     assert "ledger" in resp_json
     assert resp_json["ledger"] == request.node.name
 
@@ -123,6 +125,8 @@ def test_ledger_transaction_multiple_records(request: FixtureRequest, cookbook_c
     assert resp.headers["Content-Type"] == "application/json;charset=utf-8"
 
     resp_json = resp.json()
+    assert isinstance(resp_json, dict)
+
     assert "ledger" in resp_json
     assert resp_json["ledger"] == request.node.name
 

@@ -2,21 +2,21 @@ from dataclasses import dataclass, replace
 from typing import Any
 
 from fluree_py.ledger.mixin import CommitableMixin, RequestMixin, WithContextMixin
-from fluree_py.types import JsonObject
+from fluree_py.ledger.protocol.history import HistoryClause, TimeClause
 
 
 @dataclass(frozen=True, kw_only=True)
 class HistoryBuilderImpl(RequestMixin, WithContextMixin, CommitableMixin):
     endpoint: str
     ledger: str
-    history: JsonObject | None = None
-    t: JsonObject | None = None
+    history: HistoryClause | None = None
+    t: TimeClause | None = None
     commit_details: bool | None = None
 
-    def with_history(self, history: JsonObject) -> "HistoryBuilderImpl":
+    def with_history(self, history: HistoryClause) -> "HistoryBuilderImpl":
         return replace(self, history=history)
 
-    def with_t(self, t: JsonObject) -> "HistoryBuilderImpl":
+    def with_t(self, t: TimeClause) -> "HistoryBuilderImpl":
         return replace(self, t=t)
 
     def with_commit_details(self, commit_details: bool) -> "HistoryBuilderImpl":
