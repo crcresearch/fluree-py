@@ -2,7 +2,7 @@ from dataclasses import dataclass, replace
 from typing import Any
 
 from fluree_py.http.mixin import CommitableMixin, RequestMixin, WithContextMixin
-from fluree_py.types.query.where.types import WhereClause
+from fluree_py.types.query.where import WhereClause
 from fluree_py.types.common import JsonArray, JsonObject
 
 
