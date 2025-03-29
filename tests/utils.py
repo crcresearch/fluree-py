@@ -76,6 +76,6 @@ def create_and_retrieve_model(
     )
 
     # Parse the response into a model
-    result_model = model_instance.model_validate_json(resp.content)
+    result_model = model_instance.model_validate_json(resp.text)
 
     return result_model
