@@ -1,3 +1,5 @@
+from typing import Any
+
 from hypothesis import assume, example, given
 from hypothesis import strategies as st
 
@@ -38,7 +40,7 @@ node_object_template_strategy = st.dictionaries(keys=st.text(min_size=1), values
 @example({"schema:address": ["*"]})  # Get all address predicates
 @example({"bestFriend": ["*"]})  # Get all best friend predicates
 @example({"bestFriend": [{"address": ["*"]}]})  # Get address of best friend
-def test_node_object_template_valid(template: dict):
+def test_node_object_template_valid(template: dict[str, Any]):
     assert is_node_object_template(template)
 
 
@@ -48,7 +50,7 @@ select_object_strategy = st.dictionaries(keys=logic_variable_strategy, values=se
 
 @given(select_object_strategy)
 @example({"?s": ["name", {"bestFriend": ["*"]}]})  # Get name and all predicates of best friend
-def test_select_object_valid(obj: dict):
+def test_select_object_valid(obj: dict[str, Any]):
     assert is_select_object(obj)
 
 
@@ -60,7 +62,7 @@ select_array_element_strategy = st.one_of(logic_variable_strategy, select_object
 @example("?s")
 @example({"?s": ["*"]})
 @example({"?friend": ["*"]})
-def test_select_array_element_valid(element: str | dict):
+def test_select_array_element_valid(element: str | dict[str, Any]):
     assert is_select_array_element(element)
 
 
@@ -71,5 +73,5 @@ select_array_strategy = st.lists(select_array_element_strategy, min_size=1)
 @given(select_array_strategy)
 @example(["?s", "?name", "?friend"])  # Get multiple variables
 @example([{"?s": ["*"]}, {"?friend": ["*"]}])  # Get multiple objects
-def test_select_array_valid(arr: list):
+def test_select_array_valid(arr: list[str | dict[str, Any]]):
     assert is_select_array(arr)

@@ -7,18 +7,19 @@ from pytest import FixtureRequest
 from respx import MockRouter
 
 from fluree_py import FlureeClient
+from fluree_py.ledger.builder.create import CreateReadyToCommitImpl
 
 
 @pytest.fixture
-def mocked_api(request: FixtureRequest) -> Generator[MockRouter, None, None]:
+def mocked_api(test_name: str) -> Generator[MockRouter, None, None]:
     with respx.mock(base_url="http://localhost:8090", assert_all_called=False) as respx_mock:
         create_route = respx_mock.post("/fluree/create", name="create")
         create_route.return_value = Response(
             201,
             headers={"Content-Type": "application/json;charset=utf-8"},
             json={
-                "commit": f"fluree:file://{request.node.name}/commit/bylyfvz5kexxf6l3tdzbobuz6eooxtgfxg3xqnp3pep7zfwxspkp.json",
-                "ledger": request.node.name,
+                "commit": f"fluree:file://{test_name}/commit/bylyfvz5kexxf6l3tdzbobuz6eooxtgfxg3xqnp3pep7zfwxspkp.json",
+                "ledger": test_name,
                 "t": 1,
                 "tx-id": "790b9747063d7878af67428ac92b37d2ff82971dee3ea533c053e44403a026de",
             },
@@ -46,7 +47,7 @@ def fluree_client(request: FixtureRequest, fluree_client: FlureeClient) -> Gener
 
 
 def test_create_ledger(
-    request: FixtureRequest,
+    test_name: str,
     fluree_client: FlureeClient,
 ):
     context = {
@@ -63,7 +64,10 @@ def test_create_ledger(
         }
     ]
 
-    resp = fluree_client.with_ledger(request.node.name).create().with_context(context).with_insert(data).commit()
+    with_insert = fluree_client.with_ledger(test_name).create().with_context(context).with_insert(data)
+    assert isinstance(with_insert, CreateReadyToCommitImpl)
+
+    resp = with_insert.commit()
 
     assert resp.status_code == 201
     assert resp.headers["Content-Type"] == "application/json;charset=utf-8"
@@ -72,12 +76,12 @@ def test_create_ledger(
     assert isinstance(resp_json, dict)
 
     assert "ledger" in resp_json
-    assert resp_json["ledger"] == request.node.name
+    assert resp_json["ledger"] == test_name
 
     assert "t" in resp_json
     assert resp_json["t"] == 1
 
     assert "commit" in resp_json
-    assert resp_json["commit"].startswith(f"fluree:file://{request.node.name}/commit/")
+    assert resp_json["commit"].startswith(f"fluree:file://{test_name}/commit/")
 
     assert "tx-id" in resp_json

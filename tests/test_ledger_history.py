@@ -51,7 +51,7 @@ def cookbook_client(request: FixtureRequest, cookbook_client: FlureeClient) -> G
     assert create_route.calls.last.request.headers["Content-Type"] == "application/json"
 
 
-def test_ledger_history(request: FixtureRequest, cookbook_client: FlureeClient):
+def test_ledger_history(test_name: str, cookbook_client: FlureeClient):
     context = {
         "ex": "http://example.org/",
         "schema": "http://schema.org/",
@@ -59,7 +59,7 @@ def test_ledger_history(request: FixtureRequest, cookbook_client: FlureeClient):
     }
 
     resp = (
-        cookbook_client.with_ledger(request.node.name)
+        cookbook_client.with_ledger(test_name)
         .history()
         .with_context(context)
         .with_history((None, "schema:name"))

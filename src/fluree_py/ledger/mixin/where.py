@@ -1,13 +1,27 @@
-from dataclasses import dataclass, replace
-from typing import Self
+"""Mixin for handling where clause operations in Fluree queries."""
 
-from fluree_py.ledger.protocol.where import SupportsWhere
-from fluree_py.query.where.types import WhereClause
+from typing import Generic, Self, TypeVar, cast
+
+from fluree_py.ledger.mixin.utils import resolve_base_class_reference
+from fluree_py.ledger.protocol.mixin.where import HasWhereData
+from fluree_py.query.where import WhereClause
+
+T = TypeVar("T", bound="HasWhereData")
 
 
-@dataclass(frozen=True, kw_only=True)
-class WithWhereMixin(SupportsWhere):
-    where: WhereClause | None = None
+class WithWhereMixin(Generic[T]):
+    """Provides where clause capabilities for Fluree queries."""
 
     def with_where(self, clause: WhereClause) -> Self:
-        return replace(self, where=clause)
+        """
+        Updates the query with a new where clause.
+
+        Exceptions:
+            TypeError: If the type parameter cannot be resolved.
+        """
+        resolved_type = resolve_base_class_reference(self.__class__, "WithWhereMixin")
+
+        # Create a new instance of the resolved type
+        updated_fields = self.__dict__.copy()
+        updated_fields["where"] = clause
+        return cast("Self", resolved_type(**updated_fields))

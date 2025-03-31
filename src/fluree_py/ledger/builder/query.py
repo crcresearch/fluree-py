@@ -3,14 +3,31 @@ from typing import Any, Self
 
 from fluree_py.ledger.mixin import CommitableMixin, RequestMixin, WithContextMixin
 from fluree_py.ledger.mixin.where import WithWhereMixin
-from fluree_py.ledger.protocol.query import ActiveIdentity, GroupByClause, HavingClause, OrderByClause, QueryBuilder
+from fluree_py.ledger.protocol.endpoint.query import (
+    ActiveIdentity,
+    GroupByClause,
+    HavingClause,
+    OrderByClause,
+    QueryBuilder,
+)
 from fluree_py.query.select.types import SelectArray, SelectObject
+from fluree_py.query.where import WhereClause
 
 
 @dataclass(frozen=True, kw_only=True)
-class QueryBuilderImpl(QueryBuilder, RequestMixin, WithContextMixin, WithWhereMixin, CommitableMixin):
+class QueryBuilderImpl(
+    WithContextMixin["QueryBuilderImpl"],
+    WithWhereMixin["QueryBuilderImpl"],
+    RequestMixin,
+    CommitableMixin["QueryBuilderImpl"],
+    QueryBuilder,
+):
+    """Implementation of a query operation builder."""
+
     endpoint: str
     ledger: str
+    context: dict[str, Any] | None = None
+    where: WhereClause | None = None
     group_by: GroupByClause | None = None
     having: HavingClause | None = None
     order_by: OrderByClause | None = None
@@ -18,25 +35,32 @@ class QueryBuilderImpl(QueryBuilder, RequestMixin, WithContextMixin, WithWhereMi
     select_fields: dict[str, Any] | list[str] | None = None
 
     def with_group_by(self, fields: GroupByClause) -> Self:
+        """Add group by clause to the query."""
         return replace(self, group_by=fields)
 
     def with_having(self, condition: HavingClause) -> Self:
+        """Add having clause to the query."""
         return replace(self, having=condition)
 
     def with_order_by(self, fields: OrderByClause) -> Self:
+        """Add order by clause to the query."""
         return replace(self, order_by=fields)
 
     def with_opts(self, opts: ActiveIdentity) -> Self:
+        """Add query options to the query."""
         return replace(self, opts=opts)
 
     def with_select(self, fields: SelectObject | SelectArray) -> Self:
+        """Add select fields to the query."""
         return replace(self, select_fields=fields)
 
     def get_url(self) -> str:
+        """Get the endpoint URL for the query operation."""
         return self.endpoint
 
     def build_request_payload(self) -> dict[str, Any]:
-        result = {}
+        """Build the request payload for the query operation."""
+        result: dict[str, Any] = {}
         if self.context:
             result["@context"] = self.context
         result |= {"from": self.ledger}

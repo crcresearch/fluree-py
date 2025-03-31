@@ -1,12 +1,16 @@
 from typing import Protocol
 
-from fluree_py.ledger.protocol.create import CreateBuilder
-from fluree_py.ledger.protocol.history import HistoryBuilder
-from fluree_py.ledger.protocol.query import QueryBuilder
-from fluree_py.ledger.protocol.transaction import TransactionBuilder
+from fluree_py.ledger.protocol.endpoint import (
+    CreateBuilder,
+    HistoryBuilder,
+    QueryBuilder,
+    TransactionBuilder,
+)
 
 
 class SupportsLedgerOperations(Protocol):
+    """Protocol defining core ledger operations."""
+
     def create(self) -> CreateBuilder: ...
     def transaction(self) -> TransactionBuilder: ...
     def query(self) -> QueryBuilder: ...
