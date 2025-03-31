@@ -7,6 +7,7 @@ from pytest import FixtureRequest
 from respx import MockRouter
 
 from fluree_py import FlureeClient
+from fluree_py.ledger.builder.create import CreateReadyToCommitImpl
 
 
 @pytest.fixture
@@ -67,20 +68,22 @@ def test_create_ledger(
         }
     ]
 
-    resp = (
+    with_insert = (
         fluree_client.with_ledger(request.node.name)
         .create()
         .with_context(context)
         .with_insert(data)
-        .commit()
     )
+    assert isinstance(with_insert, CreateReadyToCommitImpl)
+
+    resp = with_insert.commit()
 
     assert resp.status_code == 201
     assert resp.headers["Content-Type"] == "application/json;charset=utf-8"
 
     resp_json = resp.json()
     assert isinstance(resp_json, dict)
-    
+
     assert "ledger" in resp_json
     assert resp_json["ledger"] == request.node.name
 

@@ -22,7 +22,7 @@ WhereRelationship: TypeAlias = Dict[Union[Predicate, LogicVariable], Predicate]
 WhereCondition = Dict[WhereResultSet, WhereRelationship]
 
 # Examples:
-# [ 
+# [
 #    {
 #        "@id": "?s",
 #        "bestFriend": "?friend"
@@ -50,6 +50,7 @@ WhereOperationOptional: TypeAlias = List[Union[Literal["optional"], WhereConditi
 # (! (strStarts ?url \"http\"))
 WhereFilterExpression: TypeAlias = str
 
+
 # A filter expression is a string that starts and ends with a parenthesis.
 # It starts with a function, followed by a space
 # It then contains a list of arguments.
@@ -64,27 +65,30 @@ def is_filter_expression(var: str) -> TypeGuard[WhereFilterExpression]:
     """
     if not all(c.isprintable() for c in var):
         return False
-    
+
     # Check if the string starts and ends with a parenthesis
     if not (var.startswith("(") and var.endswith(")")):
         return False
-    
+
     # Get internal string
     internal = var[1:-1]
-    
+
     # Check if the internal string is balanced
-    if internal.count("(") != internal.count(")") or internal.count("\"") % 2 != 0:
+    if internal.count("(") != internal.count(")") or internal.count('"') % 2 != 0:
         return False
-    
+
     # The internal string may have multiple arguments
     # Each argument can be a nested filter expression, a logic variable, or a predicate
     # There must be at least one logic variable or nested filter expression
-    
+
     return True
+
 
 # Examples:
 # ["filter", "(> ?age 45)", "(< ?age 50)"]
-WhereOperationFilter: TypeAlias = List[Union[Literal["optional"], WhereFilterExpression]]
+WhereOperationFilter: TypeAlias = List[
+    Union[Literal["optional"], WhereFilterExpression]
+]
 
 
 # Examples:
@@ -97,10 +101,16 @@ WhereOperationUnion: TypeAlias = List[Union[Literal["union"], WhereCondition]]
 
 # Examples:
 # ["bind", "?canVote", "(>= ?age 18)"]
-WhereOperationBind: TypeAlias = List[Union[Literal["bind"], LogicVariable, WhereFilterExpression]]
+WhereOperationBind: TypeAlias = List[
+    Union[Literal["bind"], LogicVariable, WhereFilterExpression]
+]
 
-WhereOperation = Union[WhereOperationOptional, WhereOperationFilter, WhereOperationUnion, WhereOperationBind]
-
+WhereOperation = Union[
+    WhereOperationOptional,
+    WhereOperationFilter,
+    WhereOperationUnion,
+    WhereOperationBind,
+]
 
 
 WhereClauseEntry: TypeAlias = Union[WhereCondition, WhereOperation]

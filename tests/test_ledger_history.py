@@ -7,6 +7,7 @@ from pytest import FixtureRequest
 from respx import MockRouter
 
 from fluree_py import FlureeClient
+from fluree_py.ledger.builder.history import HistoryBuilderImpl
 
 
 @pytest.fixture
@@ -61,6 +62,14 @@ def test_ledger_history(request: FixtureRequest, cookbook_client: FlureeClient):
         "schema": "http://schema.org/",
         "f": "https://ns.flur.ee/ledger#",
     }
+
+    history = cookbook_client.with_ledger(request.node.name).history()
+    assert isinstance(history, HistoryBuilderImpl)
+
+    with_context = (
+        cookbook_client.with_ledger(request.node.name).history().with_context(context)
+    )
+    assert isinstance(with_context, HistoryBuilderImpl)
 
     resp = (
         cookbook_client.with_ledger(request.node.name)

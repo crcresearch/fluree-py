@@ -3,14 +3,25 @@ from typing import Any, Self
 
 from fluree_py.ledger.mixin import CommitableMixin, RequestMixin, WithContextMixin
 from fluree_py.ledger.mixin.where import WithWhereMixin
-from fluree_py.ledger.protocol.query import GroupByClause, HavingClause, OrderByClause, QueryBuilder, ActiveIdentity
+from fluree_py.ledger.protocol.endpoint.query import (
+    GroupByClause,
+    HavingClause,
+    OrderByClause,
+    QueryBuilder,
+    ActiveIdentity,
+)
 from fluree_py.query.select.types import SelectArray, SelectObject
+from fluree_py.query.where.types import WhereClause
 
 
 @dataclass(frozen=True, kw_only=True)
-class QueryBuilderImpl(QueryBuilder, RequestMixin, WithContextMixin, WithWhereMixin, CommitableMixin):
+class QueryBuilderImpl(
+    WithContextMixin, WithWhereMixin, RequestMixin, CommitableMixin, QueryBuilder
+):
     endpoint: str
     ledger: str
+    context: dict[str, Any] | None = None
+    where: WhereClause | None = None
     group_by: GroupByClause | None = None
     having: HavingClause | None = None
     order_by: OrderByClause | None = None

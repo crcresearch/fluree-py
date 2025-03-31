@@ -1,8 +1,8 @@
 from typing import Protocol
 
-from fluree_py.ledger.protocol.commit import SupportsCommitable
-from fluree_py.ledger.protocol.context import SupportsContext
-from fluree_py.ledger.protocol.request import SupportsRequestCreation
+from fluree_py.ledger.protocol.mixin.commit import SupportsCommitable
+from fluree_py.ledger.protocol.mixin.context import SupportsContext
+from fluree_py.ledger.protocol.mixin.request import SupportsRequestCreation
 
 
 class BaseBuilder(SupportsContext, Protocol):

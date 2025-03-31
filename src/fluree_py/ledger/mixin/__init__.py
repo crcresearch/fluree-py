@@ -1,5 +1,6 @@
 from fluree_py.ledger.mixin.commit import CommitMixin, AsyncCommitMixin, CommitableMixin
 from fluree_py.ledger.mixin.context import WithContextMixin
+from fluree_py.ledger.mixin.insert import WithInsertMixin
 from fluree_py.ledger.mixin.request import RequestMixin
 
 __all__ = [

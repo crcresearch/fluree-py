@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from fluree_py.ledger.ledger import LedgerSelected
-from fluree_py.ledger.protocol import SupportsLedgerOperations
+from fluree_py.ledger.protocol.ledger import SupportsLedgerOperations
 
 
 @dataclass(frozen=True, kw_only=True)

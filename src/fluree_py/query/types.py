@@ -1,4 +1,3 @@
-
 from typing import Literal, TypeAlias
 
 # A predicate identifier in a FlureeQL query.
@@ -13,4 +12,4 @@ Predicate: TypeAlias = str
 
 # The wildcard symbol in a FlureeQL query.
 # The wildcard symbol, "*", represents all predicates of a subject.
-Wildcard: TypeAlias = Literal['*']
+Wildcard: TypeAlias = Literal["*"]

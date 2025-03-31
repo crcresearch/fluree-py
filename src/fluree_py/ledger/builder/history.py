@@ -2,13 +2,16 @@ from dataclasses import dataclass, replace
 from typing import Any
 
 from fluree_py.ledger.mixin import CommitableMixin, RequestMixin, WithContextMixin
-from fluree_py.ledger.protocol.history import HistoryClause, TimeClause
+from fluree_py.ledger.protocol.endpoint import HistoryClause, TimeClause, HistoryBuilder
 
 
 @dataclass(frozen=True, kw_only=True)
-class HistoryBuilderImpl(RequestMixin, WithContextMixin, CommitableMixin):
+class HistoryBuilderImpl(
+    RequestMixin, WithContextMixin, CommitableMixin, HistoryBuilder
+):
     endpoint: str
     ledger: str
+    context: dict[str, Any] | None = None
     history: HistoryClause | None = None
     t: TimeClause | None = None
     commit_details: bool | None = None

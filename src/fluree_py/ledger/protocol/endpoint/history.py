@@ -1,24 +1,39 @@
 from typing import Any, Literal, Protocol, Self, TypeAlias, TypeGuard, TypedDict, Union
 
-from fluree_py.ledger.protocol.base import BaseBuilder, BaseReadyToCommit
+from fluree_py.ledger.protocol.mixin import (
+    SupportsCommitable,
+    SupportsContext,
+    SupportsRequestCreation,
+)
 
 TimeCommit: TypeAlias = int
+
 
 def is_time_commit(t: Any) -> TypeGuard[TimeCommit]:
     return isinstance(t, int) and t >= 0
 
+
 LatestTimeConstraint = Literal["latest"]
 
-TimeConstraint = TypedDict('TimeConstraint', {
-    'at': TimeCommit | LatestTimeConstraint,
-    'from': TimeCommit | LatestTimeConstraint,
-    'to': TimeCommit | LatestTimeConstraint
-}, total=False)
+TimeConstraint = TypedDict(
+    "TimeConstraint",
+    {
+        "at": TimeCommit | LatestTimeConstraint,
+        "from": TimeCommit | LatestTimeConstraint,
+        "to": TimeCommit | LatestTimeConstraint,
+    },
+    total=False,
+)
+
 
 def is_time_constraint(t: Any) -> TypeGuard[TimeConstraint]:
-    return isinstance(t, dict) and all(is_time_commit(v) or v == "latest" for v in t.values())
+    return isinstance(t, dict) and all(
+        is_time_commit(v) or v == "latest" for v in t.values()
+    )
+
 
 TimeClause = Union[TimeConstraint, TimeCommit]
+
 
 def is_time_clause(t: Any) -> TypeGuard[TimeClause]:
     return is_time_constraint(t) or is_time_commit(t)
@@ -42,7 +57,9 @@ HistoryClause: TypeAlias = (
 )
 
 
-class HistoryBuilder(BaseBuilder, BaseReadyToCommit, Protocol):
+class HistoryBuilder(
+    SupportsContext, SupportsRequestCreation, SupportsCommitable, Protocol
+):
     """Protocol for history builders."""
 
     def with_history(self, history: HistoryClause) -> Self: ...

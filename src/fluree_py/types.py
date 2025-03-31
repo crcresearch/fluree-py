@@ -7,7 +7,7 @@ Fluree's JSON-based API.
 Types:
     JsonObject: A dictionary with string keys and any JSON-serializable values.
                Used for representing JSON objects in Fluree queries and responses.
-               
+
     JsonArray: A list of any JSON-serializable values.
                Used for representing JSON arrays in Fluree queries and responses.
 
@@ -17,7 +17,7 @@ Examples:
     ...     "select": ["*"],
     ...     "where": {"@id": "?s"}
     ... }
-    
+
     >>> # JsonArray example
     >>> results: JsonArray = [
     ...     {"@id": "person/1", "name": "John"},
