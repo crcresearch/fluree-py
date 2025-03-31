@@ -14,13 +14,14 @@ build-backend = "hatchling.build"
 [dependency-groups]
 dev = ["ruff>=0.11.2", { include-group = "test" }]
 test = [
+  "hypothesis>=6.130.5",
   "polyfactory>=2.20.0",
   "respx>=0.22.0",
   "pytest>=8.3.5",
+  "pytest-cov>=6.0.0",
   "pytest-icdiff>=0.9",
   "pytest-sugar>=1.0.0",
   "testcontainers[generic]>=4.9.2",
-  "hypothesis>=6.130.5",
 ]
 
 [tool.pytest.ini_options]
