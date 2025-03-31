@@ -25,6 +25,7 @@ dev = [
     "respx>=0.22.0",
     "testcontainers[generic]>=4.9.2",
     "hypothesis>=6.130.5",
+    "pytest-cov>=6.0.0",
 ]
 lint = [
     "ruff>=0.11.2",
