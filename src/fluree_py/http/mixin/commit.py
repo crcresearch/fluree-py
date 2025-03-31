@@ -2,7 +2,7 @@ from typing import Generic, TypeVar
 
 from httpx import AsyncClient, Client
 
-from fluree_py.http.protocol.mixin import SupportsAsyncCommit, SupportsCommit
+from fluree_py.http.protocol.mixin.commit import SupportsAsyncCommit, SupportsCommit
 from fluree_py.http.protocol.mixin.request import SupportsRequestCreation
 from fluree_py.http.response import FlureeResponse
 

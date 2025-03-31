@@ -15,7 +15,7 @@ class FlureeResponse:
     def json(self) -> JsonObject | JsonArray:
         """Parse the response as JSON."""
         return self.response.json()
-    
+
     @property
     def text(self) -> str:
         """Get the response text."""

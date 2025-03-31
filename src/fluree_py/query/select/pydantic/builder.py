@@ -215,6 +215,8 @@ class FlureeSelectBuilder:
                                 raise DeeplyNestedStructureError(
                                     f"Deeply nested dictionaries are not supported in field '{field_name}'"
                                 )
+                    case _:
+                        pass
             except Exception as e:
                 if not isinstance(e, FlureeSelectError):
                     raise TypeProcessingError(

@@ -83,14 +83,12 @@ def cookbook_client(
 
 
 # https://developers.flur.ee/docs/reference/cookbook/#-wildcard
-def test_ledger_query_wildcard_example(
-    request: FixtureRequest, cookbook_client: FlureeClient
-):
+def test_ledger_query_wildcard_example(test_name: str, cookbook_client: FlureeClient):
     resp = (
-        cookbook_client.with_ledger(request.node.name)
+        cookbook_client.with_ledger(test_name)
         .query()
         .with_context({"ex": "http://example.org/", "schema": "http://schema.org/"})
-        .with_where({"@id": "?s", "schema:name": "?name"})
+        .with_where([{"@id": "?s", "schema:name": "?name"}])
         .with_select({"?s": ["*"]})
         .commit()
     )

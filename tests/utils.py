@@ -66,11 +66,12 @@ def create_and_retrieve_model(
     ).with_insert([model_instance.model_dump()]).commit()
 
     # Get the model back from the ledger
+    model_id = model_instance.id  # type: ignore
     resp = (
         fluree_client.with_ledger(ledger=ledger_name)
         .query()
         .with_context(context)
-        .with_where([{"@id": "?s"}, ["filter", f'(= ?s "{model_instance.id}")']])
+        .with_where([{"@id": "?s"}, ["filter", f'(= ?s "{model_id}")']])
         .with_select(fields={"?s": from_pydantic(type(model_instance))})
         .commit()
     )

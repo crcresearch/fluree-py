@@ -1,18 +1,26 @@
 from typing import Protocol
 
-from fluree_py.http.protocol.endpoint.base import BaseBuilder, BaseReadyToCommit
-from fluree_py.types.common import JsonArray, JsonObject
+from fluree_py.http.protocol.mixin import (
+    SupportsCommitable,
+    SupportsContext,
+    SupportsInsert,
+    SupportsRequestCreation,
+)
+from fluree_py.http.protocol.mixin.context import HasContextData
+from fluree_py.http.protocol.mixin.insert import HasInsertData
 
 
-class CreateBuilder(BaseBuilder, Protocol):
+class CreateBuilder(
+    SupportsContext["CreateBuilder"], SupportsInsert["CreateReadyToCommit"], Protocol
+):
     """Protocol for create builders."""
 
-    def with_insert(
-        self, data: JsonObject | JsonArray
-    ) -> "CreateReadyToCommit": ...
+    pass
 
 
-class CreateReadyToCommit(BaseReadyToCommit, Protocol):
+class CreateReadyToCommit(
+    SupportsRequestCreation, SupportsCommitable, HasInsertData, HasContextData, Protocol
+):
     """Protocol for create builders that are ready to commit."""
 
     pass

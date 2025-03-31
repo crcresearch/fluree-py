@@ -1,7 +1,3 @@
-from typing import Any
-from pydantic import BaseModel
-
-
 # TODO: Implement query builder
 # An example of a query is:
 # {

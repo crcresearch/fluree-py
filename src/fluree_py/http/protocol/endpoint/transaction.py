@@ -1,21 +1,36 @@
 from typing import Protocol, Self
 
-from fluree_py.http.protocol.endpoint.base import BaseBuilder, BaseReadyToCommit
-from fluree_py.http.mixin.where import SupportsWhere
+from fluree_py.http.protocol.mixin import (
+    SupportsCommitable,
+    SupportsContext,
+    SupportsRequestCreation,
+)
+from fluree_py.http.protocol.mixin.insert import HasInsertData, SupportsInsert
+from fluree_py.http.protocol.mixin.where import SupportsWhere
 from fluree_py.types.common import JsonArray, JsonObject
 
 
-class TransactionBuilder(BaseBuilder, Protocol):
+class TransactionBuilder(
+    SupportsContext["TransactionBuilder"],
+    SupportsInsert["TransactionReadyToCommit"],
+    SupportsWhere["TransactionBuilder"],
+    Protocol,
+):
     """Protocol for transaction builders."""
 
-    def with_insert(
+    def with_delete(
         self, data: JsonObject | JsonArray
     ) -> "TransactionReadyToCommit": ...
-    def with_delete(self, data: JsonObject | JsonArray) -> "TransactionReadyToCommit": ...
 
 
-class TransactionReadyToCommit(BaseBuilder, BaseReadyToCommit, SupportsWhere, Protocol):
+class TransactionReadyToCommit(
+    SupportsRequestCreation,
+    SupportsCommitable,
+    SupportsContext["TransactionReadyToCommit"],
+    SupportsWhere["TransactionReadyToCommit"],
+    HasInsertData,
+    Protocol,
+):
     """Protocol for transaction builders that are ready to commit."""
 
-    def with_insert(self, data: JsonObject | JsonArray) -> Self: ...
     def with_delete(self, data: JsonObject | JsonArray) -> Self: ...

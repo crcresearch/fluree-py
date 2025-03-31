@@ -1,9 +1,11 @@
 from typing import Protocol
 
-from fluree_py.http.protocol.endpoint import CreateBuilder
-from fluree_py.http.protocol.endpoint import HistoryBuilder
-from fluree_py.http.protocol.endpoint import QueryBuilder
-from fluree_py.http.protocol.endpoint import TransactionBuilder
+from fluree_py.http.protocol.endpoint import (
+    CreateBuilder,
+    HistoryBuilder,
+    QueryBuilder,
+    TransactionBuilder,
+)
 
 
 class SupportsLedgerOperations(Protocol):
