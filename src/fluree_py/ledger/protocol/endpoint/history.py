@@ -28,7 +28,8 @@ TimeConstraint = TypedDict(
 
 def is_time_constraint(t: Any) -> TypeGuard[TimeConstraint]:
     return isinstance(t, dict) and all(
-        is_time_commit(v) or v == "latest" for v in t.values()
+        is_time_commit(v) or v == "latest"
+        for v in t.values()  # type: ignore
     )
 
 
@@ -58,7 +59,10 @@ HistoryClause: TypeAlias = (
 
 
 class HistoryBuilder(
-    SupportsContext, SupportsRequestCreation, SupportsCommitable, Protocol
+    SupportsContext["HistoryBuilder"],
+    SupportsRequestCreation,
+    SupportsCommitable,
+    Protocol,
 ):
     """Protocol for history builders."""
 

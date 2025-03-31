@@ -4,8 +4,7 @@ from fluree_py.types import JsonArray, JsonObject
 
 
 class HasInsertData(Protocol):
-    @property
-    def data(self) -> JsonObject | JsonArray | None: ...
+    data: JsonObject | JsonArray | None
 
 
 T = TypeVar("T", bound="HasInsertData", covariant=True)

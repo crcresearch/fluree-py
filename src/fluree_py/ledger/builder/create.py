@@ -13,18 +13,22 @@ from fluree_py.types import JsonArray, JsonObject
 
 @dataclass(frozen=True, kw_only=True)
 class CreateReadyToCommitImpl(
-    RequestMixin, WithContextMixin, CommitableMixin, CreateReadyToCommit
+    RequestMixin,
+    WithContextMixin["CreateReadyToCommitImpl"],
+    WithInsertMixin["CreateReadyToCommitImpl"],
+    CommitableMixin["CreateReadyToCommitImpl"],
+    CreateReadyToCommit,
 ):
     endpoint: str
     ledger: str
-    data: JsonObject | JsonArray | None = None
+    data: JsonObject | JsonArray | None
     context: dict[str, Any] | None = None
 
     def get_url(self) -> str:
         return self.endpoint
 
     def build_request_payload(self) -> dict[str, Any]:
-        result = {}
+        result: dict[str, Any] = {}
         if self.context:
             result["@context"] = self.context
         result |= {"ledger": self.ledger, "insert": self.data}
@@ -33,8 +37,8 @@ class CreateReadyToCommitImpl(
 
 @dataclass(frozen=True, kw_only=True)
 class CreateBuilderImpl(
-    WithContextMixin,
-    WithInsertMixin["CreateReadyToCommitImpl"],
+    WithContextMixin["CreateBuilderImpl"],
+    WithInsertMixin[CreateReadyToCommitImpl],
     CreateBuilder,
 ):
     endpoint: str

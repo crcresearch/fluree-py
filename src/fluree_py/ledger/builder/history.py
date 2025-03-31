@@ -7,7 +7,10 @@ from fluree_py.ledger.protocol.endpoint import HistoryClause, TimeClause, Histor
 
 @dataclass(frozen=True, kw_only=True)
 class HistoryBuilderImpl(
-    RequestMixin, WithContextMixin, CommitableMixin, HistoryBuilder
+    RequestMixin,
+    WithContextMixin["HistoryBuilderImpl"],
+    CommitableMixin["HistoryBuilderImpl"],
+    HistoryBuilder,
 ):
     endpoint: str
     ledger: str
@@ -29,7 +32,7 @@ class HistoryBuilderImpl(
         return self.endpoint
 
     def build_request_payload(self) -> dict[str, Any]:
-        result = {}
+        result: dict[str, Any] = {}
         if self.context:
             result["@context"] = self.context
         result |= {"from": self.ledger, "history": self.history, "t": self.t}

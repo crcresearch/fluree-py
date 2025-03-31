@@ -8,5 +8,6 @@ __all__ = [
     "AsyncCommitMixin",
     "CommitableMixin",
     "WithContextMixin",
+    "WithInsertMixin",
     "RequestMixin",
 ]

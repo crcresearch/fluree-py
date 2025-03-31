@@ -8,5 +8,5 @@ from fluree_py.ledger.protocol.ledger import SupportsLedgerOperations
 class FlureeClient:
     base_url: str
 
-    def with_ledger(self, ledger: str) -> "SupportsLedgerOperations":
+    def with_ledger(self, ledger: str) -> SupportsLedgerOperations:
         return LedgerSelected(base_url=self.base_url, ledger=ledger)

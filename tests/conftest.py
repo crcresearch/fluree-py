@@ -1,13 +1,13 @@
 from typing import Generator
 
 import pytest
-from testcontainers.core.waiting_utils import wait_for_logs
-from testcontainers.generic import ServerContainer
+from testcontainers.core.waiting_utils import wait_for_logs  # type: ignore
+from testcontainers.generic import ServerContainer  # type: ignore
 
 from fluree_py import FlureeClient
 
 
-def pytest_addoption(parser):
+def pytest_addoption(parser: pytest.Parser):
     """Add custom command line options."""
     parser.addoption(
         "--use-fluree-server",
@@ -18,7 +18,7 @@ def pytest_addoption(parser):
 
 
 @pytest.fixture(scope="session")
-def fluree_url(request) -> Generator[str, None, None]:
+def fluree_url(request: pytest.FixtureRequest) -> Generator[str, None, None]:
     # Return dummy address if --use-fluree-server is not set
     if not request.config.getoption("--use-fluree-server"):
         yield "http://localhost:8090"
@@ -32,7 +32,7 @@ def fluree_url(request) -> Generator[str, None, None]:
     wait_for_logs(container, "Starting Fluree server with profile")
 
     # Return the container's connection URL
-    yield container._create_connection_url()
+    yield container._create_connection_url()  # type: ignore
 
     # Print the container's logs
     (out, err) = container.get_logs()
@@ -49,16 +49,30 @@ def fluree_client(fluree_url: str) -> FlureeClient:
 
 
 @pytest.fixture
+def using_fluree_server(request: pytest.FixtureRequest) -> bool:
+    is_using_fluree_server = request.config.getoption("--use-fluree-server")
+    assert isinstance(is_using_fluree_server, bool)
+    return is_using_fluree_server
+
+
+@pytest.fixture
+def test_name(request: pytest.FixtureRequest) -> str:
+    node_name: str = request.node.name  # type: ignore
+    assert isinstance(node_name, str)
+    return node_name
+
+
+@pytest.fixture
 def cookbook_client(
-    request: pytest.FixtureRequest, fluree_client: FlureeClient
+    using_fluree_server: bool, test_name: str, fluree_client: FlureeClient
 ) -> Generator[FlureeClient, None, None]:
-    if not request.config.getoption("--use-fluree-server"):
+    if not using_fluree_server:
         yield fluree_client
         return
 
     # Only setup the ledger if we're using a real Fluree server
     resp = (
-        fluree_client.with_ledger(ledger=request.node.name)
+        fluree_client.with_ledger(ledger=test_name)
         .create()
         .with_context({"ex": "http://example.org/", "schema": "http://schema.org/"})
         .with_insert(

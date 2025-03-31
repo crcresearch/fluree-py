@@ -28,8 +28,8 @@ GroupByClause: TypeAlias = LogicVariable | list[LogicVariable]
 
 
 class QueryBuilder(
-    SupportsContext,
-    SupportsWhere,
+    SupportsContext["QueryBuilder"],
+    SupportsWhere["QueryBuilder"],
     SupportsRequestCreation,
     SupportsCommitable,
     Protocol,

@@ -4,8 +4,7 @@ from fluree_py.query.where.types import WhereClause
 
 
 class HasWhereData(Protocol):
-    @property
-    def where(self) -> WhereClause | None: ...
+    where: WhereClause | None
 
 
 T = TypeVar("T", bound="HasWhereData", covariant=True)

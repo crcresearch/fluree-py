@@ -14,9 +14,9 @@ from fluree_py.types import JsonArray, JsonObject
 
 @dataclass(frozen=True, kw_only=True)
 class TransactionBuilderImpl(
-    WithContextMixin,
+    WithContextMixin["TransactionBuilderImpl"],
     WithInsertMixin["TransactionReadyToCommitImpl"],
-    WithWhereMixin,
+    WithWhereMixin["TransactionBuilderImpl"],
     TransactionBuilder,
 ):
     endpoint: str
@@ -37,22 +37,17 @@ class TransactionBuilderImpl(
 @dataclass(frozen=True, kw_only=True)
 class TransactionReadyToCommitImpl(
     RequestMixin,
-    WithContextMixin,
-    WithWhereMixin,
-    CommitableMixin,
+    WithContextMixin["TransactionReadyToCommitImpl"],
+    WithWhereMixin["TransactionReadyToCommitImpl"],
+    CommitableMixin["TransactionReadyToCommitImpl"],
     TransactionReadyToCommit,
 ):
     endpoint: str
     ledger: str
-    context: dict[str, Any] | None = None
-    where: WhereClause | None = None
-    data: JsonObject | JsonArray | None = None
-    delete_data: JsonObject | JsonArray | None = None
-
-    def with_insert(
-        self, data: JsonObject | JsonArray
-    ) -> "TransactionReadyToCommitImpl":
-        return replace(self, insert_data=data)
+    context: dict[str, Any] | None
+    where: WhereClause | None
+    data: JsonObject | JsonArray | None
+    delete_data: JsonObject | JsonArray | None
 
     def with_delete(
         self, data: JsonObject | JsonArray
@@ -63,7 +58,7 @@ class TransactionReadyToCommitImpl(
         return self.endpoint
 
     def build_request_payload(self) -> dict[str, Any]:
-        result = {}
+        result: dict[str, Any] = {}
         if self.context:
             result["@context"] = self.context
         result |= {"ledger": self.ledger}

@@ -118,7 +118,7 @@ SelectExpressionList: TypeAlias = List[SelectExpression]
 #
 #     # Multi-level nested object
 #     { "bestFriend": [ { "address": ["*"] } ] }
-NodeObjectTemplate: TypeAlias = Dict[Predicate, SelectExpressionList]
+NodeObjectTemplate: TypeAlias = Dict[Predicate, "SelectExpressionList"]
 
 
 def is_node_object_template(var: Any) -> TypeGuard[NodeObjectTemplate]:
@@ -127,7 +127,7 @@ def is_node_object_template(var: Any) -> TypeGuard[NodeObjectTemplate]:
     """
     if not isinstance(var, dict):
         return False
-    return all(isinstance(k, str) and isinstance(v, list) for k, v in var.items())
+    return all(isinstance(k, str) and isinstance(v, list) for (k, v) in var.items())  # type: ignore
 
 
 # A select object in a FlureeQL query.
@@ -146,7 +146,7 @@ def is_select_object(var: Any) -> TypeGuard[SelectObject]:
     """
     if not isinstance(var, dict):
         return False
-    return all(is_logic_variable(k) and isinstance(v, list) for k, v in var.items())
+    return all(is_logic_variable(k) and isinstance(v, list) for k, v in var.items())  # type: ignore
 
 
 # An element in a select array in a FlureeQL query.
@@ -182,7 +182,8 @@ def is_select_array(var: Any) -> TypeGuard[SelectArray]:
     """
     if not isinstance(var, list):
         return False
-    return all(is_select_array_element(v) for v in var)
+
+    return all(is_select_array_element(v) for v in var)  # type: ignore
 
 
 # A select clause in a FlureeQL query.

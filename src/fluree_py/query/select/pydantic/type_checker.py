@@ -92,10 +92,5 @@ class TypeChecker:
         if not config:
             return True
 
-        match config:
-            case dict() as d:
-                extra = d.get("extra", "ignore")
-            case _:
-                extra = getattr(config, "extra", "ignore")
-
+        extra = config.get("extra", "ignore")
         return extra in ("forbid", None)

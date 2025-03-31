@@ -10,7 +10,9 @@ from fluree_py.ledger.protocol.mixin.context import HasContextData
 from fluree_py.ledger.protocol.mixin.insert import HasInsertData
 
 
-class CreateBuilder(SupportsContext, SupportsInsert, Protocol):
+class CreateBuilder(
+    SupportsContext["CreateBuilder"], SupportsInsert["CreateReadyToCommit"], Protocol
+):
     """Protocol for create builders."""
 
     pass

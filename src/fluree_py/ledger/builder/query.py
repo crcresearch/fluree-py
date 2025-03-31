@@ -16,7 +16,11 @@ from fluree_py.query.where.types import WhereClause
 
 @dataclass(frozen=True, kw_only=True)
 class QueryBuilderImpl(
-    WithContextMixin, WithWhereMixin, RequestMixin, CommitableMixin, QueryBuilder
+    WithContextMixin["QueryBuilderImpl"],
+    WithWhereMixin["QueryBuilderImpl"],
+    RequestMixin,
+    CommitableMixin["QueryBuilderImpl"],
+    QueryBuilder,
 ):
     endpoint: str
     ledger: str
@@ -47,7 +51,7 @@ class QueryBuilderImpl(
         return self.endpoint
 
     def build_request_payload(self) -> dict[str, Any]:
-        result = {}
+        result: dict[str, Any] = {}
         if self.context:
             result["@context"] = self.context
         result |= {"from": self.ledger}

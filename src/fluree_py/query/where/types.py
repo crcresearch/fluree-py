@@ -7,10 +7,9 @@
 from typing import Dict, List, Literal, TypeAlias, TypeGuard, Union
 
 from fluree_py.query.select.types import LogicVariable
-from fluree_py.query.types import Predicate
 
-WhereResultSet: TypeAlias = Dict[Union[Predicate, LogicVariable], LogicVariable]
-WhereRelationship: TypeAlias = Dict[Union[Predicate, LogicVariable], Predicate]
+WhereResultSet: TypeAlias = Dict[str, str]
+WhereRelationship: TypeAlias = Dict[str, str]
 
 # A where condition describes relationships between nodes that must be satisfied for the nodes to be included in result sets, and it names those sets.
 #
@@ -19,7 +18,7 @@ WhereRelationship: TypeAlias = Dict[Union[Predicate, LogicVariable], Predicate]
 # { "@id": "?s", "schema:name": "?name" }
 # { "@id": "?s", "schema:name": "Freddie", "schema:familyName": "Mercury" }
 # { "@id": "http://example.org/jack", "?p": "?o" }
-WhereCondition = Dict[WhereResultSet, WhereRelationship]
+WhereCondition = Union[WhereResultSet, WhereRelationship]
 
 # Examples:
 # [
@@ -115,4 +114,4 @@ WhereOperation = Union[
 
 WhereClauseEntry: TypeAlias = Union[WhereCondition, WhereOperation]
 
-WhereClause: TypeAlias = List[WhereClauseEntry]
+WhereClause: TypeAlias = WhereClauseEntry | List[WhereClauseEntry]
