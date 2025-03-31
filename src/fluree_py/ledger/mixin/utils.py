@@ -1,8 +1,15 @@
+"""Utility functions for resolving generic type parameters in mixins."""
+
 import sys
 from typing import Any, ForwardRef
 
 
 def find_base_class(cls: type[Any], base_name: str) -> type[Any]:
+    """Locates a base class by name in the class's original bases.
+
+    Exceptions:
+        TypeError: If the base class cannot be found.
+    """
     for base in cls.__orig_bases__:
         if base.__name__ == base_name:
             return base
@@ -10,6 +17,11 @@ def find_base_class(cls: type[Any], base_name: str) -> type[Any]:
 
 
 def resolve_base_class_reference(cls: type[Any], base_name: str) -> type[Any]:
+    """Resolves the type parameter from a generic base class.
+
+    Exceptions:
+        TypeError: If no type argument is found or if the type cannot be resolved.
+    """
     base_class = find_base_class(cls, base_name)
 
     if not hasattr(base_class, "__args__"):

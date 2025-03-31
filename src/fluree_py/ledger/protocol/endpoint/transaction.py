@@ -1,3 +1,5 @@
+"""Protocols for building and executing transactions in the Fluree ledger."""
+
 from typing import Protocol, Self
 
 from fluree_py.ledger.protocol.mixin import (
@@ -16,7 +18,8 @@ class TransactionBuilder(
     SupportsWhere["TransactionBuilder"],
     Protocol,
 ):
-    """Protocol for transaction builders."""
+    """Protocol for building transaction operations.
+    """
 
     def with_delete(
         self, data: JsonObject | JsonArray
@@ -31,6 +34,7 @@ class TransactionReadyToCommit(
     HasInsertData,
     Protocol,
 ):
-    """Protocol for transaction builders that are ready to commit."""
+    """Protocol for transaction operations ready to be committed.
+    """
 
     def with_delete(self, data: JsonObject | JsonArray) -> Self: ...
