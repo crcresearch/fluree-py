@@ -2,13 +2,19 @@ from dataclasses import dataclass, replace
 from typing import Any
 
 from fluree_py.ledger.mixin import CommitableMixin, RequestMixin, WithContextMixin
-from fluree_py.ledger.protocol.history import HistoryClause, TimeClause
+from fluree_py.ledger.protocol.endpoint import HistoryClause, TimeClause, HistoryBuilder
 
 
 @dataclass(frozen=True, kw_only=True)
-class HistoryBuilderImpl(RequestMixin, WithContextMixin, CommitableMixin):
+class HistoryBuilderImpl(
+    RequestMixin,
+    WithContextMixin["HistoryBuilderImpl"],
+    CommitableMixin["HistoryBuilderImpl"],
+    HistoryBuilder,
+):
     endpoint: str
     ledger: str
+    context: dict[str, Any] | None = None
     history: HistoryClause | None = None
     t: TimeClause | None = None
     commit_details: bool | None = None
@@ -26,7 +32,7 @@ class HistoryBuilderImpl(RequestMixin, WithContextMixin, CommitableMixin):
         return self.endpoint
 
     def build_request_payload(self) -> dict[str, Any]:
-        result = {}
+        result: dict[str, Any] = {}
         if self.context:
             result["@context"] = self.context
         result |= {"from": self.ledger, "history": self.history, "t": self.t}

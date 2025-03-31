@@ -34,7 +34,11 @@ def transact_side_effect(request: Request):
                 "tx-id": "48c46259a0912fb95d5266fbccf52f828670fb9fc5d60432b741a3e7e73302c3",
             },
         )
-    return Response(404)
+    return Response(
+        409,
+        headers={"Content-Type": "application/json;charset=utf-8"},
+        json={"error": f"Ledger {ledger} does not exist!"},
+    )
 
 
 @pytest.fixture
@@ -72,10 +76,10 @@ def cookbook_client(
 
 # https://developers.flur.ee/docs/reference/cookbook/#inserting-a-single-record
 def test_ledger_transaction_single_record(
-    request: FixtureRequest, cookbook_client: FlureeClient
+    test_name: str, cookbook_client: FlureeClient
 ):
     resp = (
-        cookbook_client.with_ledger(request.node.name)
+        cookbook_client.with_ledger(test_name)
         .transaction()
         .with_context({"ex": "http://example.org/", "schema": "http://schema.org/"})
         .with_insert(
@@ -93,25 +97,25 @@ def test_ledger_transaction_single_record(
 
     resp_json = resp.json()
     assert isinstance(resp_json, dict)
-    
+
     assert "ledger" in resp_json
-    assert resp_json["ledger"] == request.node.name
+    assert resp_json["ledger"] == test_name
 
     assert "t" in resp_json
     assert resp_json["t"] == 2
 
     assert "commit" in resp_json
-    assert resp_json["commit"].startswith(f"fluree:file://{request.node.name}/commit/")
+    assert resp_json["commit"].startswith(f"fluree:file://{test_name}/commit/")
 
     assert "tx-id" in resp_json
 
 
 # https://developers.flur.ee/docs/reference/cookbook/#inserting-multiple-records
 def test_ledger_transaction_multiple_records(
-    request: FixtureRequest, cookbook_client: FlureeClient
+    test_name: str, cookbook_client: FlureeClient
 ):
     resp = (
-        cookbook_client.with_ledger(request.node.name)
+        cookbook_client.with_ledger(test_name)
         .transaction()
         .with_context({"ex": "http://example.org/", "schema": "http://schema.org/"})
         .with_insert(
@@ -138,23 +142,21 @@ def test_ledger_transaction_multiple_records(
     assert isinstance(resp_json, dict)
 
     assert "ledger" in resp_json
-    assert resp_json["ledger"] == request.node.name
+    assert resp_json["ledger"] == test_name
 
     assert "t" in resp_json
     assert resp_json["t"] == 2
 
     assert "commit" in resp_json
-    assert resp_json["commit"].startswith(f"fluree:file://{request.node.name}/commit/")
+    assert resp_json["commit"].startswith(f"fluree:file://{test_name}/commit/")
 
     assert "tx-id" in resp_json
 
 
 # Transaction Errors
-def test_transaction_on_missing_ledger(
-    request: FixtureRequest, fluree_client: FlureeClient
-):
+def test_transaction_on_missing_ledger(test_name: str, cookbook_client: FlureeClient):
     resp = (
-        fluree_client.with_ledger(request.node.name)
+        cookbook_client.with_ledger(test_name + "missing")
         .transaction()
         .with_context({"ex": "http://example.org/", "schema": "http://schema.org/"})
         .with_insert(
@@ -168,4 +170,4 @@ def test_transaction_on_missing_ledger(
     )
 
     assert resp.status_code == 409
-    assert resp.json() == {"error": f"Ledger {request.node.name} does not exist!"}
+    assert resp.json() == {"error": f"Ledger {test_name + 'missing'} does not exist!"}

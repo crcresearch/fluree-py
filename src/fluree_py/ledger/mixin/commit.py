@@ -2,8 +2,8 @@ from typing import Generic, TypeVar
 
 from httpx import AsyncClient, Client
 
-from fluree_py.ledger.protocol.commit import SupportsAsyncCommit, SupportsCommit
-from fluree_py.ledger.protocol.request import SupportsRequestCreation
+from fluree_py.ledger.protocol.mixin.commit import SupportsAsyncCommit, SupportsCommit
+from fluree_py.ledger.protocol.mixin.request import SupportsRequestCreation
 from fluree_py.response import FlureeResponse
 
 T = TypeVar("T", bound=SupportsRequestCreation)

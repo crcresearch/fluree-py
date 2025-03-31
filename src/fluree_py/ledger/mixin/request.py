@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from httpx import Request
 
-from fluree_py.ledger.protocol.request import SupportsRequestCreation
+from fluree_py.ledger.protocol.mixin.request import SupportsRequestCreation
 from fluree_py.types import JsonObject
 
 

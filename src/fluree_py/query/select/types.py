@@ -37,16 +37,16 @@ Grammar (EBNF):
 Examples:
     # Select object - get name and all predicates of best friend
     { "?s": [ "name", { "bestFriend": ["*"] } ] }
-    
+
     # Select array - get multiple variables and objects
     ["?s", "?name", "?friend"]
     [ { "?s": ["*"] }, { "?friend": ["*"] } ]
-    
+
     # Node object template - nested data structures
     { "schema:address": ["*"] }                    # Get all address predicates
     { "bestFriend": ["*"] }                        # Get all best friend predicates
     { "bestFriend": [ { "address": ["*"] } ] }     # Get address of best friend
-    
+
     # Logic variable examples
     "?firstname"
     "?first-name"
@@ -84,6 +84,7 @@ def is_logic_variable(var: str) -> TypeGuard[LogicVariable]:
         return False
     return LOGIC_VARIABLE_PATTERN.search(var) is not None
 
+
 # A select expression in a FlureeQL query.
 # Select expressions define what data to include in the query results.
 # They can be:
@@ -111,13 +112,13 @@ SelectExpressionList: TypeAlias = List[SelectExpression]
 #
 # Examples:
 #     { "schema:address": ["*"] }
-#     
+#
 #     # Return an object that has all predicates for the node that "bestFriend" refers to
 #     { "bestFriend": ["*"] }
-#     
+#
 #     # Multi-level nested object
 #     { "bestFriend": [ { "address": ["*"] } ] }
-NodeObjectTemplate: TypeAlias = Dict[Predicate, SelectExpressionList]
+NodeObjectTemplate: TypeAlias = Dict[Predicate, "SelectExpressionList"]
 
 
 def is_node_object_template(var: Any) -> TypeGuard[NodeObjectTemplate]:
@@ -126,7 +127,7 @@ def is_node_object_template(var: Any) -> TypeGuard[NodeObjectTemplate]:
     """
     if not isinstance(var, dict):
         return False
-    return all(isinstance(k, str) and isinstance(v, list) for k, v in var.items())
+    return all(isinstance(k, str) and isinstance(v, list) for (k, v) in var.items())  # type: ignore
 
 
 # A select object in a FlureeQL query.
@@ -138,13 +139,14 @@ def is_node_object_template(var: Any) -> TypeGuard[NodeObjectTemplate]:
 #     { "?s": [ "name", { "bestFriend": ["*"] } ] }
 SelectObject: TypeAlias = Dict[LogicVariable, SelectExpressionList]
 
+
 def is_select_object(var: Any) -> TypeGuard[SelectObject]:
     """
     Type guard to check if a value is a valid select object.
     """
     if not isinstance(var, dict):
         return False
-    return all(is_logic_variable(k) and isinstance(v, list) for k, v in var.items())
+    return all(is_logic_variable(k) and isinstance(v, list) for k, v in var.items())  # type: ignore
 
 
 # An element in a select array in a FlureeQL query.
@@ -180,7 +182,9 @@ def is_select_array(var: Any) -> TypeGuard[SelectArray]:
     """
     if not isinstance(var, list):
         return False
-    return all(is_select_array_element(v) for v in var)
+
+    return all(is_select_array_element(v) for v in var)  # type: ignore
+
 
 # A select clause in a FlureeQL query.
 # A select clause can be either a select object or a select array.
