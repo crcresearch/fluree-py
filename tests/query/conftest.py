@@ -1,6 +1,6 @@
 import pytest
 
-from fluree_py.client import FlureeClient
+from fluree_py.http.client import FlureeClient
 
 
 @pytest.fixture(scope="session")

@@ -7,7 +7,7 @@ from pytest import FixtureRequest
 from respx import MockRouter
 
 from fluree_py import FlureeClient
-from fluree_py.ledger.builder.create import CreateReadyToCommitImpl
+from fluree_py.http.endpoint import CreateReadyToCommitImpl
 
 
 @pytest.fixture

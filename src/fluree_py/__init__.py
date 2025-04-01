@@ -1,3 +1,3 @@
-from fluree_py.client import FlureeClient
+from fluree_py.http.client import FlureeClient
 
 __all__ = ["FlureeClient"]
