@@ -1,9 +1,10 @@
-from fluree_py.http.protocol.mixin import (
-    SupportsCommitable,
-    SupportsContext,
-    SupportsInsert,
-    SupportsWhere,
-)
+"""HTTP protocol module for Fluree operations.
+
+This module provides the core protocol definitions and builders for interacting
+with Fluree through HTTP.
+"""
+
+from fluree_py.http.protocol.ledger import SupportsLedgerOperations
 from fluree_py.http.protocol.endpoint import (
     CreateBuilder,
     HistoryBuilder,
@@ -12,13 +13,10 @@ from fluree_py.http.protocol.endpoint import (
 )
 
 __all__ = [
+    "SupportsLedgerOperations",
     "CreateBuilder",
     "CreateReadyToCommit",
     "HistoryBuilder",
     "QueryBuilder",
     "TransactionBuilder",
-    "SupportsCommitable",
-    "SupportsContext",
-    "SupportsInsert",
-    "SupportsWhere",
 ]

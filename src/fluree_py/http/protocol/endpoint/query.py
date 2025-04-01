@@ -9,8 +9,8 @@ from fluree_py.http.protocol.mixin import (
     SupportsCommitable,
     SupportsContext,
     SupportsRequestCreation,
+    SupportsWhere,
 )
-from fluree_py.http.protocol.mixin.where import SupportsWhere
 from fluree_py.types.query.select import SelectArray, SelectObject
 from fluree_py.types.query.query import (
     OrderByClause,

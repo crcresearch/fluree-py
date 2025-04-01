@@ -7,7 +7,8 @@ from fluree_py.http.protocol.mixin import (
     SupportsContext,
     SupportsRequestCreation,
 )
-from fluree_py.types.history import HistoryClause, TimeClause
+from fluree_py.types.common import TimeClause
+from fluree_py.types.http.history import HistoryClause
 
 
 class HistoryBuilder(

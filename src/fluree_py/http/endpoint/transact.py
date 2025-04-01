@@ -1,9 +1,13 @@
 from dataclasses import dataclass, replace
 from typing import Any
 
-from fluree_py.http.mixin import CommitableMixin, RequestMixin, WithContextMixin
-from fluree_py.http.mixin.insert import WithInsertMixin
-from fluree_py.http.mixin.where import WithWhereMixin
+from fluree_py.http.mixin import (
+    CommitableMixin,
+    RequestMixin,
+    WithContextMixin,
+    WithInsertMixin,
+    WithWhereMixin,
+)
 from fluree_py.http.protocol.endpoint import (
     TransactionBuilder,
     TransactionReadyToCommit,

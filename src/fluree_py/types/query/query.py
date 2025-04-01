@@ -1,14 +1,11 @@
 from typing import TypeAlias, TypedDict
 
-from fluree_py.types.common import JsonObject
+from fluree_py.types.common import Context
 from fluree_py.types.query.select import LogicVariable, SelectClause
 from fluree_py.types.query.where import WhereClause, WhereFilterExpression  
-from fluree_py.types.history import TimeClause   
+from fluree_py.types.common import TimeClause   
 
-Context: TypeAlias = JsonObject
-"""
-A W3C JSON-LD context for a FlureeQL request.
-"""
+
 
 Role: TypeAlias = str
 DecentralizedIdentifier: TypeAlias = str

@@ -4,7 +4,7 @@ from typing import Generic, TypeVar, cast
 
 from fluree_py.http.mixin.utils import resolve_base_class_reference
 from fluree_py.http.protocol.mixin import HasInsertData
-from fluree_py.types.common import JsonArray, JsonObject
+from fluree_py.types.common  import JsonArray, JsonObject
 
 
 T = TypeVar("T", bound="HasInsertData")

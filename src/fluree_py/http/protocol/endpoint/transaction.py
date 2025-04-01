@@ -6,9 +6,10 @@ from fluree_py.http.protocol.mixin import (
     SupportsCommitable,
     SupportsContext,
     SupportsRequestCreation,
+    HasInsertData,
+    SupportsInsert,
+    SupportsWhere,
 )
-from fluree_py.http.protocol.mixin.insert import HasInsertData, SupportsInsert
-from fluree_py.http.protocol.mixin.where import SupportsWhere
 from fluree_py.types.common import JsonArray, JsonObject
 
 

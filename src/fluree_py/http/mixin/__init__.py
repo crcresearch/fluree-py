@@ -4,7 +4,7 @@ from fluree_py.http.mixin.commit import CommitMixin, AsyncCommitMixin, Commitabl
 from fluree_py.http.mixin.context import WithContextMixin
 from fluree_py.http.mixin.insert import WithInsertMixin
 from fluree_py.http.mixin.request import RequestMixin
-
+from fluree_py.http.mixin.where import WithWhereMixin
 __all__ = [
     "CommitMixin",
     "AsyncCommitMixin",
@@ -12,4 +12,5 @@ __all__ = [
     "WithContextMixin",
     "WithInsertMixin",
     "RequestMixin",
+    "WithWhereMixin",
 ]

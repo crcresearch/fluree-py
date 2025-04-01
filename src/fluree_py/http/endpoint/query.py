@@ -1,9 +1,19 @@
 from dataclasses import dataclass, replace
 from typing import Any, Self
 
-from fluree_py.http.mixin import CommitableMixin, RequestMixin, WithContextMixin
-from fluree_py.http.mixin.where import WithWhereMixin   
-from fluree_py.http.protocol.endpoint.query import  QueryBuilder
+from fluree_py.http.mixin import (
+    CommitableMixin,
+    RequestMixin,
+    WithContextMixin,
+    WithWhereMixin,
+)
+from fluree_py.http.protocol.endpoint.query import (
+    GroupByClause,
+    HavingClause,
+    OrderByClause,
+    QueryBuilder,
+    ActiveIdentity,
+)
 from fluree_py.types.query.select import SelectArray, SelectObject
 from fluree_py.types.query.where import WhereClause 
 from fluree_py.types.query.query import GroupByClause, HavingClause, OrderByClause, ActiveIdentity

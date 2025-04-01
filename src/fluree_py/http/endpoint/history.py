@@ -1,9 +1,14 @@
 from dataclasses import dataclass, replace
 from typing import Any
 
-from fluree_py.http.mixin import CommitableMixin, RequestMixin, WithContextMixin
+from fluree_py.http.mixin import (
+    CommitableMixin,
+    RequestMixin,
+    WithContextMixin,
+)
 from fluree_py.http.protocol.endpoint import HistoryBuilder
-from fluree_py.types.history import HistoryClause, TimeClause
+from fluree_py.types.common import TimeClause
+from fluree_py.types.http.history import HistoryClause
 
 
 @dataclass(frozen=True, kw_only=True)
