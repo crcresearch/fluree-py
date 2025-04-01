@@ -1,3 +1,5 @@
+"""Mixin for handling where clause operations in Fluree queries."""
+
 from typing import Generic, TypeVar, cast
 
 from fluree_py.http.mixin.utils import resolve_base_class_reference
@@ -8,7 +10,14 @@ T = TypeVar("T", bound="HasWhereData")
 
 
 class WithWhereMixin(Generic[T]):
+    """Provides where clause capabilities for Fluree queries."""
+
     def with_where(self: T, clause: WhereClause) -> T:
+        """Updates the query with a new where clause.
+
+        Exceptions:
+            TypeError: If the type parameter cannot be resolved.
+        """
         resolved_type = resolve_base_class_reference(self.__class__, "WithWhereMixin")
 
         # Create a new instance of the resolved type

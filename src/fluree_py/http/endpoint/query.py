@@ -3,15 +3,10 @@ from typing import Any, Self
 
 from fluree_py.http.mixin import CommitableMixin, RequestMixin, WithContextMixin
 from fluree_py.http.mixin.where import WithWhereMixin   
-from fluree_py.http.protocol.endpoint.query import (    
-    GroupByClause,
-    HavingClause,
-    OrderByClause,
-    QueryBuilder,
-    ActiveIdentity,
-)
+from fluree_py.http.protocol.endpoint.query import  QueryBuilder
 from fluree_py.types.query.select import SelectArray, SelectObject
-from fluree_py.types.query.where import WhereClause
+from fluree_py.types.query.where import WhereClause 
+from fluree_py.types.query.query import GroupByClause, HavingClause, OrderByClause, ActiveIdentity
 
 @dataclass(frozen=True, kw_only=True)
 class QueryBuilderImpl(
@@ -21,6 +16,8 @@ class QueryBuilderImpl(
     CommitableMixin["QueryBuilderImpl"],
     QueryBuilder,
 ):
+    """Implementation of a query operation builder."""
+
     endpoint: str
     ledger: str
     context: dict[str, Any] | None = None
@@ -32,24 +29,31 @@ class QueryBuilderImpl(
     select_fields: dict[str, Any] | list[str] | None = None
 
     def with_group_by(self, fields: GroupByClause) -> Self:
+        """Add group by clause to the query."""
         return replace(self, group_by=fields)
 
     def with_having(self, condition: HavingClause) -> Self:
+        """Add having clause to the query."""
         return replace(self, having=condition)
 
     def with_order_by(self, fields: OrderByClause) -> Self:
+        """Add order by clause to the query."""
         return replace(self, order_by=fields)
 
     def with_opts(self, opts: ActiveIdentity) -> Self:
+        """Add query options to the query."""
         return replace(self, opts=opts)
 
     def with_select(self, fields: SelectObject | SelectArray) -> Self:
+        """Add select fields to the query."""
         return replace(self, select_fields=fields)
 
     def get_url(self) -> str:
+        """Get the endpoint URL for the query operation."""
         return self.endpoint
 
     def build_request_payload(self) -> dict[str, Any]:
+        """Build the request payload for the query operation."""
         result: dict[str, Any] = {}
         if self.context:
             result["@context"] = self.context

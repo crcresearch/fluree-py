@@ -46,13 +46,6 @@ jobs:
           path: htmlcov/
           retention-days: 14
 
-      - name: Upload coverage summary
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-summary-${{ matrix.python-version }}
-          path: coverage-summary.txt
-          retention-days: 14
-
   build:
     name: Build package
     needs: test
@@ -70,7 +63,4 @@ jobs:
         run: uv sync --all-extras --dev
 
       - name: Build package
-        run: uv run python -m build
-
-      - name: Check distribution
-        run: uv run twine check dist/*
+        run: uv build
