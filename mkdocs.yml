@@ -33,7 +33,6 @@ plugins:
       python:
         inventories:
         - https://docs.python.org/3/objects.inv
-        - https://docs.python.org/3/objects.inv
         options:
           # General
           find_stubs_package: true
@@ -83,7 +82,9 @@ theme:
   - navigation.top
   - search.highlight
   - search.suggest
-  - toc.follow  
+  - toc.follow
+  icon:
+    repo: fontawesome/brands/github 
   palette:
     - media: "(prefers-color-scheme)"
       toggle:
@@ -129,13 +130,7 @@ markdown_extensions:
 
 nav:
   - Home: index.md
-  - Query Language: types.md
   - Coverage report: coverage.md
-  - API Reference:
-    - "<code class='doc-symbol doc-symbol-nav doc-symbol-module'></code>fluree_py":
-      - "<code class='doc-symbol doc-symbol-nav doc-symbol-module'></code>query":
-        - "<code class='doc-symbol doc-symbol-nav doc-symbol-module'></code>select":
-          - "<code class='doc-symbol doc-symbol-nav doc-symbol-module'></code>types": reference/fluree_py/query/select/types.md
 
 extra:
   social:
