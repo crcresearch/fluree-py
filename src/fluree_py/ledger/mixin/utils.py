@@ -34,12 +34,20 @@ def resolve_base_class_reference(cls: type[Any], base_name: str) -> type[Any]:
     if not isinstance(type_arg, ForwardRef):
         return type_arg
 
-    resolved_type = type_arg._evaluate(
-        sys.modules[cls.__module__].__dict__,
-        locals(),
-        type_params=(),
-        recursive_guard=frozenset(),
-    )
+    if sys.version_info < (3, 13):
+        resolved_type = type_arg._evaluate(
+            sys.modules[cls.__module__].__dict__,
+            locals(),
+            recursive_guard=frozenset(),
+        )
+    else:
+        resolved_type = type_arg._evaluate(
+            sys.modules[cls.__module__].__dict__,
+            locals(),
+            type_params=(),
+            recursive_guard=frozenset(),
+        )
+
     if not resolved_type:
         raise TypeError(f"Unable to resolve type argument {type_arg}")
 
