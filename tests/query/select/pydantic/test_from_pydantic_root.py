@@ -3,7 +3,7 @@ import warnings
 import pytest
 from pydantic import BaseModel, Field
 
-from fluree_py.client import FlureeClient
+from fluree_py.http.client import FlureeClient
 from fluree_py.query.select.pydantic import from_pydantic
 from tests.utils import create_and_retrieve_random_model
 
