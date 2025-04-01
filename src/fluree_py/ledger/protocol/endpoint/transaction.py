@@ -18,8 +18,7 @@ class TransactionBuilder(
     SupportsWhere["TransactionBuilder"],
     Protocol,
 ):
-    """Protocol for building transaction operations.
-    """
+    """Protocol for building transaction operations."""
 
     def with_delete(
         self, data: JsonObject | JsonArray
@@ -34,7 +33,6 @@ class TransactionReadyToCommit(
     HasInsertData,
     Protocol,
 ):
-    """Protocol for transaction operations ready to be committed.
-    """
+    """Protocol for transaction operations ready to be committed."""
 
     def with_delete(self, data: JsonObject | JsonArray) -> Self: ...

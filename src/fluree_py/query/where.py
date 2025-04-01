@@ -115,4 +115,3 @@ WhereOperation = Union[
 WhereClauseEntry: TypeAlias = Union[WhereCondition, WhereOperation]
 
 WhereClause: TypeAlias = WhereClauseEntry | List[WhereClauseEntry]
- 

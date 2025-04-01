@@ -20,6 +20,7 @@ class CreateReadyToCommitImpl(
     CreateReadyToCommit,
 ):
     """Implementation of a create operation ready to be committed."""
+
     endpoint: str
     ledger: str
     data: JsonObject | JsonArray | None
@@ -45,6 +46,7 @@ class CreateBuilderImpl(
     CreateBuilder,
 ):
     """Implementation of a create operation builder."""
+
     endpoint: str
     ledger: str
     data: JsonObject | JsonArray | None = None

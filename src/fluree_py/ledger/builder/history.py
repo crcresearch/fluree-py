@@ -14,6 +14,7 @@ class HistoryBuilderImpl(
     HistoryBuilder,
 ):
     """Implementation of a history query builder."""
+
     endpoint: str
     ledger: str
     context: dict[str, Any] | None = None

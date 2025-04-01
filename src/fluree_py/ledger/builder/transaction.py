@@ -20,7 +20,8 @@ class TransactionBuilderImpl(
     TransactionBuilder,
 ):
     """Implementation of a transaction operation builder."""
-    endpoint: str   
+
+    endpoint: str
     ledger: str
     context: dict[str, Any] | None = None
     where: WhereClause | None = None
@@ -45,6 +46,7 @@ class TransactionReadyToCommitImpl(
     TransactionReadyToCommit,
 ):
     """Implementation of a transaction operation ready to be committed."""
+
     endpoint: str
     ledger: str
     context: dict[str, Any] | None

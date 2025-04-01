@@ -17,6 +17,7 @@ from fluree_py.ledger.protocol import (
 @dataclass(frozen=True, kw_only=True)
 class LedgerSelected:
     """Selected ledger for operations."""
+
     base_url: str
     ledger: str
 

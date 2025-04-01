@@ -1,6 +1,6 @@
 """Protocols and types for querying historical data in the Fluree ledger."""
 
-from typing import Protocol, Self 
+from typing import Protocol, Self
 
 from fluree_py.ledger.protocol.mixin import (
     SupportsCommitable,

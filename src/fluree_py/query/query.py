@@ -23,16 +23,19 @@ HavingClause: TypeAlias = WhereFilterExpression | list[WhereFilterExpression]
 GroupByClause: TypeAlias = LogicVariable | list[LogicVariable]
 
 
-QuerySchema = TypedDict("QuerySchema", {
-    "@context": Context,
-    "from": str | list[str],
-    "where": WhereClause,
-    "select": SelectClause, 
-    "t": TimeClause,
-    "groupBy": GroupByClause,
-    "having": HavingClause,
-    "orderBy": OrderByClause
-})
+QuerySchema = TypedDict(
+    "QuerySchema",
+    {
+        "@context": Context,
+        "from": str | list[str],
+        "where": WhereClause,
+        "select": SelectClause,
+        "t": TimeClause,
+        "groupBy": GroupByClause,
+        "having": HavingClause,
+        "orderBy": OrderByClause,
+    },
+)
 """
 A schema for a FlureeQL query.
 """

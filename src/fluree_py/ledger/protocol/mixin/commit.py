@@ -6,7 +6,7 @@ from fluree_py.response import FlureeResponse
 class SupportsCommit(Protocol):
     """Protocol for objects that support synchronous commit operations."""
 
-    def commit(self) -> FlureeResponse: 
+    def commit(self) -> FlureeResponse:
         """Executes the transaction synchronously.
 
         Exceptions:
@@ -14,6 +14,7 @@ class SupportsCommit(Protocol):
             TypeError: If the type parameter cannot be resolved.
         """
         ...
+
 
 class SupportsAsyncCommit(Protocol):
     """Protocol for objects that support asynchronous commit operations."""
@@ -27,6 +28,8 @@ class SupportsAsyncCommit(Protocol):
         """
         ...
 
+
 class SupportsCommitable(SupportsCommit, SupportsAsyncCommit, Protocol):
     """Protocol for objects that support both sync and async commit operations."""
+
     pass

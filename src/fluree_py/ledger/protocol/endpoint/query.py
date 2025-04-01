@@ -12,7 +12,13 @@ from fluree_py.ledger.protocol.mixin import (
 )
 from fluree_py.ledger.protocol.mixin.where import SupportsWhere
 from fluree_py.query.select.types import SelectArray, SelectObject
-from fluree_py.query.query import OrderByClause, ActiveIdentity, GroupByClause, HavingClause
+from fluree_py.query.query import (
+    OrderByClause,
+    ActiveIdentity,
+    GroupByClause,
+    HavingClause,
+)
+
 
 class QueryBuilder(
     SupportsContext["QueryBuilder"],
@@ -21,8 +27,7 @@ class QueryBuilder(
     SupportsCommitable,
     Protocol,
 ):
-    """Protocol for building query operations.
-    """
+    """Protocol for building query operations."""
 
     def with_order_by(self, fields: OrderByClause) -> Self: ...
     def with_opts(self, opts: ActiveIdentity) -> Self: ...

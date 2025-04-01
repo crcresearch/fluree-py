@@ -7,9 +7,7 @@ from fluree_py.ledger.protocol.endpoint.create import (
     CreateBuilder,
     CreateReadyToCommit,
 )
-from fluree_py.ledger.protocol.endpoint.history import (
-    HistoryBuilder
-)
+from fluree_py.ledger.protocol.endpoint.history import HistoryBuilder
 from fluree_py.ledger.protocol.endpoint.query import QueryBuilder
 from fluree_py.ledger.protocol.endpoint.transaction import (
     TransactionBuilder,

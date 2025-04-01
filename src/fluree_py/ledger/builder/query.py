@@ -23,6 +23,7 @@ class QueryBuilderImpl(
     QueryBuilder,
 ):
     """Implementation of a query operation builder."""
+
     endpoint: str
     ledger: str
     context: dict[str, Any] | None = None
