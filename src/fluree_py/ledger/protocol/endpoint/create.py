@@ -1,3 +1,5 @@
+"""Protocols for creating new entities in the Fluree ledger."""
+
 from typing import Protocol
 
 from fluree_py.ledger.protocol.mixin import (
@@ -13,7 +15,7 @@ from fluree_py.ledger.protocol.mixin.insert import HasInsertData
 class CreateBuilder(
     SupportsContext["CreateBuilder"], SupportsInsert["CreateReadyToCommit"], Protocol
 ):
-    """Protocol for create builders."""
+    """Protocol for building create operations."""
 
     pass
 
@@ -21,6 +23,6 @@ class CreateBuilder(
 class CreateReadyToCommit(
     SupportsRequestCreation, SupportsCommitable, HasInsertData, HasContextData, Protocol
 ):
-    """Protocol for create builders that are ready to commit."""
+    """Protocol for create operations ready to be committed."""
 
     pass

@@ -8,7 +8,7 @@ from fluree_py.ledger.protocol.endpoint import (
     TransactionBuilder,
     TransactionReadyToCommit,
 )
-from fluree_py.query.where.types import WhereClause
+from fluree_py.query.where import WhereClause
 from fluree_py.types import JsonArray, JsonObject
 
 
@@ -19,6 +19,8 @@ class TransactionBuilderImpl(
     WithWhereMixin["TransactionBuilderImpl"],
     TransactionBuilder,
 ):
+    """Implementation of a transaction operation builder."""
+
     endpoint: str
     ledger: str
     context: dict[str, Any] | None = None
@@ -29,6 +31,7 @@ class TransactionBuilderImpl(
     def with_delete(
         self, data: JsonObject | JsonArray
     ) -> "TransactionReadyToCommitImpl":
+        """Add delete operation to the transaction."""
         updated_fields = self.__dict__.copy()
         updated_fields["delete_data"] = data
         return TransactionReadyToCommitImpl(**updated_fields)
@@ -42,6 +45,8 @@ class TransactionReadyToCommitImpl(
     CommitableMixin["TransactionReadyToCommitImpl"],
     TransactionReadyToCommit,
 ):
+    """Implementation of a transaction operation ready to be committed."""
+
     endpoint: str
     ledger: str
     context: dict[str, Any] | None
@@ -52,12 +57,15 @@ class TransactionReadyToCommitImpl(
     def with_delete(
         self, data: JsonObject | JsonArray
     ) -> "TransactionReadyToCommitImpl":
+        """Add delete operation to the transaction."""
         return replace(self, delete_data=data)
 
     def get_url(self) -> str:
+        """Get the endpoint URL for the transaction operation."""
         return self.endpoint
 
     def build_request_payload(self) -> dict[str, Any]:
+        """Build the request payload for the transaction operation."""
         result: dict[str, Any] = {}
         if self.context:
             result["@context"] = self.context

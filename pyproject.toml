@@ -3,14 +3,9 @@ name = "fluree-py"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-authors = [
-    { name = "James Sweet", email = "jsweet@nd.edu" }
-]
+authors = [{ name = "James Sweet", email = "jsweet@nd.edu" }]
 requires-python = ">=3.11"
-dependencies = [
-    "httpx>=0.28.1",
-    "pydantic>=2.10.6",
-]
+dependencies = ["httpx>=0.28.1", "pydantic>=2.10.6"]
 
 [build-system]
 requires = ["hatchling"]
@@ -18,17 +13,32 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
-    "polyfactory>=2.20.0",
-    "pytest-icdiff>=0.9",
-    "pytest-sugar>=1.0.0",
-    "pytest>=8.3.5",
-    "respx>=0.22.0",
-    "testcontainers[generic]>=4.9.2",
-    "hypothesis>=6.130.5",
-    "pytest-cov>=6.0.0",
+  "polyfactory>=2.20.0",
+  "pytest-icdiff>=0.9",
+  "pytest-sugar>=1.0.0",
+  "pytest>=8.3.5",
+  "respx>=0.22.0",
+  "testcontainers[generic]>=4.9.2",
+  "hypothesis>=6.130.5",
+  "pytest-cov>=6.0.0",
 ]
-lint = [
-    "ruff>=0.11.2",
+lint = ["ruff>=0.11.2"]
+docs = [
+  "mkdocs>=1.6.1",
+  "mkdocs-material>=9.6.10",
+  "mkdocstrings[python]>=0.29.1",
+  "mkdocs-coverage>=1.1.0",
+  "mkdocs-section-index>=0.3.9",
+  "mkdocs-git-revision-date-localized-plugin>=1.4.5",
+  "griffe-pydantic>=1.1.4",
+  "griffe-warnings-deprecated>=1.1.0",
+  "griffe-generics>=1.0.13",
+  "griffe-inherited-method-crossrefs>=0.0.1.4",
+  "griffe-modernized-annotations>=1.0.8",
+  "markdown-callouts>=0.4.0",
+  "mkdocs-api-autonav>=0.2.1",
+  "mkdocs-literate-nav>=0.6.2",
+  "mkdocs-callouts>=1.16.0",
 ]
 
 [tool.uv]
@@ -41,9 +51,7 @@ addopts = "--import-mode=importlib --verbose"
 packages = ["src/fluree_py"]
 
 [tool.hatch.build.targets.sdist]
-include = [
-    "src/fluree_py/**/*.py",
-]
+include = ["src/fluree_py/**/*.py"]
 
 [tool.hatch.metadata]
 allow-direct-references = true

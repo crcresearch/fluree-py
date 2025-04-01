@@ -1,3 +1,5 @@
+"""Mixin for handling data insertion operations in Fluree."""
+
 from typing import Generic, TypeVar, cast
 
 from fluree_py.ledger.mixin.utils import resolve_base_class_reference
@@ -9,7 +11,14 @@ T = TypeVar("T", bound="HasInsertData")
 
 
 class WithInsertMixin(Generic[T]):
+    """Provides data insertion capabilities for Fluree operations."""
+
     def with_insert(self, data: JsonObject | JsonArray) -> T:
+        """Updates the operation with new data to be inserted.
+
+        Exceptions:
+            TypeError: If the type parameter cannot be resolved.
+        """
         resolved_type = resolve_base_class_reference(self.__class__, "WithInsertMixin")
 
         # Create a new instance of the resolved type
