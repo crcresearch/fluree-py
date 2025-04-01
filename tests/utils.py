@@ -3,7 +3,7 @@ from typing import Any, Type, TypeVar
 from polyfactory.factories.pydantic_factory import ModelFactory as PydanticModelFactory
 from pydantic import BaseModel
 
-from fluree_py.client import FlureeClient
+from fluree_py.http.client import FlureeClient
 from fluree_py.query.select.pydantic import from_pydantic
 
 T = TypeVar("T", bound=BaseModel)

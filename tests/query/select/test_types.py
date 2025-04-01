@@ -3,7 +3,7 @@ from typing import Any, Union
 from hypothesis import assume, example, given
 from hypothesis import strategies as st
 
-from fluree_py.query.select.types import (
+from fluree_py.types.query.select import (
     is_logic_variable,
     is_node_object_template,
     is_select_array,
