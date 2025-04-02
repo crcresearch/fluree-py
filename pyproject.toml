@@ -1,11 +1,22 @@
 [project]
 name = "fluree-py"
 version = "0.1.0"
-description = "Add your description here"
+description = "A Python client library for interacting with FlureeDB, providing a type-safe and developer-friendly interface to the FlureeDB API."
 readme = "README.md"
 authors = [{ name = "James Sweet", email = "jsweet@nd.edu" }]
 requires-python = ">=3.11"
 dependencies = ["httpx>=0.28.1", "pydantic>=2.10.6"]
+license = { text = "MIT" }
+keywords = ["fluree", "database", "client", "api", "graph-database"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
 
 [build-system]
 requires = ["hatchling"]
@@ -13,40 +24,47 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
-  "polyfactory>=2.20.0",
-  "pytest-icdiff>=0.9",
-  "pytest-sugar>=1.0.0",
-  "pytest>=8.3.5",
-  "respx>=0.22.0",
-  "testcontainers[generic]>=4.9.2",
-  "hypothesis>=6.130.5",
-  "pytest-cov>=6.0.0",
+    "polyfactory>=2.20.0",
+    "pytest-icdiff>=0.9",
+    "pytest-sugar>=1.0.0",
+    "pytest>=8.3.5",
+    "respx>=0.22.0",
+    "testcontainers[generic]>=4.9.2",
+    "hypothesis>=6.130.5",
+    "pytest-cov>=6.0.0",
     "pytest-asyncio>=0.26.0",
 ]
-lint = ["ruff>=0.11.2"]
+lint = [
+    "ruff>=0.11.2",
+    "mypy>=1.8.0",
+]
 docs = [
-  "mkdocs>=1.6.1",
-  "mkdocs-material>=9.6.10",
-  "mkdocstrings[python]>=0.29.1",
-  "mkdocs-coverage>=1.1.0",
-  "mkdocs-section-index>=0.3.9",
-  "mkdocs-git-revision-date-localized-plugin>=1.4.5",
-  "griffe-pydantic>=1.1.4",
-  "griffe-warnings-deprecated>=1.1.0",
-  "griffe-generics>=1.0.13",
-  "griffe-inherited-method-crossrefs>=0.0.1.4",
-  "griffe-modernized-annotations>=1.0.8",
-  "markdown-callouts>=0.4.0",
-  "mkdocs-api-autonav>=0.2.1",
-  "mkdocs-literate-nav>=0.6.2",
-  "mkdocs-callouts>=1.16.0",
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.6.10",
+    "mkdocstrings[python]>=0.29.1",
+    "mkdocs-coverage>=1.1.0",
+    "mkdocs-section-index>=0.3.9",
+    "mkdocs-git-revision-date-localized-plugin>=1.4.5",
+    "griffe-pydantic>=1.1.4",
+    "griffe-warnings-deprecated>=1.1.0",
+    "griffe-generics>=1.0.13",
+    "griffe-inherited-method-crossrefs>=0.0.1.4",
+    "griffe-modernized-annotations>=1.0.8",
+    "markdown-callouts>=0.4.0",
+    "mkdocs-api-autonav>=0.2.1",
+    "mkdocs-literate-nav>=0.6.2",
+    "mkdocs-callouts>=1.16.0",
 ]
 
 [tool.uv]
 default-groups = ["dev", "lint"]
 
 [tool.pytest.ini_options]
-addopts = "--import-mode=importlib --verbose"
+addopts = "--import-mode=importlib --verbose --cov=src/fluree_py --cov-report=term-missing"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/fluree_py"]
@@ -56,3 +74,27 @@ include = ["src/fluree_py/**/*.py"]
 
 [tool.hatch.metadata]
 allow-direct-references = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+select = ["E", "F", "B", "I", "N", "UP", "PL", "RUF"]
+ignore = []
+
+[tool.ruff.isort]
+known-first-party = ["fluree_py"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_optional = true
