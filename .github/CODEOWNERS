@@ -1,0 +1,10 @@
+# This file defines ownership of code in the repository.
+# See https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owners for everything in the repo
+* @jsweet
+
+# Nix Setup
+.nix/ @jsweet
+flake.nix @jsweet
+flake.lock @jsweet 
