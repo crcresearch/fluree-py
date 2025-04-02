@@ -21,6 +21,7 @@ dev = [
   "testcontainers[generic]>=4.9.2",
   "hypothesis>=6.130.5",
   "pytest-cov>=6.0.0",
+    "pytest-asyncio>=0.26.0",
 ]
 lint = ["ruff>=0.11.2"]
 docs = [
