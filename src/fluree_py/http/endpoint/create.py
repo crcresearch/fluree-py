@@ -2,21 +2,19 @@ from dataclasses import dataclass
 from typing import Any
 
 from fluree_py.http.mixin import (
-    CommitableMixin,
-    RequestMixin,
     WithContextMixin,
     WithInsertMixin,
 )
+from fluree_py.http.mixin.commit import CommitableMixin
 from fluree_py.http.protocol.endpoint.create import CreateBuilder, CreateReadyToCommit
 from fluree_py.types.common import JsonArray, JsonObject
 
 
 @dataclass(frozen=True, kw_only=True)
 class CreateReadyToCommitImpl(
-    RequestMixin,
+    CommitableMixin,
     WithContextMixin["CreateReadyToCommitImpl"],
     WithInsertMixin["CreateReadyToCommitImpl"],
-    CommitableMixin["CreateReadyToCommitImpl"],
     CreateReadyToCommit,
 ):
     """Implementation of a create operation ready to be committed."""
@@ -42,7 +40,7 @@ class CreateReadyToCommitImpl(
 @dataclass(frozen=True, kw_only=True)
 class CreateBuilderImpl(
     WithContextMixin["CreateBuilderImpl"],
-    WithInsertMixin[CreateReadyToCommitImpl],
+    WithInsertMixin["CreateReadyToCommitImpl"],
     CreateBuilder,
 ):
     """Implementation of a create operation builder."""

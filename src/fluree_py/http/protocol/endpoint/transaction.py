@@ -3,10 +3,9 @@
 from typing import Protocol, Self
 
 from fluree_py.http.protocol.mixin import (
+    HasInsertData,
     SupportsCommitable,
     SupportsContext,
-    SupportsRequestCreation,
-    HasInsertData,
     SupportsInsert,
     SupportsWhere,
 )
@@ -21,13 +20,12 @@ class TransactionBuilder(
 ):
     """Protocol for building transaction operations."""
 
-    def with_delete(
-        self, data: JsonObject | JsonArray
-    ) -> "TransactionReadyToCommit": ...
+    def with_delete(self, data: JsonObject | JsonArray) -> "TransactionReadyToCommit":
+        """Set the delete data for the operation."""
+        ...
 
 
 class TransactionReadyToCommit(
-    SupportsRequestCreation,
     SupportsCommitable,
     SupportsContext["TransactionReadyToCommit"],
     SupportsWhere["TransactionReadyToCommit"],
@@ -36,4 +34,6 @@ class TransactionReadyToCommit(
 ):
     """Protocol for transaction operations ready to be committed."""
 
-    def with_delete(self, data: JsonObject | JsonArray) -> Self: ...
+    def with_delete(self, data: JsonObject | JsonArray) -> Self:
+        """Set the delete data for the operation."""
+        ...

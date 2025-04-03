@@ -7,12 +7,14 @@ class HasContextData(Protocol):
     context: dict[str, Any] | None
 
 
-T = TypeVar("T", bound="HasContextData", covariant=True)
+T_co = TypeVar("T_co", bound="HasContextData", covariant=True)
 
 
-class SupportsContext(Generic[T], Protocol):
+class SupportsContext(Generic[T_co], Protocol):
     """Protocol for objects that support context operations."""
 
     context: dict[str, Any] | None
 
-    def with_context(self, context: dict[str, Any]) -> T: ...
+    def with_context(self, context: dict[str, Any]) -> T_co:
+        """Set the context for this operation."""
+        ...

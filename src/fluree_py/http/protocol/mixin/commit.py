@@ -7,7 +7,8 @@ class SupportsCommit(Protocol):
     """Protocol for objects that support synchronous commit operations."""
 
     def commit(self) -> FlureeResponse:
-        """Executes the transaction synchronously.
+        """
+        Execute the transaction synchronously.
 
         Exceptions:
             httpx.RequestError: If the HTTP request fails.
@@ -20,7 +21,8 @@ class SupportsAsyncCommit(Protocol):
     """Protocol for objects that support asynchronous commit operations."""
 
     async def acommit(self) -> FlureeResponse:
-        """Executes the transaction asynchronously.
+        """
+        Execute the transaction asynchronously.
 
         Exceptions:
             httpx.RequestError: If the HTTP request fails.
@@ -31,5 +33,3 @@ class SupportsAsyncCommit(Protocol):
 
 class SupportsCommitable(SupportsCommit, SupportsAsyncCommit, Protocol):
     """Protocol for objects that support both sync and async commit operations."""
-
-    pass

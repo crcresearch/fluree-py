@@ -1,15 +1,17 @@
+"""Where clause grammar package."""
+
 # You can think of a FlureeQL query executing in two phases: the where phase and the select phase. The where phase filters and returns sets of bound values that the select phase can use to construct JSON objects. The where clause may return node subject ?bindings that we then use with select expressions like "*" to perform graph crawls from those subject nodes.
 # The where clause may also retrieve all the bindings we need, and we simply instruct the select clause that we want those bindings returned directly as query results.
 # In any case, in addition to establishing logic variables for bound values, we use the where clause to establish various data constraints for the data we are interested in querying (e.g. filtering by a particular predicate value, or expressing optional and outer-join data conditions).
 # When a where clause is an array, it can combine a series of where conditions and where operations.
 
 # Define Condition as a dictionary with flexible key-value pairs
-from typing import Dict, List, Literal, TypeAlias, TypeGuard, Union
+from typing import Literal, TypeAlias, TypeGuard
 
 from fluree_py.types.query.select import LogicVariable
 
-WhereResultSet: TypeAlias = Dict[str, str]
-WhereRelationship: TypeAlias = Dict[str, str]
+WhereResultSet: TypeAlias = dict[str, str]
+WhereRelationship: TypeAlias = dict[str, str]
 
 # A where condition describes relationships between nodes that must be satisfied for the nodes to be included in result sets, and it names those sets.
 #
@@ -18,7 +20,7 @@ WhereRelationship: TypeAlias = Dict[str, str]
 # { "@id": "?s", "schema:name": "?name" }
 # { "@id": "?s", "schema:name": "Freddie", "schema:familyName": "Mercury" }
 # { "@id": "http://example.org/jack", "?p": "?o" }
-WhereCondition = Union[WhereResultSet, WhereRelationship]
+WhereCondition = WhereResultSet | WhereRelationship
 
 # Examples:
 # [
@@ -31,7 +33,7 @@ WhereCondition = Union[WhereResultSet, WhereRelationship]
 #       "schema:name": "?name"
 #     }
 #   ]
-SuccessiveWhereCondition: TypeAlias = List[WhereCondition]
+SuccessiveWhereCondition: TypeAlias = list[WhereCondition]
 
 
 # Examples:
@@ -40,7 +42,7 @@ SuccessiveWhereCondition: TypeAlias = List[WhereCondition]
 #     { "@id": "?s", "schema:name": "?name" },
 #     { "@id": "?s", "schema:age": "?age" }
 # ]
-WhereOperationOptional: TypeAlias = List[Union[Literal["optional"], WhereCondition]]
+WhereOperationOptional: TypeAlias = list[Literal["optional"] | WhereCondition]
 
 
 # Examples:
@@ -59,9 +61,7 @@ WhereFilterExpression: TypeAlias = str
 # "(< ?age 50)"
 # (! (strStarts ?url \"http\"))
 def is_filter_expression(var: str) -> TypeGuard[WhereFilterExpression]:
-    """
-    Type guard to check if a string is a valid filter expression.
-    """
+    """Type guard to check if a string is a valid filter expression."""
     if not all(c.isprintable() for c in var):
         return False
 
@@ -85,9 +85,7 @@ def is_filter_expression(var: str) -> TypeGuard[WhereFilterExpression]:
 
 # Examples:
 # ["filter", "(> ?age 45)", "(< ?age 50)"]
-WhereOperationFilter: TypeAlias = List[
-    Union[Literal["optional"], WhereFilterExpression]
-]
+WhereOperationFilter: TypeAlias = list[Literal["optional"] | WhereFilterExpression]
 
 
 # Examples:
@@ -96,22 +94,14 @@ WhereOperationFilter: TypeAlias = List[
 #   { "@id": "?s", "schema:email": "?email" },
 #   { "@id": "?s", "ex:email": "?email" }
 # ]
-WhereOperationUnion: TypeAlias = List[Union[Literal["union"], WhereCondition]]
+WhereOperationUnion: TypeAlias = list[Literal["union"] | WhereCondition]
 
 # Examples:
 # ["bind", "?canVote", "(>= ?age 18)"]
-WhereOperationBind: TypeAlias = List[
-    Union[Literal["bind"], LogicVariable, WhereFilterExpression]
-]
+WhereOperationBind: TypeAlias = list[Literal["bind"] | LogicVariable | WhereFilterExpression]
 
-WhereOperation = Union[
-    WhereOperationOptional,
-    WhereOperationFilter,
-    WhereOperationUnion,
-    WhereOperationBind,
-]
+WhereOperation = WhereOperationOptional | WhereOperationFilter | WhereOperationUnion | WhereOperationBind
 
+WhereClauseEntry: TypeAlias = WhereCondition | WhereOperation
 
-WhereClauseEntry: TypeAlias = Union[WhereCondition, WhereOperation]
-
-WhereClause: TypeAlias = WhereClauseEntry | List[WhereClauseEntry]
+WhereClause: TypeAlias = WhereClauseEntry | list[WhereClauseEntry]

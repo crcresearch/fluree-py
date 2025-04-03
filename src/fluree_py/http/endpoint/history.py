@@ -3,7 +3,6 @@ from typing import Any
 
 from fluree_py.http.mixin import (
     CommitableMixin,
-    RequestMixin,
     WithContextMixin,
 )
 from fluree_py.http.protocol.endpoint import HistoryBuilder
@@ -13,9 +12,8 @@ from fluree_py.types.http.history import HistoryClause
 
 @dataclass(frozen=True, kw_only=True)
 class HistoryBuilderImpl(
-    RequestMixin,
+    CommitableMixin,
     WithContextMixin["HistoryBuilderImpl"],
-    CommitableMixin["HistoryBuilderImpl"],
     HistoryBuilder,
 ):
     """Implementation of a history query builder."""

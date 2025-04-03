@@ -1,9 +1,9 @@
 """Mixin for managing context data in Fluree operations."""
 
 from typing import Any, Generic, TypeVar, cast
+
 from fluree_py.http.mixin.utils import resolve_base_class_reference
 from fluree_py.http.protocol.mixin import HasContextData
-
 
 T = TypeVar("T", bound="HasContextData")
 """Ensure that the type we are trying to create has a context attribute."""
@@ -13,7 +13,8 @@ class WithContextMixin(Generic[T]):
     """Provides context management for Fluree operations."""
 
     def with_context(self, context: dict[str, Any]) -> T:
-        """Updates the operation's context with new data.
+        """
+        Update the operation's context with new data.
 
         Exceptions:
             TypeError: If the type parameter cannot be resolved.
@@ -23,4 +24,4 @@ class WithContextMixin(Generic[T]):
         # Manually create a new instance with updated context
         updated_fields = self.__dict__.copy()
         updated_fields["context"] = context
-        return cast(T, resolved_type(**updated_fields))
+        return cast("T", resolved_type(**updated_fields))

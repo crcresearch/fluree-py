@@ -9,12 +9,14 @@ class HasWhereData(Protocol):
     where: WhereClause | None
 
 
-T = TypeVar("T", bound="HasWhereData", covariant=True)
+T_co = TypeVar("T_co", bound="HasWhereData", covariant=True)
 
 
-class SupportsWhere(Generic[T], Protocol):
+class SupportsWhere(Generic[T_co], Protocol):
     """Protocol for objects that support where clause operations."""
 
     where: WhereClause | None = None
 
-    def with_where(self, clause: WhereClause) -> T: ...
+    def with_where(self, clause: WhereClause) -> T_co:
+        """Set the where clause for the operation."""
+        ...
