@@ -1,4 +1,5 @@
-from typing import Generator
+import logging
+from collections.abc import Generator
 
 import pytest
 from testcontainers.core.waiting_utils import wait_for_logs  # type: ignore
@@ -6,8 +7,12 @@ from testcontainers.generic import ServerContainer  # type: ignore
 
 from fluree_py import FlureeClient
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-def pytest_addoption(parser: pytest.Parser):
+
+def pytest_addoption(parser: pytest.Parser) -> None:
     """Add custom command line options."""
     parser.addoption(
         "--use-fluree-server",
@@ -32,12 +37,13 @@ def fluree_url(request: pytest.FixtureRequest) -> Generator[str, None, None]:
     wait_for_logs(container, "Starting Fluree server with profile")
 
     # Return the container's connection URL
-    yield container._create_connection_url()  # type: ignore
+    yield container._create_connection_url()  # type: ignore # noqa: SLF001
 
     # Print the container's logs
     (out, err) = container.get_logs()
-    print(out.decode("utf-8"))
-    print(err.decode("utf-8"))
+    logger.info("Container logs:\n%s", out.decode("utf-8"))
+    if err:
+        logger.error("Container error logs:\n%s", err.decode("utf-8"))
 
     # Cleanup
     container.stop()
@@ -64,7 +70,9 @@ def test_name(request: pytest.FixtureRequest) -> str:
 
 @pytest.fixture
 def cookbook_client(
-    using_fluree_server: bool, test_name: str, fluree_client: FlureeClient
+    using_fluree_server: bool,
+    test_name: str,
+    fluree_client: FlureeClient,
 ) -> Generator[FlureeClient, None, None]:
     if not using_fluree_server:
         yield fluree_client
@@ -110,7 +118,7 @@ def cookbook_client(
                         {"@id": "ex:betty"},
                     ],
                 },
-            ]
+            ],
         )
         .commit()
     )

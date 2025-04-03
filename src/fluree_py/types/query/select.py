@@ -1,5 +1,5 @@
 """
-FlureeQL Select Clause Grammar
+FlureeQL Select clause grammar package.
 
 The select clause in FlureeQL determines the structure and content of query results.
 It can be either a select object or a select array.
@@ -57,7 +57,7 @@ Example Queries:
 """
 
 import re
-from typing import Any, Dict, List, TypeAlias, TypeGuard, Union
+from typing import Any, TypeAlias, TypeGuard, Union
 
 from fluree_py.types.common import Predicate, Wildcard
 
@@ -102,7 +102,7 @@ Example Queries:
     ["name", { "bestFriend": ["*"] }]
 """
 
-SelectExpressionList: TypeAlias = List[SelectExpression]
+SelectExpressionList: TypeAlias = list[SelectExpression]
 """
 A list of select expressions in a FlureeQL query.
 Used in both select objects and node templates to specify multiple expressions.
@@ -111,7 +111,7 @@ Example Queries:
     ["name", "*", { "bestFriend": ["*"] }]
 """
 
-NodeObjectTemplate: TypeAlias = Dict[Predicate, "SelectExpressionList"]
+NodeObjectTemplate: TypeAlias = dict[Predicate, "SelectExpressionList"]
 """
 A node object template in a FlureeQL query.
 Node object templates define how to traverse nested predicate values.
@@ -138,7 +138,7 @@ def is_node_object_template(var: Any) -> TypeGuard[NodeObjectTemplate]:
     return all(isinstance(k, str) and isinstance(v, list) for (k, v) in var.items())  # type: ignore
 
 
-SelectObject: TypeAlias = Dict[LogicVariable, SelectExpressionList]
+SelectObject: TypeAlias = dict[LogicVariable, SelectExpressionList]
 """
 A select object in a FlureeQL query.
 A select object maps logic variables to arrays of select expressions.
@@ -159,7 +159,7 @@ def is_select_object(var: Any) -> TypeGuard[SelectObject]:
     return all(is_logic_variable(k) and isinstance(v, list) for k, v in var.items())  # type: ignore
 
 
-SelectArrayElement: TypeAlias = Union[LogicVariable, SelectObject]
+SelectArrayElement: TypeAlias = LogicVariable | SelectObject
 """
 An element in a select array in a FlureeQL query.
 An element in a select array can be either a logic variable or a select object.
@@ -177,7 +177,7 @@ def is_select_array_element(var: Any) -> TypeGuard[SelectArrayElement]:
     return is_logic_variable(var) if isinstance(var, str) else is_select_object(var)
 
 
-SelectArray: TypeAlias = List[SelectArrayElement]
+SelectArray: TypeAlias = list[SelectArrayElement]
 """
 A select array in a FlureeQL query.
 A select array is a list containing logic variables or select objects.
@@ -200,7 +200,7 @@ def is_select_array(var: Any) -> TypeGuard[SelectArray]:
     return all(is_select_array_element(v) for v in var)  # type: ignore
 
 
-SelectClause: TypeAlias = Union[SelectObject, SelectArray]
+SelectClause: TypeAlias = SelectObject | SelectArray
 """
 A select clause in a FlureeQL query.
 A select clause can be either a select object or a select array.
@@ -212,17 +212,17 @@ Example Queries:
 
 __all__ = [
     "LogicVariable",
+    "NodeObjectTemplate",
     "Predicate",
-    "Wildcard",
+    "SelectArray",
+    "SelectArrayElement",
     "SelectExpression",
     "SelectExpressionList",
-    "NodeObjectTemplate",
     "SelectObject",
-    "SelectArrayElement",
-    "SelectArray",
+    "Wildcard",
     "is_logic_variable",
     "is_node_object_template",
-    "is_select_object",
-    "is_select_array_element",
     "is_select_array",
+    "is_select_array_element",
+    "is_select_object",
 ]

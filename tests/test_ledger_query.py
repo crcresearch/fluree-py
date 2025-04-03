@@ -1,17 +1,17 @@
-from typing import Generator
+from collections.abc import Generator
+from http import HTTPStatus
 
 import pytest
 import respx
 from httpx import Request, Response
-from pytest import FixtureRequest
 from respx import MockRouter
 
 from fluree_py import FlureeClient
 
 
-def query_side_effect(request: Request):
+def query_side_effect(request: Request) -> Response:  # noqa: ARG001
     return Response(
-        200,
+        HTTPStatus.OK,
         headers={"Content-Type": "application/json;charset=utf-8"},
         json=[
             {
@@ -53,9 +53,7 @@ def query_side_effect(request: Request):
 
 @pytest.fixture
 def mocked_api() -> Generator[MockRouter, None, None]:
-    with respx.mock(
-        base_url="http://localhost:8090", assert_all_called=False
-    ) as respx_mock:
+    with respx.mock(base_url="http://localhost:8090", assert_all_called=False) as respx_mock:
         query_route = respx_mock.post("/fluree/query", name="query")
         query_route.side_effect = query_side_effect
 
@@ -64,7 +62,7 @@ def mocked_api() -> Generator[MockRouter, None, None]:
 
 @pytest.fixture
 def cookbook_client(
-    request: FixtureRequest, cookbook_client: FlureeClient
+    request: pytest.FixtureRequest, cookbook_client: FlureeClient
 ) -> Generator[FlureeClient, None, None]:
     # If we're using a real Fluree server, yield the client and ignore the mocked API
     if request.config.getoption("--use-fluree-server"):
@@ -83,7 +81,7 @@ def cookbook_client(
 
 
 # https://developers.flur.ee/docs/reference/cookbook/#-wildcard
-def test_ledger_query_wildcard_example(test_name: str, cookbook_client: FlureeClient):
+def test_ledger_query_wildcard_example(test_name: str, cookbook_client: FlureeClient) -> None:
     resp = (
         cookbook_client.with_ledger(test_name)
         .query()
@@ -93,8 +91,7 @@ def test_ledger_query_wildcard_example(test_name: str, cookbook_client: FlureeCl
         .commit()
     )
 
-    print(resp.json())
-    assert resp.status_code == 200
+    assert resp.status_code == HTTPStatus.OK
     assert resp.headers["Content-Type"] == "application/json;charset=utf-8"
 
     assert resp.json() == [

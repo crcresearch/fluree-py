@@ -1,9 +1,9 @@
-from typing import Generator
+from collections.abc import Generator
+from http import HTTPStatus
 
 import pytest
 import respx
 from httpx import Response
-from pytest import FixtureRequest
 from respx import MockRouter
 
 from fluree_py import FlureeClient
@@ -11,12 +11,10 @@ from fluree_py import FlureeClient
 
 @pytest.fixture
 def mocked_api() -> Generator[MockRouter, None, None]:
-    with respx.mock(
-        base_url="http://localhost:8090", assert_all_called=False
-    ) as respx_mock:
+    with respx.mock(base_url="http://localhost:8090", assert_all_called=False) as respx_mock:
         history_route = respx_mock.post("/fluree/history", name="history")
         history_route.return_value = Response(
-            200,
+            HTTPStatus.OK,
             headers={"Content-Type": "application/json;charset=utf-8"},
             json=[
                 {
@@ -28,7 +26,7 @@ def mocked_api() -> Generator[MockRouter, None, None]:
                     ],
                     "f:retract": [],
                     "f:t": 1,
-                }
+                },
             ],
         )
 
@@ -37,7 +35,7 @@ def mocked_api() -> Generator[MockRouter, None, None]:
 
 @pytest.fixture
 def cookbook_client(
-    request: FixtureRequest, cookbook_client: FlureeClient
+    request: pytest.FixtureRequest, cookbook_client: FlureeClient
 ) -> Generator[FlureeClient, None, None]:
     # If we're using a real Fluree server, yield the client and ignore the mocked API
     if request.config.getoption("--use-fluree-server"):
@@ -55,7 +53,7 @@ def cookbook_client(
     assert create_route.calls.last.request.headers["Content-Type"] == "application/json"
 
 
-def test_ledger_history(test_name: str, cookbook_client: FlureeClient):
+def test_ledger_history(test_name: str, cookbook_client: FlureeClient) -> None:
     context = {
         "ex": "http://example.org/",
         "schema": "http://schema.org/",
@@ -71,7 +69,7 @@ def test_ledger_history(test_name: str, cookbook_client: FlureeClient):
         .commit()
     )
 
-    assert resp.status_code == 200
+    assert resp.status_code == HTTPStatus.OK
     assert resp.headers["Content-Type"] == "application/json;charset=utf-8"
 
     assert resp.json() == [
@@ -84,5 +82,5 @@ def test_ledger_history(test_name: str, cookbook_client: FlureeClient):
             ],
             "f:retract": [],
             "f:t": 1,
-        }
+        },
     ]

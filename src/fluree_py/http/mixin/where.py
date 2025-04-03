@@ -10,10 +10,11 @@ T = TypeVar("T", bound="HasWhereData")
 
 
 class WithWhereMixin(Generic[T]):
-    """Provides where clause capabilities for Fluree queries."""
+    """Provide where clause capabilities for Fluree queries."""
 
-    def with_where(self: T, clause: WhereClause) -> T:
-        """Updates the query with a new where clause.
+    def with_where(self, clause: WhereClause) -> T:
+        """
+        Update the query with a new where clause.
 
         Exceptions:
             TypeError: If the type parameter cannot be resolved.
@@ -23,4 +24,4 @@ class WithWhereMixin(Generic[T]):
         # Create a new instance of the resolved type
         updated_fields = self.__dict__.copy()
         updated_fields["where"] = clause
-        return cast(T, resolved_type(**updated_fields))
+        return cast("T", resolved_type(**updated_fields))

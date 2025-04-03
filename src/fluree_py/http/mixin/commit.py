@@ -1,21 +1,18 @@
 """Mixins for committing transactions to the Fluree ledger."""
 
-from typing import Generic, TypeVar
-
 from httpx import AsyncClient, Client
 
+from fluree_py.http.mixin.request import WithRequestMixin
 from fluree_py.http.protocol.mixin.commit import SupportsAsyncCommit, SupportsCommit
-from fluree_py.http.protocol.mixin.request import SupportsRequestCreation
 from fluree_py.http.response import FlureeResponse
 
-T = TypeVar("T", bound=SupportsRequestCreation)
 
-
-class CommitMixin(SupportsCommit, Generic[T]):
+class CommitMixin(WithRequestMixin, SupportsCommit):
     """Synchronous commit functionality for Fluree transactions."""
 
-    def commit(self: T) -> FlureeResponse:
-        """Executes the transaction synchronously.
+    def commit(self) -> FlureeResponse:
+        """
+        Execute the transaction synchronously.
 
         Exceptions:
             httpx.RequestError: If the HTTP request fails.
@@ -27,11 +24,12 @@ class CommitMixin(SupportsCommit, Generic[T]):
         return FlureeResponse(response=response)
 
 
-class AsyncCommitMixin(SupportsAsyncCommit, Generic[T]):
+class AsyncCommitMixin(WithRequestMixin, SupportsAsyncCommit):
     """Asynchronous commit functionality for Fluree transactions."""
 
-    async def acommit(self: T) -> FlureeResponse:
-        """Executes the transaction asynchronously.
+    async def acommit(self) -> FlureeResponse:
+        """
+        Execute the transaction asynchronously.
 
         Exceptions:
             httpx.RequestError: If the HTTP request fails.
@@ -43,5 +41,5 @@ class AsyncCommitMixin(SupportsAsyncCommit, Generic[T]):
         return FlureeResponse(response=response)
 
 
-class CommitableMixin(CommitMixin[T], AsyncCommitMixin[T], Generic[T]):
+class CommitableMixin(CommitMixin, AsyncCommitMixin):
     """Combines synchronous and asynchronous commit capabilities."""

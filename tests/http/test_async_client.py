@@ -1,9 +1,9 @@
-from typing import Generator
+from collections.abc import Generator
+from http import HTTPStatus
 
 import pytest
 import respx
 from httpx import Response
-from pytest import FixtureRequest
 from respx import MockRouter
 
 from fluree_py import FlureeClient
@@ -12,12 +12,10 @@ from fluree_py.http.endpoint import CreateReadyToCommitImpl
 
 @pytest.fixture
 def mocked_api(test_name: str) -> Generator[MockRouter, None, None]:
-    with respx.mock(
-        base_url="http://localhost:8090", assert_all_called=False
-    ) as respx_mock:
+    with respx.mock(base_url="http://localhost:8090", assert_all_called=False) as respx_mock:
         create_route = respx_mock.post("/fluree/create", name="create")
         create_route.return_value = Response(
-            201,
+            HTTPStatus.CREATED,
             headers={"Content-Type": "application/json;charset=utf-8"},
             json={
                 "commit": f"fluree:file://{test_name}/commit/bylyfvz5kexxf6l3tdzbobuz6eooxtgfxg3xqnp3pep7zfwxspkp.json",
@@ -31,9 +29,7 @@ def mocked_api(test_name: str) -> Generator[MockRouter, None, None]:
 
 
 @pytest.fixture
-def fluree_client(
-    request: FixtureRequest, fluree_client: FlureeClient
-) -> Generator[FlureeClient, None, None]:
+def fluree_client(request: pytest.FixtureRequest, fluree_client: FlureeClient) -> Generator[FlureeClient, None, None]:
     # If we're using a real Fluree server, yield the client and ignore the mocked API
     if request.config.getoption("--use-fluree-server"):
         yield fluree_client
@@ -54,7 +50,7 @@ def fluree_client(
 async def test_create_ledger_async(
     test_name: str,
     fluree_client: FlureeClient,
-):
+) -> None:
     context = {
         "ex": "http://example.org/",
         "schema": "http://schema.org/",
@@ -66,20 +62,15 @@ async def test_create_ledger_async(
             "@type": "ex:Yeti",
             "schema:age": 4,
             "schema:name": "Freddy",
-        }
+        },
     ]
 
-    with_insert = (
-        fluree_client.with_ledger(test_name)
-        .create()
-        .with_context(context)
-        .with_insert(data)
-    )
+    with_insert = fluree_client.with_ledger(test_name).create().with_context(context).with_insert(data)
     assert isinstance(with_insert, CreateReadyToCommitImpl)
 
     resp = await with_insert.acommit()
 
-    assert resp.status_code == 201
+    assert resp.status_code == HTTPStatus.CREATED
     assert resp.headers["Content-Type"] == "application/json;charset=utf-8"
 
     resp_json = resp.json()

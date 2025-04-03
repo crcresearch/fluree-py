@@ -1,11 +1,8 @@
+"""Type checking utilities for the FlureeQL select query builder."""
+
 from types import UnionType
-from pydantic import BaseModel
-
-
 from typing import (
     Any,
-    List,
-    Type,
     TypeGuard,
     Union,
     get_args,
@@ -13,31 +10,34 @@ from typing import (
     get_type_hints,
 )
 
+from pydantic import BaseModel
+
 
 class TypeChecker:
-    """Handles type checking and validation for Pydantic models.
+    """
+    Handles type checking and validation for Pydantic models.
 
     This class provides utility methods for checking various types that can appear
     in Pydantic models, such as lists, dictionaries, and nested models.
     """
 
     @classmethod
-    def is_list_type(cls, field_type: Any) -> TypeGuard[Type[List[Any]]]:
+    def is_list_type(cls, field_type: Any) -> TypeGuard[type[list[Any]]]:  # noqa: ANN401
         """Check if a type is a list type."""
         return hasattr(field_type, "__origin__") and field_type.__origin__ is list
 
     @classmethod
-    def is_dict_type(cls, field_type: Any) -> TypeGuard[Type[dict[str, Any]]]:
+    def is_dict_type(cls, field_type: Any) -> TypeGuard[type[dict[str, Any]]]:  # noqa: ANN401
         """Check if a type is a dict type."""
         return hasattr(field_type, "__origin__") and field_type.__origin__ is dict
 
     @classmethod
-    def is_tuple_type(cls, field_type: Any) -> TypeGuard[Type[tuple[Any, ...]]]:
+    def is_tuple_type(cls, field_type: Any) -> TypeGuard[type[tuple[Any, ...]]]:  # noqa: ANN401
         """Check if a type is a tuple type."""
         return hasattr(field_type, "__origin__") and field_type.__origin__ is tuple
 
     @classmethod
-    def is_primitive_type(cls, field_type: Any) -> bool:
+    def is_primitive_type(cls, field_type: Any) -> bool:  # noqa: ANN401
         """Check if a type is a primitive type (str, int, float, bool)."""
         return isinstance(field_type, type) and field_type in {str, int, float, bool}
 
@@ -47,7 +47,7 @@ class TypeChecker:
         return field_name == "id"
 
     @classmethod
-    def dict_max_depth(cls, field_type: Any, depth: int = 0) -> int:
+    def dict_max_depth(cls, field_type: Any, depth: int = 0) -> int:  # noqa: ANN401
         """Recursively count dictionary nesting depth."""
         while TypeChecker.is_dict_type(field_type):
             args = get_args(field_type)
@@ -58,12 +58,12 @@ class TypeChecker:
         return depth
 
     @classmethod
-    def is_base_model(cls, field_type: Any) -> TypeGuard[Type[BaseModel]]:
+    def is_base_model(cls, field_type: Any) -> TypeGuard[type[BaseModel]]:  # noqa: ANN401
         """Check if a type is a BaseModel."""
         return isinstance(field_type, type) and issubclass(field_type, BaseModel)
 
     @classmethod
-    def get_real_type(cls, field_type: Any) -> Any:
+    def get_real_type(cls, field_type: Any) -> Any:  # noqa: ANN401
         """Get the real type from a potentially optional/union type."""
         origin = get_origin(field_type)
         if origin in {Union, UnionType}:
@@ -73,17 +73,17 @@ class TypeChecker:
         return field_type
 
     @classmethod
-    def check_model_has_id(cls, model: Type[BaseModel]) -> bool:
+    def check_model_has_id(cls, model: type[BaseModel]) -> bool:
         """Check if a model has an id field in its type hints."""
         return "id" in get_type_hints(model, include_extras=True)
 
     @classmethod
-    def has_model_config(cls, model: Type[BaseModel]) -> bool:
+    def has_model_config(cls, model: type[BaseModel]) -> bool:
         """Check if a model has a model_config attribute."""
         return hasattr(model, "model_config")
 
     @classmethod
-    def check_model_requires_id(cls, model: Type[BaseModel]) -> bool:
+    def check_model_requires_id(cls, model: type[BaseModel]) -> bool:
         """Check if a model requires an id field based on its configuration."""
         if not cls.has_model_config(model):
             return True

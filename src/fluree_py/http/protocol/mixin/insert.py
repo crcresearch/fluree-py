@@ -9,12 +9,14 @@ class HasInsertData(Protocol):
     data: JsonObject | JsonArray | None
 
 
-T = TypeVar("T", bound="HasInsertData", covariant=True)
+T_co = TypeVar("T_co", bound="HasInsertData", covariant=True)
 
 
-class SupportsInsert(Generic[T], Protocol):
+class SupportsInsert(Generic[T_co], Protocol):
     """Protocol for objects that support insert operations."""
 
     data: JsonObject | JsonArray | None
 
-    def with_insert(self, data: JsonObject | JsonArray) -> T: ...
+    def with_insert(self, data: JsonObject | JsonArray) -> T_co:
+        """Set the insert data for the operation."""
+        ...

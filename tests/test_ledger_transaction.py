@@ -1,20 +1,20 @@
 import json
-from typing import Generator
+from collections.abc import Generator
+from http import HTTPStatus
 
 import pytest
 import respx
 from httpx import Request, Response
-from pytest import FixtureRequest
 from respx import MockRouter
 
 from fluree_py import FlureeClient
 
 
-def transact_side_effect(request: Request):
+def transact_side_effect(request: Request) -> Response:
     ledger = json.loads(request.content)["ledger"]
     if ledger == "test_ledger_transaction_single_record":
         return Response(
-            200,
+            HTTPStatus.OK,
             headers={"Content-Type": "application/json;charset=utf-8"},
             json={
                 "ledger": ledger,
@@ -23,9 +23,9 @@ def transact_side_effect(request: Request):
                 "tx-id": "2a3e5896f19dbf9db70c2ee025a08964ae1ca5858e13d2dac7b5edeee730c370",
             },
         )
-    elif ledger == "test_ledger_transaction_multiple_records":
+    if ledger == "test_ledger_transaction_multiple_records":
         return Response(
-            200,
+            HTTPStatus.OK,
             headers={"Content-Type": "application/json;charset=utf-8"},
             json={
                 "ledger": "test_ledger_transaction_multiple_records",
@@ -35,7 +35,7 @@ def transact_side_effect(request: Request):
             },
         )
     return Response(
-        409,
+        HTTPStatus.CONFLICT,
         headers={"Content-Type": "application/json;charset=utf-8"},
         json={"error": f"Ledger {ledger} does not exist!"},
     )
@@ -43,9 +43,7 @@ def transact_side_effect(request: Request):
 
 @pytest.fixture
 def mocked_api() -> Generator[MockRouter, None, None]:
-    with respx.mock(
-        base_url="http://localhost:8090", assert_all_called=False
-    ) as respx_mock:
+    with respx.mock(base_url="http://localhost:8090", assert_all_called=False) as respx_mock:
         transact_route = respx_mock.post("/fluree/transact", name="transact")
         transact_route.side_effect = transact_side_effect
 
@@ -54,7 +52,7 @@ def mocked_api() -> Generator[MockRouter, None, None]:
 
 @pytest.fixture
 def cookbook_client(
-    request: FixtureRequest, cookbook_client: FlureeClient
+    request: pytest.FixtureRequest, cookbook_client: FlureeClient
 ) -> Generator[FlureeClient, None, None]:
     # If we're using a real Fluree server, yield the client and ignore the mocked API
     if request.config.getoption("--use-fluree-server"):
@@ -68,16 +66,12 @@ def cookbook_client(
     # Assert that the mocked API was called
     create_route = mocked_api["transact"]
     assert create_route.call_count == 1
-    assert (
-        create_route.calls.last.request.url == "http://localhost:8090/fluree/transact"
-    )
+    assert create_route.calls.last.request.url == "http://localhost:8090/fluree/transact"
     assert create_route.calls.last.request.headers["Content-Type"] == "application/json"
 
 
 # https://developers.flur.ee/docs/reference/cookbook/#inserting-a-single-record
-def test_ledger_transaction_single_record(
-    test_name: str, cookbook_client: FlureeClient
-):
+def test_ledger_transaction_single_record(test_name: str, cookbook_client: FlureeClient) -> None:
     resp = (
         cookbook_client.with_ledger(test_name)
         .transaction()
@@ -87,12 +81,12 @@ def test_ledger_transaction_single_record(
                 "@id": "ex:fluree",
                 "@type": "schema:Organization",
                 "schema:description": "We ❤️ Data",
-            }
+            },
         )
         .commit()
     )
 
-    assert resp.status_code == 200
+    assert resp.status_code == HTTPStatus.OK
     assert resp.headers["Content-Type"] == "application/json;charset=utf-8"
 
     resp_json = resp.json()
@@ -111,9 +105,7 @@ def test_ledger_transaction_single_record(
 
 
 # https://developers.flur.ee/docs/reference/cookbook/#inserting-multiple-records
-def test_ledger_transaction_multiple_records(
-    test_name: str, cookbook_client: FlureeClient
-):
+def test_ledger_transaction_multiple_records(test_name: str, cookbook_client: FlureeClient) -> None:
     resp = (
         cookbook_client.with_ledger(test_name)
         .transaction()
@@ -130,12 +122,12 @@ def test_ledger_transaction_multiple_records(
                     "@type": "ex:Monster",
                     "schema:description": "We ❤️ Human Blood",
                 },
-            ]
+            ],
         )
         .commit()
     )
 
-    assert resp.status_code == 200
+    assert resp.status_code == HTTPStatus.OK
     assert resp.headers["Content-Type"] == "application/json;charset=utf-8"
 
     resp_json = resp.json()
@@ -154,7 +146,7 @@ def test_ledger_transaction_multiple_records(
 
 
 # Transaction Errors
-def test_transaction_on_missing_ledger(test_name: str, cookbook_client: FlureeClient):
+def test_transaction_on_missing_ledger(test_name: str, cookbook_client: FlureeClient) -> None:
     resp = (
         cookbook_client.with_ledger(test_name + "missing")
         .transaction()
@@ -164,10 +156,10 @@ def test_transaction_on_missing_ledger(test_name: str, cookbook_client: FlureeCl
                 "@id": "ex:fluree",
                 "@type": "schema:Organization",
                 "schema:description": "We ❤️ Data",
-            }
+            },
         )
         .commit()
     )
 
-    assert resp.status_code == 409
+    assert resp.status_code == HTTPStatus.CONFLICT
     assert resp.json() == {"error": f"Ledger {test_name + 'missing'} does not exist!"}

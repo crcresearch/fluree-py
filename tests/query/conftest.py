@@ -6,7 +6,7 @@ from fluree_py.http.client import FlureeClient
 @pytest.fixture(scope="session")
 def client_with_cookbook(fluree_client: FlureeClient) -> FlureeClient:
     fluree_client.with_ledger(ledger="cookbook/base").create().with_context(
-        {"ex": "http://example.org/", "schema": "http://schema.org/"}
+        {"ex": "http://example.org/", "schema": "http://schema.org/"},
     ).with_insert(
         [
             {
@@ -42,7 +42,7 @@ def client_with_cookbook(fluree_client: FlureeClient) -> FlureeClient:
                     {"@id": "ex:betty"},
                 ],
             },
-        ]
+        ],
     ).commit()
 
     return fluree_client

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import TypeVar, cast
+from typing import TypeVar
 
 from httpx import Headers, Response
 
@@ -10,6 +10,8 @@ T = TypeVar("T")
 
 @dataclass(frozen=True, kw_only=True)
 class FlureeResponse:
+    """A response from the Fluree ledger."""
+
     response: Response
 
     def json(self) -> JsonObject | JsonArray:
@@ -40,7 +42,3 @@ class FlureeResponse:
     def is_success(self) -> bool:
         """Check if the response was successful."""
         return self.response.is_success
-
-    def cast(self, type_: type[T]) -> T:
-        """Cast the JSON response to a specific type."""
-        return cast(T, self.json())

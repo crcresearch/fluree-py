@@ -9,7 +9,7 @@ from fluree_py.query.select.pydantic import (
 )
 
 
-def test_list_of_base_types():
+def test_list_of_base_types() -> None:
     class Model(BaseModel):
         id: str
         entries: list[str]
@@ -18,7 +18,7 @@ def test_list_of_base_types():
         from_pydantic(Model)
 
 
-def test_list_of_dictionaries():
+def test_list_of_dictionaries() -> None:
     class Model(BaseModel):
         id: str
         entries: list[dict[str, str]]
@@ -27,7 +27,7 @@ def test_list_of_dictionaries():
         from_pydantic(Model)
 
 
-def test_inside_nested_model():
+def test_inside_nested_model() -> None:
     class NestedModel(BaseModel):
         id: str
         nested_entries: list[str]
@@ -40,7 +40,7 @@ def test_inside_nested_model():
         from_pydantic(Model)
 
 
-def test_inside_nested_model_list():
+def test_inside_nested_model_list() -> None:
     class NestedModel(BaseModel):
         id: str
         nested_entries: list[str]
@@ -54,7 +54,7 @@ def test_inside_nested_model_list():
 
 
 # Should warn if a model has a single optional field as fluree won't accept an insert with just an ID field
-def test_single_optional_field():
+def test_single_optional_field() -> None:
     class Model(BaseModel):
         id: str
         name: str | None = None
@@ -64,7 +64,7 @@ def test_single_optional_field():
 
 
 # Should warn if a model has only optional fields as fluree won't accept an insert with just an ID field
-def test_only_optional_fields():
+def test_only_optional_fields() -> None:
     class Model(BaseModel):
         id: str
         name: str | None = None

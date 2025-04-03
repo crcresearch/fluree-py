@@ -1,3 +1,5 @@
+"""Protocols for interacting with a Fluree ledger."""
+
 from typing import Protocol
 
 from fluree_py.http.protocol.endpoint import (
@@ -11,7 +13,18 @@ from fluree_py.http.protocol.endpoint import (
 class SupportsLedgerOperations(Protocol):
     """Protocol defining core ledger operations."""
 
-    def create(self) -> CreateBuilder: ...
-    def transaction(self) -> TransactionBuilder: ...
-    def query(self) -> QueryBuilder: ...
-    def history(self) -> HistoryBuilder: ...
+    def create(self) -> CreateBuilder:
+        """Create a new builder for create operations."""
+        ...
+
+    def transaction(self) -> TransactionBuilder:
+        """Create a new builder for transaction operations."""
+        ...
+
+    def query(self) -> QueryBuilder:
+        """Create a new builder for query operations."""
+        ...
+
+    def history(self) -> HistoryBuilder:
+        """Create a new builder for history operations."""
+        ...

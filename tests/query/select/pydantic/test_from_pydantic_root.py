@@ -10,15 +10,12 @@ from tests.utils import create_and_retrieve_random_model
 
 # Ignore all warnings in these tests
 @pytest.fixture(scope="class", autouse=True)
-def setup_class():
+def setup_class() -> None:
     warnings.filterwarnings("ignore")
-    yield
 
 
 # Base Types
-def test_base_type(
-    using_fluree_server: bool, test_name: str, fluree_client: FlureeClient
-):
+def test_base_type(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class Model(BaseModel):
         id: str
         name: str
@@ -27,16 +24,12 @@ def test_base_type(
     assert select == ["*"]
 
     if using_fluree_server:
-        model, result_model = create_and_retrieve_random_model(
-            Model, fluree_client, test_name
-        )
+        model, result_model = create_and_retrieve_random_model(Model, fluree_client, test_name)
         assert model == result_model
 
 
 # List of Base Types
-def test_list_of_base_type(
-    using_fluree_server: bool, test_name: str, fluree_client: FlureeClient
-):
+def test_list_of_base_type(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class Model(BaseModel):
         id: str
         name: list[str]
@@ -46,14 +39,15 @@ def test_list_of_base_type(
 
     if using_fluree_server:
         model, result_model = create_and_retrieve_random_model(
-            Model, fluree_client, test_name, {"name": {"@container": "@list"}}
+            Model,
+            fluree_client,
+            test_name,
+            {"name": {"@container": "@list"}},
         )
         assert model == result_model
 
 
-def test_optional_list_of_base_type(
-    using_fluree_server: bool, test_name: str, fluree_client: FlureeClient
-):
+def test_optional_list_of_base_type(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class Model(BaseModel):
         id: str
         name: list[str] | None = None
@@ -63,14 +57,19 @@ def test_optional_list_of_base_type(
 
     if using_fluree_server:
         model, result_model = create_and_retrieve_random_model(
-            Model, fluree_client, test_name, {"name": {"@container": "@list"}}
+            Model,
+            fluree_client,
+            test_name,
+            {"name": {"@container": "@list"}},
         )
         assert model == result_model
 
 
 def test_optional_list_of_base_type_with_initializer(
-    using_fluree_server: bool, test_name: str, fluree_client: FlureeClient
-):
+    using_fluree_server: bool,
+    test_name: str,
+    fluree_client: FlureeClient,
+) -> None:
     class Model(BaseModel):
         id: str
         name: list[str] | None = Field(default_factory=list)
@@ -80,13 +79,16 @@ def test_optional_list_of_base_type_with_initializer(
 
     if using_fluree_server:
         model, result_model = create_and_retrieve_random_model(
-            Model, fluree_client, test_name, {"name": {"@container": "@list"}}
+            Model,
+            fluree_client,
+            test_name,
+            {"name": {"@container": "@list"}},
         )
         assert model == result_model
 
 
 # Dictionaries
-def test_dict(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient):
+def test_dict(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class Model(BaseModel):
         id: str
         nested: dict[str, str]
@@ -95,9 +97,7 @@ def test_dict(using_fluree_server: bool, test_name: str, fluree_client: FlureeCl
     assert select == ["*", {"nested": ["*"]}]
 
     if using_fluree_server:
-        model, result_model = create_and_retrieve_random_model(
-            Model, fluree_client, test_name
-        )
+        model, result_model = create_and_retrieve_random_model(Model, fluree_client, test_name)
 
         # Remove id field from nested dictionary as it is added by Fluree
         del result_model.nested["id"]
@@ -105,9 +105,7 @@ def test_dict(using_fluree_server: bool, test_name: str, fluree_client: FlureeCl
         assert model == result_model
 
 
-def test_optional_dict(
-    using_fluree_server: bool, test_name: str, fluree_client: FlureeClient
-):
+def test_optional_dict(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class Model(BaseModel):
         id: str
         nested: dict[str, str] | None = None
@@ -116,9 +114,7 @@ def test_optional_dict(
     assert select == ["*", {"nested": ["*"]}]
 
     if using_fluree_server:
-        model, result_model = create_and_retrieve_random_model(
-            Model, fluree_client, test_name
-        )
+        model, result_model = create_and_retrieve_random_model(Model, fluree_client, test_name)
 
         # Remove id field from nested dictionary as it is added by Fluree
         if result_model.nested and "id" in result_model.nested:
@@ -127,9 +123,7 @@ def test_optional_dict(
         assert model == result_model
 
 
-def test_dict_with_initializer(
-    using_fluree_server: bool, test_name: str, fluree_client: FlureeClient
-):
+def test_dict_with_initializer(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class Model(BaseModel):
         id: str
         nested: dict[str, str] = Field(default_factory=dict)
@@ -138,9 +132,7 @@ def test_dict_with_initializer(
     assert select == ["*", {"nested": ["*"]}]
 
     if using_fluree_server:
-        model, result_model = create_and_retrieve_random_model(
-            Model, fluree_client, test_name
-        )
+        model, result_model = create_and_retrieve_random_model(Model, fluree_client, test_name)
 
         # Remove id field from nested dictionary as it is added by Fluree
         if result_model.nested and "id" in result_model.nested:
@@ -149,9 +141,7 @@ def test_dict_with_initializer(
         assert model == result_model
 
 
-def test_optional_dict_with_initializer(
-    using_fluree_server: bool, test_name: str, fluree_client: FlureeClient
-):
+def test_optional_dict_with_initializer(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class Model(BaseModel):
         id: str
         nested: dict[str, str] | None = Field(default_factory=dict)
@@ -160,9 +150,7 @@ def test_optional_dict_with_initializer(
     assert select == ["*", {"nested": ["*"]}]
 
     if using_fluree_server:
-        model, result_model = create_and_retrieve_random_model(
-            Model, fluree_client, test_name
-        )
+        model, result_model = create_and_retrieve_random_model(Model, fluree_client, test_name)
 
         # Remove id field from nested dictionary as it is added by Fluree
         if result_model.nested and "id" in result_model.nested:
@@ -172,9 +160,7 @@ def test_optional_dict_with_initializer(
 
 
 # List of Dictionaries
-def test_list_of_dict(
-    using_fluree_server: bool, test_name: str, fluree_client: FlureeClient
-):
+def test_list_of_dict(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class Model(BaseModel):
         id: str
         nested: list[dict[str, str]]
@@ -184,7 +170,10 @@ def test_list_of_dict(
 
     if using_fluree_server:
         model, result_model = create_and_retrieve_random_model(
-            Model, fluree_client, test_name, {"nested": {"@container": "@list"}}
+            Model,
+            fluree_client,
+            test_name,
+            {"nested": {"@container": "@list"}},
         )
 
         # Remove id field from nested models as it is added by Fluree
@@ -194,9 +183,7 @@ def test_list_of_dict(
         assert model == result_model
 
 
-def test_optional_list_of_dict(
-    using_fluree_server: bool, test_name: str, fluree_client: FlureeClient
-):
+def test_optional_list_of_dict(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class Model(BaseModel):
         id: str
         nested: list[dict[str, str]] | None = None
@@ -206,7 +193,10 @@ def test_optional_list_of_dict(
 
     if using_fluree_server:
         model, result_model = create_and_retrieve_random_model(
-            Model, fluree_client, test_name, {"nested": {"@container": "@list"}}
+            Model,
+            fluree_client,
+            test_name,
+            {"nested": {"@container": "@list"}},
         )
 
         # Remove id field from nested models as it is added by Fluree
@@ -217,9 +207,7 @@ def test_optional_list_of_dict(
         assert model == result_model
 
 
-def test_list_of_dict_with_initializer(
-    using_fluree_server: bool, test_name: str, fluree_client: FlureeClient
-):
+def test_list_of_dict_with_initializer(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class Model(BaseModel):
         id: str
         nested: list[dict[str, str]] = Field(default_factory=list)
@@ -229,7 +217,10 @@ def test_list_of_dict_with_initializer(
 
     if using_fluree_server:
         model, result_model = create_and_retrieve_random_model(
-            Model, fluree_client, test_name, {"nested": {"@container": "@list"}}
+            Model,
+            fluree_client,
+            test_name,
+            {"nested": {"@container": "@list"}},
         )
 
         # Remove id field from nested models as it is added by Fluree
@@ -241,7 +232,7 @@ def test_list_of_dict_with_initializer(
 
 def test_optional_list_of_dict_with_initializer(
     using_fluree_server: bool, test_name: str, fluree_client: FlureeClient
-):
+) -> None:
     class Model(BaseModel):
         id: str
         nested: list[dict[str, str]] | None = Field(default_factory=list)
@@ -251,7 +242,10 @@ def test_optional_list_of_dict_with_initializer(
 
     if using_fluree_server:
         model, result_model = create_and_retrieve_random_model(
-            Model, fluree_client, test_name, {"nested": {"@container": "@list"}}
+            Model,
+            fluree_client,
+            test_name,
+            {"nested": {"@container": "@list"}},
         )
 
         # Remove id field from nested models as it is added by Fluree

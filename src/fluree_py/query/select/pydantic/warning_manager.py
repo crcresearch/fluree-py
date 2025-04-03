@@ -1,15 +1,19 @@
-from dataclasses import dataclass, field
+"""Warning management for the FlureeQL select query builder."""
+
 import warnings
+from dataclasses import dataclass, field
 
 
 @dataclass
 class WarningManager:
-    """Manages warnings for the Pydantic model processing.
+    """
+    Manages warnings for the Pydantic model processing.
 
     Example:
         >>> manager = WarningManager()
         >>> manager.add_warning(ListOrderWarning, "Field 'items' is a list")
         >>> manager.emit_warnings()
+
     """
 
     warnings_list: list[tuple[type[Warning], str]] = field(default_factory=list)

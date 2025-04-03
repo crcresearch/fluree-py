@@ -2,18 +2,17 @@ from dataclasses import dataclass, replace
 from typing import Any
 
 from fluree_py.http.mixin import (
-    CommitableMixin,
-    RequestMixin,
     WithContextMixin,
     WithInsertMixin,
     WithWhereMixin,
 )
+from fluree_py.http.mixin.commit import CommitableMixin
 from fluree_py.http.protocol.endpoint import (
     TransactionBuilder,
     TransactionReadyToCommit,
 )
-from fluree_py.types.query.where import WhereClause
 from fluree_py.types.common import JsonArray, JsonObject
+from fluree_py.types.query.where import WhereClause
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -32,9 +31,7 @@ class TransactionBuilderImpl(
     data: JsonObject | JsonArray | None = None
     delete_data: JsonObject | JsonArray | None = None
 
-    def with_delete(
-        self, data: JsonObject | JsonArray
-    ) -> "TransactionReadyToCommitImpl":
+    def with_delete(self, data: JsonObject | JsonArray) -> "TransactionReadyToCommitImpl":
         """Add delete operation to the transaction."""
         updated_fields = self.__dict__.copy()
         updated_fields["delete_data"] = data
@@ -43,10 +40,9 @@ class TransactionBuilderImpl(
 
 @dataclass(frozen=True, kw_only=True)
 class TransactionReadyToCommitImpl(
-    RequestMixin,
+    CommitableMixin,
     WithContextMixin["TransactionReadyToCommitImpl"],
     WithWhereMixin["TransactionReadyToCommitImpl"],
-    CommitableMixin["TransactionReadyToCommitImpl"],
     TransactionReadyToCommit,
 ):
     """Implementation of a transaction operation ready to be committed."""
@@ -58,9 +54,7 @@ class TransactionReadyToCommitImpl(
     data: JsonObject | JsonArray | None
     delete_data: JsonObject | JsonArray | None
 
-    def with_delete(
-        self, data: JsonObject | JsonArray
-    ) -> "TransactionReadyToCommitImpl":
+    def with_delete(self, data: JsonObject | JsonArray) -> "TransactionReadyToCommitImpl":
         """Add delete operation to the transaction."""
         return replace(self, delete_data=data)
 
