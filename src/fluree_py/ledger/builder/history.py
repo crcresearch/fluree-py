@@ -1,29 +1,17 @@
 from dataclasses import dataclass, replace
-from typing import Any, Protocol
+from typing import Any
 
 import httpx
 
-from fluree_py.context import SupportsContext, WithContextMixin
-
-
-class SupportsHistory(Protocol):
-    def history(self) -> "HistoryBuilder": ...
-
-
-class HistoryBuilder(SupportsContext, Protocol):
-    def with_history(self, history: list[str | None]) -> "HistoryBuilder": ...
-    def with_t(self, t: int | dict[str, int]) -> "HistoryBuilder": ...
-    def with_commit_details(self, commit_details: bool) -> "HistoryBuilder": ...
-    def request(self) -> httpx.Request: ...
-    def commit(self) -> dict[str, Any]: ...
+from fluree_py.ledger.mixin.context import WithContextMixin
 
 
 @dataclass(frozen=True, kw_only=True)
 class HistoryBuilderImpl(WithContextMixin):
     endpoint: str
     ledger: str
-    history: list[str | None] | None = None
-    t: int | dict[str, int] | None = None
+    history: list[str] | None = None
+    t: dict[str, Any] | None = None
     commit_details: bool | None = None
 
     def with_context(self, context: dict[str, Any]) -> "HistoryBuilderImpl":
@@ -32,7 +20,7 @@ class HistoryBuilderImpl(WithContextMixin):
     def with_history(self, history: list[str | None]) -> "HistoryBuilderImpl":
         return replace(self, history=history)
 
-    def with_t(self, t: int | dict[str, int]) -> "HistoryBuilderImpl":
+    def with_t(self, t: dict[str, Any]) -> "HistoryBuilderImpl":
         return replace(self, t=t)
 
     def with_commit_details(self, commit_details: bool) -> "HistoryBuilderImpl":

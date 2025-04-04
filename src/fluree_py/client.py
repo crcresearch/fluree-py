@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from fluree_py.ledger import LedgerSelected
+from fluree_py.ledger.ledger import LedgerSelected
 
 
 @dataclass(frozen=True, kw_only=True)

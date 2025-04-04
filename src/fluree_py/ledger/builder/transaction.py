@@ -1,32 +1,20 @@
 from dataclasses import dataclass, replace
-from typing import Any, Protocol
+from typing import Any
 
 import httpx
 
-from fluree_py.context import SupportsContext, WithContextMixin
-
-
-class SupportsTransaction(Protocol):
-    def transaction(self) -> "TransactionBuilder": ...
-
-
-class TransactionBuilder(SupportsContext, Protocol):
-    def with_insert(self, data: list[dict[str, Any]] | dict[str, Any]) -> "TransactionBuilder": ...
-    def with_delete(self, data: list[dict[str, Any]] | dict[str, Any]) -> "TransactionBuilder": ...
-    def with_where(self, clause: dict[str, Any]) -> "TransactionBuilder": ...
-    def request(self) -> httpx.Request: ...
-    def commit(self) -> dict[str, Any]: ...
+from fluree_py.ledger.mixin.context import WithContextMixin
 
 
 @dataclass(frozen=True, kw_only=True)
 class TransactionBuilderImpl(WithContextMixin):
     endpoint: str
     ledger: str
-    insert_data: list[dict[str, Any]] | dict[str, Any] | None = None
-    delete_data: list[dict[str, Any]] | dict[str, Any] | None = None
+    insert_data: dict[str, Any] | None = None
+    delete_data: dict[str, Any] | None = None
     where_clause: dict[str, Any] | None = None
 
-    def with_insert(self, data: list[dict[str, Any]] | dict[str, Any]) -> "TransactionBuilderImpl":
+    def with_insert(self, data: dict[str, Any]) -> "TransactionBuilderImpl":
         return replace(self, insert_data=data)
 
     @property
@@ -41,7 +29,7 @@ class TransactionBuilderImpl(WithContextMixin):
     def where_json(self) -> dict[str, Any]:
         return {"where": self.where_clause} if self.where_clause else {}
 
-    def with_delete(self, data: list[dict[str, Any]] | dict[str, Any]) -> "TransactionBuilderImpl":
+    def with_delete(self, data: dict[str, Any]) -> "TransactionBuilderImpl":
         return replace(self, delete_data=data)
 
     def with_where(self, clause: dict[str, Any]) -> "TransactionBuilderImpl":

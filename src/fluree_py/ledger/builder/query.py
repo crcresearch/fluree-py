@@ -1,20 +1,9 @@
 from dataclasses import dataclass, replace
-from typing import Any, Protocol
+from typing import Any
 
 import httpx
 
-from fluree_py.context import SupportsContext, WithContextMixin
-
-
-class QueryBuilder(SupportsContext, Protocol):
-    def with_where(self, conditions: dict[str, Any]) -> "QueryBuilder": ...
-    def with_group_by(self, fields: list[str]) -> "QueryBuilder": ...
-    def with_having(self, condition: dict[str, Any]) -> "QueryBuilder": ...
-    def with_order_by(self, fields: list[str]) -> "QueryBuilder": ...
-    def with_opts(self, opts: dict[str, Any]) -> "QueryBuilder": ...
-    def select(self, fields: list[str] | dict[str, Any]) -> "QueryBuilder": ...
-    def request(self) -> httpx.Request: ...
-    def commit(self) -> dict[str, Any]: ...
+from fluree_py.ledger.mixin.context import WithContextMixin
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -26,7 +15,7 @@ class QueryBuilderImpl(WithContextMixin):
     having: dict[str, Any] | None = None
     order_by: list[str] | None = None
     opts: dict[str, Any] | None = None
-    select_fields: list[str] | dict[str, Any] | None = None
+    select_fields: list[str] | None = None
 
     def with_where(self, conditions: dict[str, Any]) -> "QueryBuilderImpl":
         return replace(self, where=conditions)
@@ -63,7 +52,7 @@ class QueryBuilderImpl(WithContextMixin):
     def opts_json(self) -> dict[str, Any]:
         return {"opts": self.opts} if self.opts else {}
 
-    def select(self, fields: list[str] | dict[str, Any]) -> "QueryBuilderImpl":
+    def select(self, fields: dict[str, Any] | list[str]) -> "QueryBuilderImpl":
         return replace(self, select_fields=fields)
 
     @property

@@ -1,22 +1,9 @@
 from dataclasses import dataclass, replace
-from typing import Any, Protocol
+from typing import Any
 
 import httpx
 
-from fluree_py.context import SupportsContext, WithContextMixin
-
-
-class SupportsCreate(Protocol):
-    def create(self) -> "CreateBuilder": ...
-
-
-class CreateBuilder(SupportsContext, Protocol):
-    def with_insert(self, data: list[dict[str, Any]] | dict[str, Any]) -> "CreateReadyToCommit": ...
-
-
-class CreateReadyToCommit(Protocol):
-    def request(self) -> httpx.Request: ...
-    def commit(self) -> dict[str, Any]: ...
+from fluree_py.ledger.mixin.context import WithContextMixin
 
 
 @dataclass(frozen=True, kw_only=True)

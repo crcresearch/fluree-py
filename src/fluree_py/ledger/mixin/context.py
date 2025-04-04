@@ -1,9 +1,5 @@
 from dataclasses import dataclass, replace
-from typing import Any, Protocol, Self
-
-
-class SupportsContext(Protocol):
-    def with_context(self, context: dict[str, Any]) -> Self: ...
+from typing import Any, Self
 
 
 @dataclass(frozen=True, kw_only=True)
