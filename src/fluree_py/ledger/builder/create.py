@@ -1,16 +1,13 @@
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from typing import Any
 
-from fluree_py.ledger.mixin import Commitable, WithContextMixin, WithRequestMixin
+from fluree_py.ledger.mixin import CommitableMixin, RequestMixin, WithContextMixin
 
 
 @dataclass(frozen=True, kw_only=True)
 class CreateBuilderImpl(WithContextMixin):
     endpoint: str
     ledger: str
-
-    def with_context(self, context: dict[str, Any]) -> "CreateBuilderImpl":
-        return replace(self, context=context)
 
     def with_insert(self, data: list[dict[str, Any]] | dict[str, Any]) -> "CreateReadyToCommitImpl":
         return CreateReadyToCommitImpl(
@@ -22,7 +19,7 @@ class CreateBuilderImpl(WithContextMixin):
 
 
 @dataclass(frozen=True, kw_only=True)
-class CreateReadyToCommitImpl(WithRequestMixin, WithContextMixin, Commitable):
+class CreateReadyToCommitImpl(RequestMixin, WithContextMixin, CommitableMixin):
     endpoint: str
     ledger: str
     data: list[dict[str, Any]] | dict[str, Any]

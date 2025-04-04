@@ -1,7 +1,5 @@
 import json
 
-import pytest
-
 from fluree_py import FlureeClient
 
 
