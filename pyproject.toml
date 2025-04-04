@@ -4,15 +4,20 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 authors = [{ name = "James Sweet", email = "jsweet@nd.edu" }]
-requires-python = ">=3.10"
-dependencies = []
+requires-python = ">=3.11"
+dependencies = ["httpx>=0.28.1", "pydantic>=2.10.6"]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [dependency-groups]
-dev = ["ruff>=0.11.2"]
+dev = ["ruff>=0.11.2", { include-group = "test" }]
+test = ["pytest>=8.3.5", "testcontainers[generic]>=4.9.2"]
+
+[tool.pytest.ini_options]
+addopts = "--import-mode=importlib --verbose"
+testpaths = ["tests"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/fluree_py"]
@@ -74,7 +79,6 @@ select = [
   "PERF",
   "E",
   "W",
-  "D",
   "F",
   "PL",
   "UP",
