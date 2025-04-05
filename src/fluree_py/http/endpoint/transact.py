@@ -2,12 +2,11 @@ from dataclasses import dataclass, replace
 from typing import Any
 
 from fluree_py.http.mixin import (
-    CommitableMixin,
-    RequestMixin,
     WithContextMixin,
     WithInsertMixin,
     WithWhereMixin,
 )
+from fluree_py.http.mixin.commit import CommitableMixin
 from fluree_py.http.protocol.endpoint import (
     TransactionBuilder,
     TransactionReadyToCommit,
@@ -41,10 +40,9 @@ class TransactionBuilderImpl(
 
 @dataclass(frozen=True, kw_only=True)
 class TransactionReadyToCommitImpl(
-    RequestMixin,
+    CommitableMixin,
     WithContextMixin["TransactionReadyToCommitImpl"],
     WithWhereMixin["TransactionReadyToCommitImpl"],
-    CommitableMixin["TransactionReadyToCommitImpl"],
     TransactionReadyToCommit,
 ):
     """Implementation of a transaction operation ready to be committed."""

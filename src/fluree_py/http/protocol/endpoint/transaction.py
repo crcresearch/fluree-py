@@ -7,7 +7,6 @@ from fluree_py.http.protocol.mixin import (
     SupportsCommitable,
     SupportsContext,
     SupportsInsert,
-    SupportsRequestCreation,
     SupportsWhere,
 )
 from fluree_py.types.common import JsonArray, JsonObject
@@ -27,7 +26,6 @@ class TransactionBuilder(
 
 
 class TransactionReadyToCommit(
-    SupportsRequestCreation,
     SupportsCommitable,
     SupportsContext["TransactionReadyToCommit"],
     SupportsWhere["TransactionReadyToCommit"],

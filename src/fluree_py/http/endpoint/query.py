@@ -3,7 +3,6 @@ from typing import Any, Self
 
 from fluree_py.http.mixin import (
     CommitableMixin,
-    RequestMixin,
     WithContextMixin,
     WithWhereMixin,
 )
@@ -20,10 +19,9 @@ from fluree_py.types.query.where import WhereClause
 
 @dataclass(frozen=True, kw_only=True)
 class QueryBuilderImpl(
+    CommitableMixin,
     WithContextMixin["QueryBuilderImpl"],
     WithWhereMixin["QueryBuilderImpl"],
-    RequestMixin,
-    CommitableMixin["QueryBuilderImpl"],
     QueryBuilder,
 ):
     """Implementation of a query operation builder."""

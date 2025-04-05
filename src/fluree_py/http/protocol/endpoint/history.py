@@ -5,16 +5,14 @@ from typing import Protocol, Self
 from fluree_py.http.protocol.mixin import (
     SupportsCommitable,
     SupportsContext,
-    SupportsRequestCreation,
 )
 from fluree_py.types.common import TimeClause
 from fluree_py.types.http.history import HistoryClause
 
 
 class HistoryBuilder(
-    SupportsContext["HistoryBuilder"],
-    SupportsRequestCreation,
     SupportsCommitable,
+    SupportsContext["HistoryBuilder"],
     Protocol,
 ):
     """Protocol for history builders."""

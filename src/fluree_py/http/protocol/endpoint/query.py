@@ -8,7 +8,6 @@ from typing import (
 from fluree_py.http.protocol.mixin import (
     SupportsCommitable,
     SupportsContext,
-    SupportsRequestCreation,
     SupportsWhere,
 )
 from fluree_py.types.query.query import (
@@ -23,7 +22,6 @@ from fluree_py.types.query.select import SelectArray, SelectObject
 class QueryBuilder(
     SupportsContext["QueryBuilder"],
     SupportsWhere["QueryBuilder"],
-    SupportsRequestCreation,
     SupportsCommitable,
     Protocol,
 ):
