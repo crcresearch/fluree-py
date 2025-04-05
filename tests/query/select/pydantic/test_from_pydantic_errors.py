@@ -3,9 +3,12 @@ import pytest
 from pydantic import BaseModel, ConfigDict
 
 from fluree_py.query.select.pydantic import (
-    DeeplyNestedStructureError,
     MissingIdFieldError,
     from_pydantic,
+)
+from fluree_py.query.select.pydantic.error import (
+    DeeplyNestedDictionaryError,
+    NestedTupleError,
 )
 
 
@@ -50,7 +53,7 @@ def test_deeply_nested_dict() -> None:
         id: str
         level1: dict[str, dict[str, dict[str, str]]]
 
-    with pytest.raises(DeeplyNestedStructureError):
+    with pytest.raises(DeeplyNestedDictionaryError):
         from_pydantic(Model)
 
 
@@ -60,5 +63,8 @@ def test_list_of_tuple_field() -> None:
         id: str
         nested: list[tuple[str, str]]
 
-    with pytest.raises(DeeplyNestedStructureError):
+    with pytest.raises(NestedTupleError):
         from_pydantic(Model)
+
+
+# Should raise an error if we encounter a circular dependency

@@ -16,12 +16,11 @@ from typing import (
 from pydantic import BaseModel, ConfigDict
 
 from fluree_py.query.select.pydantic.error import (
-    DeeplyNestedStructureError,
-    FlureeSelectError,
+    DeeplyNestedDictionaryError,
     InvalidFieldTypeError,
     MissingIdFieldError,
     ModelConfigError,
-    TypeProcessingError,
+    NestedTupleError,
 )
 from fluree_py.query.select.pydantic.type_checker import TypeChecker
 from fluree_py.query.select.pydantic.warning import (
@@ -73,16 +72,11 @@ class FlureeSelectBuilder:
         if not TypeChecker.has_model_config(model):
             return
 
-        try:
-            extra = model.model_config.get("extra", "ignore")
-            if extra not in ("allow", "ignore", "forbid"):
-                raise ModelConfigError(
-                    f"Invalid 'extra' configuration value: {extra}. Must be one of: 'allow', 'ignore', 'forbid'"
-                )
-        except Exception as e:
-            if not isinstance(e, FlureeSelectError):
-                raise ModelConfigError(f"Error validating model configuration for {model.__name__}: {e!s}") from e
-            raise
+        extra = model.model_config.get("extra", "ignore")
+        if extra not in ("allow", "ignore", "forbid"):
+            raise ModelConfigError(
+                f"Invalid 'extra' configuration value: {extra}. Must be one of: 'allow', 'ignore', 'forbid'",
+            )
 
     def _process_nested_model(
         self,
@@ -106,7 +100,7 @@ class FlureeSelectBuilder:
         self._validate_model_config(field_type)
 
         if TypeChecker.check_model_requires_id(field_type) and not TypeChecker.check_model_has_id(field_type):
-            raise MissingIdFieldError(f"Nested model '{field_type.__name__}' must have an 'id' field")
+            raise MissingIdFieldError(field_type.__name__)
 
         fields = get_type_hints(field_type, include_extras=True)
         select = ["*"]
@@ -120,7 +114,7 @@ class FlureeSelectBuilder:
 
         return {field_name: select}
 
-    def _process_field(self, field_name: str, field_type: Any, select: list[Any]) -> None:
+    def _process_field(self, field_name: str, field_type: Any, select: list[Any]) -> None:  # noqa: ANN401
         """
         Process a field and add its select structure to the result.
 
@@ -129,42 +123,37 @@ class FlureeSelectBuilder:
             TypeProcessingError: If there's an error processing the field type
 
         """
-        try:
-            match field_type:
-                case t if TypeChecker.is_list_type(t):
-                    self.warning_manager.add_warning(
-                        ListOrderWarning,
-                        f"Field '{field_name}' is a list type. Order will be non-deterministic.",
-                    )
-                    args = get_args(t)
-                    if args:
-                        inner_type = TypeChecker.get_real_type(args[0])
-                        if TypeChecker.is_base_model(inner_type):
-                            select.append(self._process_nested_model(field_name, inner_type))
-                        elif TypeChecker.is_dict_type(inner_type):
-                            select.append({field_name: ["*"]})
-                    return
+        match field_type:
+            case t if TypeChecker.is_list_type(t):
+                self.warning_manager.add_warning(
+                    ListOrderWarning,
+                    f"Field '{field_name}' is a list type. Order will be non-deterministic.",
+                )
+                args = get_args(t)
+                if args:
+                    inner_type = TypeChecker.get_real_type(args[0])
+                    if TypeChecker.is_base_model(inner_type):
+                        select.append(self._process_nested_model(field_name, inner_type))
+                    elif TypeChecker.is_dict_type(inner_type):
+                        select.append({field_name: ["*"]})
+                return
 
-                case t if TypeChecker.is_base_model(t):
-                    select.append(self._process_nested_model(field_name, t))
-                    return
+            case t if TypeChecker.is_base_model(t):
+                select.append(self._process_nested_model(field_name, t))
+                return
 
-                case t if TypeChecker.is_dict_type(t):
-                    select.append({field_name: ["*"]})
-                    return
+            case t if TypeChecker.is_dict_type(t):
+                select.append({field_name: ["*"]})
+                return
 
-                case t if TypeChecker.is_primitive_type(t):
-                    # Primitive types are included in "*" so we don't need to add them explicitly
-                    return
+            case t if TypeChecker.is_primitive_type(t):
+                # Primitive types are included in "*" so we don't need to add them explicitly
+                return
 
-                case _:
-                    raise InvalidFieldTypeError(f"Unsupported field type for '{field_name}': {field_type}")
-        except Exception as e:
-            if not isinstance(e, FlureeSelectError):
-                raise TypeProcessingError(f"Error processing field '{field_name}' of type {field_type}: {e!s}") from e
-            raise
+            case _:
+                raise InvalidFieldTypeError(field_name, field_type)
 
-    def _handle_union_type(self, field_type: Any) -> Any:
+    def _handle_union_type(self, field_type: Any) -> Any:  # noqa: ANN401
         """Handle Union types by extracting the first non-None type."""
         origin = get_origin(field_type)
         if origin is UnionType:
@@ -182,30 +171,21 @@ class FlureeSelectBuilder:
 
         """
         for field_name, field_type in fields.items():
-            try:
-                match field_type:
-                    case t if TypeChecker.is_dict_type(t):
-                        if TypeChecker.dict_max_depth(t) > 1:
-                            raise DeeplyNestedStructureError(
-                                f"Deeply nested dictionaries are not supported in field '{field_name}'"
-                            )
+            match field_type:
+                case t if TypeChecker.is_dict_type(t):
+                    if TypeChecker.dict_max_depth(t) > 1:
+                        raise DeeplyNestedDictionaryError(field_name)
 
-                    case t if TypeChecker.is_list_type(t):
-                        args = get_args(t)
-                        if args:
-                            inner_type = args[0]
-                            if TypeChecker.is_tuple_type(inner_type):
-                                raise DeeplyNestedStructureError(f"Tuples are not supported in field '{field_name}'")
-                            if TypeChecker.dict_max_depth(inner_type) > 1:
-                                raise DeeplyNestedStructureError(
-                                    f"Deeply nested dictionaries are not supported in field '{field_name}'"
-                                )
-                    case _:
-                        pass
-            except Exception as e:
-                if not isinstance(e, FlureeSelectError):
-                    raise TypeProcessingError(f"Error checking nested structure for field '{field_name}': {e!s}") from e
-                raise
+                case t if TypeChecker.is_list_type(t):
+                    args = get_args(t)
+                    if args:
+                        inner_type = args[0]
+                        if TypeChecker.is_tuple_type(inner_type):
+                            raise NestedTupleError(field_name)
+                        if TypeChecker.dict_max_depth(inner_type) > 1:
+                            raise DeeplyNestedDictionaryError(field_name)
+                case _:
+                    pass
 
     def _check_optional_fields(self, fields: dict[str, Any]) -> None:
         """Check for optional fields and add appropriate warnings."""
@@ -252,7 +232,7 @@ class FlureeSelectBuilder:
 
         # Early validation checks
         if "id" not in fields:
-            raise MissingIdFieldError("Model must have an 'id' field")
+            raise MissingIdFieldError(model_type.__name__)
 
         # Validate model configuration
         self._validate_model_config(model_type)
