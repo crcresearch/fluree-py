@@ -1,4 +1,5 @@
 from collections.abc import Generator
+from http import HTTPStatus
 
 import pytest
 import respx
@@ -13,7 +14,7 @@ def mocked_api() -> Generator[MockRouter, None, None]:
     with respx.mock(base_url="http://localhost:8090", assert_all_called=False) as respx_mock:
         history_route = respx_mock.post("/fluree/history", name="history")
         history_route.return_value = Response(
-            200,
+            HTTPStatus.OK,
             headers={"Content-Type": "application/json;charset=utf-8"},
             json=[
                 {
@@ -68,7 +69,7 @@ def test_ledger_history(test_name: str, cookbook_client: FlureeClient) -> None:
         .commit()
     )
 
-    assert resp.status_code == 200
+    assert resp.status_code == HTTPStatus.OK
     assert resp.headers["Content-Type"] == "application/json;charset=utf-8"
 
     assert resp.json() == [

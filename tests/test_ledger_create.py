@@ -1,4 +1,5 @@
 from collections.abc import Generator
+from http import HTTPStatus
 
 import pytest
 import respx
@@ -14,7 +15,7 @@ def mocked_api(test_name: str) -> Generator[MockRouter, None, None]:
     with respx.mock(base_url="http://localhost:8090", assert_all_called=False) as respx_mock:
         create_route = respx_mock.post("/fluree/create", name="create")
         create_route.return_value = Response(
-            201,
+            HTTPStatus.CREATED,
             headers={"Content-Type": "application/json;charset=utf-8"},
             json={
                 "commit": f"fluree:file://{test_name}/commit/bylyfvz5kexxf6l3tdzbobuz6eooxtgfxg3xqnp3pep7zfwxspkp.json",
@@ -65,7 +66,7 @@ def test_create_ledger(test_name: str, fluree_client: FlureeClient) -> None:
 
     resp = with_insert.commit()
 
-    assert resp.status_code == 201
+    assert resp.status_code == HTTPStatus.CREATED
     assert resp.headers["Content-Type"] == "application/json;charset=utf-8"
 
     resp_json = resp.json()

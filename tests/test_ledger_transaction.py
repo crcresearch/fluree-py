@@ -1,5 +1,6 @@
 import json
 from collections.abc import Generator
+from http import HTTPStatus
 
 import pytest
 import respx
@@ -13,7 +14,7 @@ def transact_side_effect(request: Request) -> Response:
     ledger = json.loads(request.content)["ledger"]
     if ledger == "test_ledger_transaction_single_record":
         return Response(
-            200,
+            HTTPStatus.OK,
             headers={"Content-Type": "application/json;charset=utf-8"},
             json={
                 "ledger": ledger,
@@ -24,7 +25,7 @@ def transact_side_effect(request: Request) -> Response:
         )
     if ledger == "test_ledger_transaction_multiple_records":
         return Response(
-            200,
+            HTTPStatus.OK,
             headers={"Content-Type": "application/json;charset=utf-8"},
             json={
                 "ledger": "test_ledger_transaction_multiple_records",
@@ -34,7 +35,7 @@ def transact_side_effect(request: Request) -> Response:
             },
         )
     return Response(
-        409,
+        HTTPStatus.CONFLICT,
         headers={"Content-Type": "application/json;charset=utf-8"},
         json={"error": f"Ledger {ledger} does not exist!"},
     )
@@ -85,7 +86,7 @@ def test_ledger_transaction_single_record(test_name: str, cookbook_client: Flure
         .commit()
     )
 
-    assert resp.status_code == 200
+    assert resp.status_code == HTTPStatus.OK
     assert resp.headers["Content-Type"] == "application/json;charset=utf-8"
 
     resp_json = resp.json()
@@ -126,7 +127,7 @@ def test_ledger_transaction_multiple_records(test_name: str, cookbook_client: Fl
         .commit()
     )
 
-    assert resp.status_code == 200
+    assert resp.status_code == HTTPStatus.OK
     assert resp.headers["Content-Type"] == "application/json;charset=utf-8"
 
     resp_json = resp.json()
@@ -160,5 +161,5 @@ def test_transaction_on_missing_ledger(test_name: str, cookbook_client: FlureeCl
         .commit()
     )
 
-    assert resp.status_code == 409
+    assert resp.status_code == HTTPStatus.CONFLICT
     assert resp.json() == {"error": f"Ledger {test_name + 'missing'} does not exist!"}

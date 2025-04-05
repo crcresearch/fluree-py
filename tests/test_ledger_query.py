@@ -1,4 +1,5 @@
 from collections.abc import Generator
+from http import HTTPStatus
 
 import pytest
 import respx
@@ -10,7 +11,7 @@ from fluree_py import FlureeClient
 
 def query_side_effect(request: Request) -> Response:  # noqa: ARG001
     return Response(
-        200,
+        HTTPStatus.OK,
         headers={"Content-Type": "application/json;charset=utf-8"},
         json=[
             {
@@ -90,8 +91,7 @@ def test_ledger_query_wildcard_example(test_name: str, cookbook_client: FlureeCl
         .commit()
     )
 
-    print(resp.json())
-    assert resp.status_code == 200
+    assert resp.status_code == HTTPStatus.OK
     assert resp.headers["Content-Type"] == "application/json;charset=utf-8"
 
     assert resp.json() == [
