@@ -10,12 +10,12 @@ from tests.utils import create_and_retrieve_random_model
 
 # Ignore all warnings in these tests
 @pytest.fixture(scope="class", autouse=True)
-def setup_class():
+def setup_class() -> None:
     warnings.filterwarnings("ignore")
 
 
 # Base Types
-def test_base_type(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient):
+def test_base_type(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class Model(BaseModel):
         id: str
         name: str
@@ -29,7 +29,7 @@ def test_base_type(using_fluree_server: bool, test_name: str, fluree_client: Flu
 
 
 # List of Base Types
-def test_list_of_base_type(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient):
+def test_list_of_base_type(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class Model(BaseModel):
         id: str
         name: list[str]
@@ -44,7 +44,7 @@ def test_list_of_base_type(using_fluree_server: bool, test_name: str, fluree_cli
         assert model == result_model
 
 
-def test_optional_list_of_base_type(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient):
+def test_optional_list_of_base_type(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class Model(BaseModel):
         id: str
         name: list[str] | None = None
@@ -60,8 +60,10 @@ def test_optional_list_of_base_type(using_fluree_server: bool, test_name: str, f
 
 
 def test_optional_list_of_base_type_with_initializer(
-    using_fluree_server: bool, test_name: str, fluree_client: FlureeClient
-):
+    using_fluree_server: bool,
+    test_name: str,
+    fluree_client: FlureeClient,
+) -> None:
     class Model(BaseModel):
         id: str
         name: list[str] | None = Field(default_factory=list)
@@ -77,7 +79,7 @@ def test_optional_list_of_base_type_with_initializer(
 
 
 # Dictionaries
-def test_dict(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient):
+def test_dict(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class Model(BaseModel):
         id: str
         nested: dict[str, str]
@@ -94,7 +96,7 @@ def test_dict(using_fluree_server: bool, test_name: str, fluree_client: FlureeCl
         assert model == result_model
 
 
-def test_optional_dict(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient):
+def test_optional_dict(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class Model(BaseModel):
         id: str
         nested: dict[str, str] | None = None
@@ -112,7 +114,7 @@ def test_optional_dict(using_fluree_server: bool, test_name: str, fluree_client:
         assert model == result_model
 
 
-def test_dict_with_initializer(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient):
+def test_dict_with_initializer(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class Model(BaseModel):
         id: str
         nested: dict[str, str] = Field(default_factory=dict)
@@ -130,7 +132,7 @@ def test_dict_with_initializer(using_fluree_server: bool, test_name: str, fluree
         assert model == result_model
 
 
-def test_optional_dict_with_initializer(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient):
+def test_optional_dict_with_initializer(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class Model(BaseModel):
         id: str
         nested: dict[str, str] | None = Field(default_factory=dict)
@@ -149,7 +151,7 @@ def test_optional_dict_with_initializer(using_fluree_server: bool, test_name: st
 
 
 # List of Dictionaries
-def test_list_of_dict(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient):
+def test_list_of_dict(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class Model(BaseModel):
         id: str
         nested: list[dict[str, str]]
@@ -169,7 +171,7 @@ def test_list_of_dict(using_fluree_server: bool, test_name: str, fluree_client: 
         assert model == result_model
 
 
-def test_optional_list_of_dict(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient):
+def test_optional_list_of_dict(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class Model(BaseModel):
         id: str
         nested: list[dict[str, str]] | None = None
@@ -190,7 +192,7 @@ def test_optional_list_of_dict(using_fluree_server: bool, test_name: str, fluree
         assert model == result_model
 
 
-def test_list_of_dict_with_initializer(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient):
+def test_list_of_dict_with_initializer(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class Model(BaseModel):
         id: str
         nested: list[dict[str, str]] = Field(default_factory=list)
@@ -210,7 +212,9 @@ def test_list_of_dict_with_initializer(using_fluree_server: bool, test_name: str
         assert model == result_model
 
 
-def test_optional_list_of_dict_with_initializer(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient):
+def test_optional_list_of_dict_with_initializer(
+    using_fluree_server: bool, test_name: str, fluree_client: FlureeClient
+) -> None:
     class Model(BaseModel):
         id: str
         nested: list[dict[str, str]] | None = Field(default_factory=list)

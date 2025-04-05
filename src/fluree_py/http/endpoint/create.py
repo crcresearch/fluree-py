@@ -42,7 +42,7 @@ class CreateReadyToCommitImpl(
 @dataclass(frozen=True, kw_only=True)
 class CreateBuilderImpl(
     WithContextMixin["CreateBuilderImpl"],
-    WithInsertMixin[CreateReadyToCommitImpl],
+    WithInsertMixin["CreateReadyToCommitImpl"],
     CreateBuilder,
 ):
     """Implementation of a create operation builder."""

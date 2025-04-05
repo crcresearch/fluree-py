@@ -10,12 +10,12 @@ from tests.utils import create_and_retrieve_random_model
 
 # Ignore all warnings in these tests
 @pytest.fixture(scope="class", autouse=True)
-def setup_class():
+def setup_class() -> None:
     warnings.filterwarnings("ignore")
 
 
 # Config Dictionary Options
-def test_model_config_allow_extra(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient):
+def test_model_config_allow_extra(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class NestedModel(BaseModel):
         name: str
         model_config = ConfigDict(extra="allow")
@@ -35,7 +35,7 @@ def test_model_config_allow_extra(using_fluree_server: bool, test_name: str, flu
         assert model == result_model
 
 
-def test_model_config_ignore_extra(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient):
+def test_model_config_ignore_extra(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class NestedModel(BaseModel):
         name: str
         model_config = ConfigDict(extra="ignore")
@@ -53,7 +53,7 @@ def test_model_config_ignore_extra(using_fluree_server: bool, test_name: str, fl
 
 
 # Should handle nested models correctly
-def test_nested_model_with_base_type(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient):
+def test_nested_model_with_base_type(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class NestedModel(BaseModel):
         id: str
         name: str
@@ -70,7 +70,9 @@ def test_nested_model_with_base_type(using_fluree_server: bool, test_name: str, 
         assert model == result_model
 
 
-def test_optional_nested_model_with_base_type(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient):
+def test_optional_nested_model_with_base_type(
+    using_fluree_server: bool, test_name: str, fluree_client: FlureeClient
+) -> None:
     class NestedModel(BaseModel):
         id: str
         name: str
@@ -88,7 +90,7 @@ def test_optional_nested_model_with_base_type(using_fluree_server: bool, test_na
 
 
 # Should handle nested models with lists
-def test_nested_model_with_list(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient):
+def test_nested_model_with_list(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class NestedModel(BaseModel):
         id: str
         entries: list[str]
@@ -111,7 +113,7 @@ def test_nested_model_with_list(using_fluree_server: bool, test_name: str, flure
 
 
 # Should handle nested models with lists
-def test_list_of_nested_models(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient):
+def test_list_of_nested_models(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class NestedModel(BaseModel):
         id: str
         entries: list[str]
@@ -134,7 +136,7 @@ def test_list_of_nested_models(using_fluree_server: bool, test_name: str, fluree
 
 
 # Should handle nested models with lists
-def test_optional_list_of_nested_models(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient):
+def test_optional_list_of_nested_models(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class NestedModel(BaseModel):
         id: str
         entries: list[str]
@@ -157,7 +159,7 @@ def test_optional_list_of_nested_models(using_fluree_server: bool, test_name: st
 
 
 # Should recursively handle nested models correctly
-def test_nested_model_with_submodel(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient):
+def test_nested_model_with_submodel(using_fluree_server: bool, test_name: str, fluree_client: FlureeClient) -> None:
     class SubNestedModel(BaseModel):
         id: str
         name: str
@@ -176,16 +178,3 @@ def test_nested_model_with_submodel(using_fluree_server: bool, test_name: str, f
     if using_fluree_server:
         model, result_model = create_and_retrieve_random_model(Model, fluree_client, test_name)
         assert model == result_model
-
-
-# def test_circular_reference():
-#     class Model(BaseModel):
-#         id: str
-#         name: str
-
-#     class NestedModel(BaseModel):
-#         id: str
-#         parent: Model | None = None
-
-#     select = from_pydantic(NestedModel)
-#     assert select == ["*", {"parent": ["*"]}]

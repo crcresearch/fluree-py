@@ -5,16 +5,13 @@ JsonObject: TypeAlias = dict[str, Any]
 JsonArray: TypeAlias = list[Any]
 
 LedgerName: TypeAlias = str
-"""A textal name for the ledger."""
-
+"""A textual name for the ledger."""
 
 Subject: TypeAlias = str
 """A textual identifier for a subject."""
 
 Context: TypeAlias = JsonObject
-"""
-A W3C JSON-LD context for a FlureeQL request.
-"""
+"""A W3C JSON-LD context for a FlureeQL request."""
 
 Predicate: TypeAlias = str
 """
@@ -41,8 +38,8 @@ Examples:
 TimeCommit: TypeAlias = int
 
 
-def is_time_commit(t: Any) -> TypeGuard[TimeCommit]:
-    """Checks if a value is a valid time commit."""
+def is_time_commit(t: Any) -> TypeGuard[TimeCommit]:  # noqa: ANN401
+    """Check if a value is a valid time commit."""
     return isinstance(t, int) and t >= 0
 
 
@@ -59,8 +56,8 @@ TimeConstraint = TypedDict(
 )
 
 
-def is_time_constraint(t: Any) -> TypeGuard[TimeConstraint]:
-    """Checks if a value is a valid time constraint."""
+def is_time_constraint(t: Any) -> TypeGuard[TimeConstraint]:  # noqa: ANN401
+    """Check if a value is a valid time constraint."""
     return isinstance(t, dict) and all(
         is_time_commit(v) or v == "latest"
         for v in t.values()  # type: ignore

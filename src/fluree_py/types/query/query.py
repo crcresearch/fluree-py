@@ -32,6 +32,4 @@ QuerySchema = TypedDict(
         "orderBy": OrderByClause,
     },
 )
-"""
-A schema for a FlureeQL query.
-"""
+""" A schema for a FlureeQL query. """

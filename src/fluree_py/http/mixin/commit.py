@@ -16,7 +16,7 @@ class CommitMixin(SupportsCommit, Generic[T]):
 
     def commit(self) -> FlureeResponse:
         """
-        Executes the transaction synchronously.
+        Execute the transaction synchronously.
 
         Exceptions:
             httpx.RequestError: If the HTTP request fails.
@@ -33,7 +33,7 @@ class AsyncCommitMixin(SupportsAsyncCommit, Generic[T]):
 
     async def acommit(self) -> FlureeResponse:
         """
-        Executes the transaction asynchronously.
+        Execute the transaction asynchronously.
 
         Exceptions:
             httpx.RequestError: If the HTTP request fails.

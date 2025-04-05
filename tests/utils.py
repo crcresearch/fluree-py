@@ -62,7 +62,7 @@ def create_and_retrieve_model(
 
     # Create a new ledger and insert the model
     fluree_client.with_ledger(ledger=ledger_name).create().with_context(context).with_insert(
-        [model_instance.model_dump()]
+        [model_instance.model_dump()],
     ).commit()
 
     # Get the model back from the ledger
@@ -77,6 +77,4 @@ def create_and_retrieve_model(
     )
 
     # Parse the response into a model
-    result_model = model_instance.model_validate_json(resp.text)
-
-    return result_model
+    return model_instance.model_validate_json(resp.text)

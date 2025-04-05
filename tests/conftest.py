@@ -7,7 +7,7 @@ from testcontainers.generic import ServerContainer  # type: ignore
 from fluree_py import FlureeClient
 
 
-def pytest_addoption(parser: pytest.Parser):
+def pytest_addoption(parser: pytest.Parser) -> None:
     """Add custom command line options."""
     parser.addoption(
         "--use-fluree-server",
@@ -37,7 +37,7 @@ def fluree_url(request: pytest.FixtureRequest) -> Generator[str, None, None]:
     wait_for_logs(container, "Starting Fluree server with profile")
 
     # Return the container's connection URL
-    yield container._create_connection_url()  # type: ignore
+    yield container._create_connection_url()  # type: ignore # noqa: SLF001
 
     # Print the container's logs
     (out, err) = container.get_logs()
@@ -115,7 +115,7 @@ def cookbook_client(
                         {"@id": "ex:betty"},
                     ],
                 },
-            ]
+            ],
         )
         .commit()
     )

@@ -20,22 +20,22 @@ class TypeChecker:
     """
 
     @classmethod
-    def is_list_type(cls, field_type: Any) -> TypeGuard[type[list[Any]]]:
+    def is_list_type(cls, field_type: Any) -> TypeGuard[type[list[Any]]]:  # noqa: ANN401
         """Check if a type is a list type."""
         return hasattr(field_type, "__origin__") and field_type.__origin__ is list
 
     @classmethod
-    def is_dict_type(cls, field_type: Any) -> TypeGuard[type[dict[str, Any]]]:
+    def is_dict_type(cls, field_type: Any) -> TypeGuard[type[dict[str, Any]]]:  # noqa: ANN401
         """Check if a type is a dict type."""
         return hasattr(field_type, "__origin__") and field_type.__origin__ is dict
 
     @classmethod
-    def is_tuple_type(cls, field_type: Any) -> TypeGuard[type[tuple[Any, ...]]]:
+    def is_tuple_type(cls, field_type: Any) -> TypeGuard[type[tuple[Any, ...]]]:  # noqa: ANN401
         """Check if a type is a tuple type."""
         return hasattr(field_type, "__origin__") and field_type.__origin__ is tuple
 
     @classmethod
-    def is_primitive_type(cls, field_type: Any) -> bool:
+    def is_primitive_type(cls, field_type: Any) -> bool:  # noqa: ANN401
         """Check if a type is a primitive type (str, int, float, bool)."""
         return isinstance(field_type, type) and field_type in {str, int, float, bool}
 
@@ -45,7 +45,7 @@ class TypeChecker:
         return field_name == "id"
 
     @classmethod
-    def dict_max_depth(cls, field_type: Any, depth: int = 0) -> int:
+    def dict_max_depth(cls, field_type: Any, depth: int = 0) -> int:  # noqa: ANN401
         """Recursively count dictionary nesting depth."""
         while TypeChecker.is_dict_type(field_type):
             args = get_args(field_type)
@@ -56,12 +56,12 @@ class TypeChecker:
         return depth
 
     @classmethod
-    def is_base_model(cls, field_type: Any) -> TypeGuard[type[BaseModel]]:
+    def is_base_model(cls, field_type: Any) -> TypeGuard[type[BaseModel]]:  # noqa: ANN401
         """Check if a type is a BaseModel."""
         return isinstance(field_type, type) and issubclass(field_type, BaseModel)
 
     @classmethod
-    def get_real_type(cls, field_type: Any) -> Any:
+    def get_real_type(cls, field_type: Any) -> Any:  # noqa: ANN401
         """Get the real type from a potentially optional/union type."""
         origin = get_origin(field_type)
         if origin in {Union, UnionType}:

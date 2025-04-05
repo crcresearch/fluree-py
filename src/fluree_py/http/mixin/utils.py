@@ -37,13 +37,13 @@ def resolve_base_class_reference(cls: type[Any], base_name: str) -> type[Any]:
         return type_arg
 
     if sys.version_info < (3, 13):
-        resolved_type = type_arg._evaluate(
+        resolved_type = type_arg._evaluate(  # noqa: SLF001
             sys.modules[cls.__module__].__dict__,
             locals(),
             recursive_guard=frozenset(),
         )
     else:
-        resolved_type = type_arg._evaluate(
+        resolved_type = type_arg._evaluate(  # noqa: SLF001
             sys.modules[cls.__module__].__dict__,
             locals(),
             type_params=(),

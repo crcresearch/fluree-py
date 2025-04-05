@@ -4,13 +4,12 @@ from collections.abc import Generator
 import pytest
 import respx
 from httpx import Request, Response
-from pytest import FixtureRequest
 from respx import MockRouter
 
 from fluree_py import FlureeClient
 
 
-def transact_side_effect(request: Request):
+def transact_side_effect(request: Request) -> Response:
     ledger = json.loads(request.content)["ledger"]
     if ledger == "test_ledger_transaction_single_record":
         return Response(
@@ -51,7 +50,9 @@ def mocked_api() -> Generator[MockRouter, None, None]:
 
 
 @pytest.fixture
-def cookbook_client(request: FixtureRequest, cookbook_client: FlureeClient) -> Generator[FlureeClient, None, None]:
+def cookbook_client(
+    request: pytest.FixtureRequest, cookbook_client: FlureeClient
+) -> Generator[FlureeClient, None, None]:
     # If we're using a real Fluree server, yield the client and ignore the mocked API
     if request.config.getoption("--use-fluree-server"):
         yield cookbook_client
@@ -69,7 +70,7 @@ def cookbook_client(request: FixtureRequest, cookbook_client: FlureeClient) -> G
 
 
 # https://developers.flur.ee/docs/reference/cookbook/#inserting-a-single-record
-def test_ledger_transaction_single_record(test_name: str, cookbook_client: FlureeClient):
+def test_ledger_transaction_single_record(test_name: str, cookbook_client: FlureeClient) -> None:
     resp = (
         cookbook_client.with_ledger(test_name)
         .transaction()
@@ -79,7 +80,7 @@ def test_ledger_transaction_single_record(test_name: str, cookbook_client: Flure
                 "@id": "ex:fluree",
                 "@type": "schema:Organization",
                 "schema:description": "We ❤️ Data",
-            }
+            },
         )
         .commit()
     )
@@ -103,7 +104,7 @@ def test_ledger_transaction_single_record(test_name: str, cookbook_client: Flure
 
 
 # https://developers.flur.ee/docs/reference/cookbook/#inserting-multiple-records
-def test_ledger_transaction_multiple_records(test_name: str, cookbook_client: FlureeClient):
+def test_ledger_transaction_multiple_records(test_name: str, cookbook_client: FlureeClient) -> None:
     resp = (
         cookbook_client.with_ledger(test_name)
         .transaction()
@@ -120,7 +121,7 @@ def test_ledger_transaction_multiple_records(test_name: str, cookbook_client: Fl
                     "@type": "ex:Monster",
                     "schema:description": "We ❤️ Human Blood",
                 },
-            ]
+            ],
         )
         .commit()
     )
@@ -144,7 +145,7 @@ def test_ledger_transaction_multiple_records(test_name: str, cookbook_client: Fl
 
 
 # Transaction Errors
-def test_transaction_on_missing_ledger(test_name: str, cookbook_client: FlureeClient):
+def test_transaction_on_missing_ledger(test_name: str, cookbook_client: FlureeClient) -> None:
     resp = (
         cookbook_client.with_ledger(test_name + "missing")
         .transaction()
@@ -154,7 +155,7 @@ def test_transaction_on_missing_ledger(test_name: str, cookbook_client: FlureeCl
                 "@id": "ex:fluree",
                 "@type": "schema:Organization",
                 "schema:description": "We ❤️ Data",
-            }
+            },
         )
         .commit()
     )

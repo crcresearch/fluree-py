@@ -3,7 +3,6 @@ from collections.abc import Generator
 import pytest
 import respx
 from httpx import Response
-from pytest import FixtureRequest
 from respx import MockRouter
 
 from fluree_py import FlureeClient
@@ -26,7 +25,7 @@ def mocked_api() -> Generator[MockRouter, None, None]:
                     ],
                     "f:retract": [],
                     "f:t": 1,
-                }
+                },
             ],
         )
 
@@ -34,7 +33,9 @@ def mocked_api() -> Generator[MockRouter, None, None]:
 
 
 @pytest.fixture
-def cookbook_client(request: FixtureRequest, cookbook_client: FlureeClient) -> Generator[FlureeClient, None, None]:
+def cookbook_client(
+    request: pytest.FixtureRequest, cookbook_client: FlureeClient
+) -> Generator[FlureeClient, None, None]:
     # If we're using a real Fluree server, yield the client and ignore the mocked API
     if request.config.getoption("--use-fluree-server"):
         yield cookbook_client
@@ -51,7 +52,7 @@ def cookbook_client(request: FixtureRequest, cookbook_client: FlureeClient) -> G
     assert create_route.calls.last.request.headers["Content-Type"] == "application/json"
 
 
-def test_ledger_history(test_name: str, cookbook_client: FlureeClient):
+def test_ledger_history(test_name: str, cookbook_client: FlureeClient) -> None:
     context = {
         "ex": "http://example.org/",
         "schema": "http://schema.org/",
@@ -80,5 +81,5 @@ def test_ledger_history(test_name: str, cookbook_client: FlureeClient):
             ],
             "f:retract": [],
             "f:t": 1,
-        }
+        },
     ]

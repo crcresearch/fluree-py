@@ -8,7 +8,7 @@ class SupportsCommit(Protocol):
 
     def commit(self) -> FlureeResponse:
         """
-        Executes the transaction synchronously.
+        Execute the transaction synchronously.
 
         Exceptions:
             httpx.RequestError: If the HTTP request fails.
@@ -22,7 +22,7 @@ class SupportsAsyncCommit(Protocol):
 
     async def acommit(self) -> FlureeResponse:
         """
-        Executes the transaction asynchronously.
+        Execute the transaction asynchronously.
 
         Exceptions:
             httpx.RequestError: If the HTTP request fails.

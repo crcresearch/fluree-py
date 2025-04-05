@@ -4,7 +4,6 @@ from http import HTTPStatus
 import pytest
 import respx
 from httpx import Response
-from pytest import FixtureRequest
 from respx import MockRouter
 
 from fluree_py import FlureeClient
@@ -30,7 +29,7 @@ def mocked_api(test_name: str) -> Generator[MockRouter, None, None]:
 
 
 @pytest.fixture
-def fluree_client(request: FixtureRequest, fluree_client: FlureeClient) -> Generator[FlureeClient, None, None]:
+def fluree_client(request: pytest.FixtureRequest, fluree_client: FlureeClient) -> Generator[FlureeClient, None, None]:
     # If we're using a real Fluree server, yield the client and ignore the mocked API
     if request.config.getoption("--use-fluree-server"):
         yield fluree_client
@@ -51,7 +50,7 @@ def fluree_client(request: FixtureRequest, fluree_client: FlureeClient) -> Gener
 async def test_create_ledger_async(
     test_name: str,
     fluree_client: FlureeClient,
-):
+) -> None:
     context = {
         "ex": "http://example.org/",
         "schema": "http://schema.org/",
@@ -63,7 +62,7 @@ async def test_create_ledger_async(
             "@type": "ex:Yeti",
             "schema:age": 4,
             "schema:name": "Freddy",
-        }
+        },
     ]
 
     with_insert = fluree_client.with_ledger(test_name).create().with_context(context).with_insert(data)

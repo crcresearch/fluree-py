@@ -14,7 +14,7 @@ class WithInsertMixin(Generic[T]):
 
     def with_insert(self, data: JsonObject | JsonArray) -> T:
         """
-        Updates the operation with new data to be inserted.
+        Update the operation with new data to be inserted.
 
         Exceptions:
             TypeError: If the type parameter cannot be resolved.

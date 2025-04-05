@@ -3,13 +3,12 @@ from collections.abc import Generator
 import pytest
 import respx
 from httpx import Request, Response
-from pytest import FixtureRequest
 from respx import MockRouter
 
 from fluree_py import FlureeClient
 
 
-def query_side_effect(request: Request):
+def query_side_effect(request: Request) -> Response:  # noqa: ARG001
     return Response(
         200,
         headers={"Content-Type": "application/json;charset=utf-8"},
@@ -61,7 +60,9 @@ def mocked_api() -> Generator[MockRouter, None, None]:
 
 
 @pytest.fixture
-def cookbook_client(request: FixtureRequest, cookbook_client: FlureeClient) -> Generator[FlureeClient, None, None]:
+def cookbook_client(
+    request: pytest.FixtureRequest, cookbook_client: FlureeClient
+) -> Generator[FlureeClient, None, None]:
     # If we're using a real Fluree server, yield the client and ignore the mocked API
     if request.config.getoption("--use-fluree-server"):
         yield cookbook_client
@@ -79,7 +80,7 @@ def cookbook_client(request: FixtureRequest, cookbook_client: FlureeClient) -> G
 
 
 # https://developers.flur.ee/docs/reference/cookbook/#-wildcard
-def test_ledger_query_wildcard_example(test_name: str, cookbook_client: FlureeClient):
+def test_ledger_query_wildcard_example(test_name: str, cookbook_client: FlureeClient) -> None:
     resp = (
         cookbook_client.with_ledger(test_name)
         .query()

@@ -14,7 +14,7 @@ class WithContextMixin(Generic[T]):
 
     def with_context(self, context: dict[str, Any]) -> T:
         """
-        Updates the operation's context with new data.
+        Update the operation's context with new data.
 
         Exceptions:
             TypeError: If the type parameter cannot be resolved.

@@ -4,7 +4,7 @@
 # When a where clause is an array, it can combine a series of where conditions and where operations.
 
 # Define Condition as a dictionary with flexible key-value pairs
-from typing import Literal, TypeAlias, TypeGuard, Union
+from typing import Literal, TypeAlias, TypeGuard
 
 from fluree_py.types.query.select import LogicVariable
 
@@ -18,7 +18,7 @@ WhereRelationship: TypeAlias = dict[str, str]
 # { "@id": "?s", "schema:name": "?name" }
 # { "@id": "?s", "schema:name": "Freddie", "schema:familyName": "Mercury" }
 # { "@id": "http://example.org/jack", "?p": "?o" }
-WhereCondition = Union[WhereResultSet, WhereRelationship]
+WhereCondition = WhereResultSet | WhereRelationship
 
 # Examples:
 # [
@@ -59,9 +59,7 @@ WhereFilterExpression: TypeAlias = str
 # "(< ?age 50)"
 # (! (strStarts ?url \"http\"))
 def is_filter_expression(var: str) -> TypeGuard[WhereFilterExpression]:
-    """
-    Type guard to check if a string is a valid filter expression.
-    """
+    """Type guard to check if a string is a valid filter expression."""
     if not all(c.isprintable() for c in var):
         return False
 
@@ -100,13 +98,7 @@ WhereOperationUnion: TypeAlias = list[Literal["union"] | WhereCondition]
 # ["bind", "?canVote", "(>= ?age 18)"]
 WhereOperationBind: TypeAlias = list[Literal["bind"] | LogicVariable | WhereFilterExpression]
 
-WhereOperation = Union[
-    WhereOperationOptional,
-    WhereOperationFilter,
-    WhereOperationUnion,
-    WhereOperationBind,
-]
-
+WhereOperation = WhereOperationOptional | WhereOperationFilter | WhereOperationUnion | WhereOperationBind
 
 WhereClauseEntry: TypeAlias = WhereCondition | WhereOperation
 
