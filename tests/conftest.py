@@ -1,3 +1,4 @@
+import logging
 from collections.abc import Generator
 
 import pytest
@@ -5,6 +6,10 @@ from testcontainers.core.waiting_utils import wait_for_logs  # type: ignore
 from testcontainers.generic import ServerContainer  # type: ignore
 
 from fluree_py import FlureeClient
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
@@ -41,8 +46,9 @@ def fluree_url(request: pytest.FixtureRequest) -> Generator[str, None, None]:
 
     # Print the container's logs
     (out, err) = container.get_logs()
-    print(out.decode("utf-8"))
-    print(err.decode("utf-8"))
+    logger.info("Container logs:\n%s", out.decode("utf-8"))
+    if err:
+        logger.error("Container error logs:\n%s", err.decode("utf-8"))
 
     # Cleanup
     container.stop()
