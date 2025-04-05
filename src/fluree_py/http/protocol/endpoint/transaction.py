@@ -21,7 +21,9 @@ class TransactionBuilder(
 ):
     """Protocol for building transaction operations."""
 
-    def with_delete(self, data: JsonObject | JsonArray) -> "TransactionReadyToCommit": ...
+    def with_delete(self, data: JsonObject | JsonArray) -> "TransactionReadyToCommit":
+        """Set the delete data for the operation."""
+        ...
 
 
 class TransactionReadyToCommit(
@@ -34,4 +36,6 @@ class TransactionReadyToCommit(
 ):
     """Protocol for transaction operations ready to be committed."""
 
-    def with_delete(self, data: JsonObject | JsonArray) -> Self: ...
+    def with_delete(self, data: JsonObject | JsonArray) -> Self:
+        """Set the delete data for the operation."""
+        ...

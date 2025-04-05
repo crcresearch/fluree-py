@@ -1,3 +1,6 @@
+"""Errors for the FlureeQL select query builder."""
+
+
 class FlureeSelectError(Exception):
     """Base exception for Fluree select query building errors."""
 

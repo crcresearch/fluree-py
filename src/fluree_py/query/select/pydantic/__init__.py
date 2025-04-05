@@ -1,3 +1,5 @@
+"""Generate FlureeQL select clausesfrom Pydantic models."""
+
 from fluree_py.query.select.pydantic.builder import FlureeSelectBuilder, from_pydantic
 from fluree_py.query.select.pydantic.error import (
     DeeplyNestedStructureError,

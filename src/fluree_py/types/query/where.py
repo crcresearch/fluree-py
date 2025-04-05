@@ -1,3 +1,5 @@
+"""Where clause grammar package."""
+
 # You can think of a FlureeQL query executing in two phases: the where phase and the select phase. The where phase filters and returns sets of bound values that the select phase can use to construct JSON objects. The where clause may return node subject ?bindings that we then use with select expressions like "*" to perform graph crawls from those subject nodes.
 # The where clause may also retrieve all the bindings we need, and we simply instruct the select clause that we want those bindings returned directly as query results.
 # In any case, in addition to establishing logic variables for bound values, we use the where clause to establish various data constraints for the data we are interested in querying (e.g. filtering by a particular predicate value, or expressing optional and outer-join data conditions).

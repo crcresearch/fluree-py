@@ -1,3 +1,5 @@
+"""Build FlureeQL select clauses from Pydantic models."""
+
 from dataclasses import dataclass, field
 from types import UnionType
 from typing import (

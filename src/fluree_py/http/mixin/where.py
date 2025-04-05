@@ -10,11 +10,11 @@ T = TypeVar("T", bound="HasWhereData")
 
 
 class WithWhereMixin(Generic[T]):
-    """Provides where clause capabilities for Fluree queries."""
+    """Provide where clause capabilities for Fluree queries."""
 
     def with_where(self, clause: WhereClause) -> Self:
         """
-        Updates the query with a new where clause.
+        Update the query with a new where clause.
 
         Exceptions:
             TypeError: If the type parameter cannot be resolved.

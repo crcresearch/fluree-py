@@ -1,3 +1,5 @@
+"""Common types for the Fluree Python Client."""
+
 from typing import Any, Literal, TypeAlias, TypedDict, TypeGuard
 
 # Type alias for JSON-serializable data that can be either a single dict or a list of dicts

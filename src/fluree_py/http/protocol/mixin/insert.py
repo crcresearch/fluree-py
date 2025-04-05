@@ -17,4 +17,6 @@ class SupportsInsert(Generic[T_co], Protocol):
 
     data: JsonObject | JsonArray | None
 
-    def with_insert(self, data: JsonObject | JsonArray) -> T_co: ...
+    def with_insert(self, data: JsonObject | JsonArray) -> T_co:
+        """Set the insert data for the operation."""
+        ...

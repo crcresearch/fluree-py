@@ -1,3 +1,5 @@
+"""Query grammar package."""
+
 from typing import TypeAlias, TypedDict
 
 from fluree_py.types.common import Context, TimeClause

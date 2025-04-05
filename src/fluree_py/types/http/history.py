@@ -1,3 +1,5 @@
+"""Types for interacting with the Fluree HTTP history endpoint."""
+
 from typing import TypeAlias
 
 from fluree_py.types.common import Subject

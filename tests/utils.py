@@ -47,10 +47,10 @@ def create_and_retrieve_model(
     Create a Pydantic model, insert it into Fluree, and retrieve it.
 
     Args:
-        model_class: The Pydantic model class to test
+        model_instance: The Pydantic model instance to test
         fluree_client: The Fluree client to use
         ledger_name: The name of the ledger to use
-        cleanup_nested_ids: Whether to remove id fields from nested models before comparison
+        extra_context: Additional context to use for the model
 
     Returns:
         A tuple containing (original_model, retrieved_model)

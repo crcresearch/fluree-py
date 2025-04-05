@@ -17,4 +17,6 @@ class SupportsWhere(Generic[T_co], Protocol):
 
     where: WhereClause | None = None
 
-    def with_where(self, clause: WhereClause) -> T_co: ...
+    def with_where(self, clause: WhereClause) -> T_co:
+        """Set the where clause for the operation."""
+        ...

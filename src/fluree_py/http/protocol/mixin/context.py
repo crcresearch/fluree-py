@@ -15,4 +15,6 @@ class SupportsContext(Generic[T_co], Protocol):
 
     context: dict[str, Any] | None
 
-    def with_context(self, context: dict[str, Any]) -> T_co: ...
+    def with_context(self, context: dict[str, Any]) -> T_co:
+        """Set the context for this operation."""
+        ...

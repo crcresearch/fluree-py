@@ -15,7 +15,7 @@ class RequestMixin(ABC, SupportsRequestCreation):
 
     def get_request(self) -> Request:
         """
-        Constructs an HTTP request with the operation's data.
+        Construct a HTTP request with the operation's data.
 
         Exceptions:
             NotImplementedError: If get_url() or build_request_payload() are not implemented.

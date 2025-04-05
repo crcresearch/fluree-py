@@ -1,5 +1,5 @@
 """
-FlureeQL Select Clause Grammar
+FlureeQL Select clause grammar package.
 
 The select clause in FlureeQL determines the structure and content of query results.
 It can be either a select object or a select array.

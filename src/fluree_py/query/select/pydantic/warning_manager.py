@@ -1,3 +1,5 @@
+"""Warning management for the FlureeQL select query builder."""
+
 import warnings
 from dataclasses import dataclass, field
 

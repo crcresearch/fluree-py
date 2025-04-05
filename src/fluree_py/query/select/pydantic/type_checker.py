@@ -1,3 +1,5 @@
+"""Type checking utilities for the FlureeQL select query builder."""
+
 from types import UnionType
 from typing import (
     Any,

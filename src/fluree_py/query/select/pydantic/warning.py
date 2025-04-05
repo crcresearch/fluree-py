@@ -1,3 +1,6 @@
+"""Warnings for the FlureeQL select query builder."""
+
+
 class ListOrderWarning(RuntimeWarning):
     """Warning raised when a field is a list type, indicating non-deterministic order."""
 
