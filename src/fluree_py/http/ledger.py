@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from fluree_py.http.endpoint import (
     CreateBuilderImpl,
     HistoryBuilderImpl,
-    QueryBuilderImpl, 
+    QueryBuilderImpl,
     TransactionBuilderImpl,
 )
 from fluree_py.http.protocol.endpoint import (

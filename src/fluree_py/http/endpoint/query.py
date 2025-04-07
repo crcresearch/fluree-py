@@ -13,9 +13,10 @@ from fluree_py.http.protocol.endpoint.query import (
     OrderByClause,
     QueryBuilder,
 )
+from fluree_py.types.query.query import ActiveIdentity, GroupByClause, HavingClause, OrderByClause
 from fluree_py.types.query.select import SelectArray, SelectObject
-from fluree_py.types.query.where import WhereClause 
-from fluree_py.types.query.query import GroupByClause, HavingClause, OrderByClause, ActiveIdentity
+from fluree_py.types.query.where import WhereClause
+
 
 @dataclass(frozen=True, kw_only=True)
 class QueryBuilderImpl(

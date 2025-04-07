@@ -11,6 +11,7 @@ class NonGenericBaseClassError(TypeError):
         """Initialize the error with a fixed message."""
         super().__init__(f"Base class {base_name} does not have a generic argument")
 
+
 class TypeResolutionError(TypeError):
     """Exception raised when a type cannot be resolved."""
 
@@ -18,12 +19,14 @@ class TypeResolutionError(TypeError):
         """Initialize the error with a fixed message."""
         super().__init__(f"Unable to resolve type argument {type_arg}")
 
+
 def find_base_class(cls: type[Any], base_name: str) -> type[Any]:
     """Locate a base class by name in the class's original bases."""
     for base in cls.__orig_bases__:
         if base.__name__ == base_name:
             return base
     return cls
+
 
 def resolve_base_class_reference(cls: type[Any], base_name: str) -> type[Any]:
     """
@@ -46,13 +49,13 @@ def resolve_base_class_reference(cls: type[Any], base_name: str) -> type[Any]:
         return type_arg
 
     if sys.version_info < (3, 13):
-        resolved_type = type_arg._evaluate( # noqa: SLF001
+        resolved_type = type_arg._evaluate(  # noqa: SLF001
             sys.modules[cls.__module__].__dict__,
             locals(),
             recursive_guard=frozenset(),
         )
     else:
-        resolved_type = type_arg._evaluate( # noqa: SLF001
+        resolved_type = type_arg._evaluate(  # noqa: SLF001
             sys.modules[cls.__module__].__dict__,
             locals(),
             type_params=(),
