@@ -2,7 +2,7 @@
 
 from typing import Any, Generic, TypeVar, cast
 
-from fluree_py.http.mixin.utils import resolve_base_class_reference
+from fluree_py.http.mixin.utils import find_type_for_base
 from fluree_py.http.protocol.mixin import HasContextData
 
 T = TypeVar("T", bound="HasContextData")
@@ -19,9 +19,11 @@ class WithContextMixin(Generic[T]):
         Exceptions:
             TypeError: If the type parameter cannot be resolved.
         """
-        resolved_type = resolve_base_class_reference(self.__class__, "WithContextMixin")
+        resolved_type = find_type_for_base(self.__class__, "WithContextMixin")
+        if resolved_type is None or len(resolved_type) != 1:
+            raise TypeError("Cannot resolve type for WithContextMixin")
 
         # Manually create a new instance with updated context
         updated_fields = self.__dict__.copy()
         updated_fields["context"] = context
-        return cast("T", resolved_type(**updated_fields))
+        return cast("T", resolved_type[0](**updated_fields))
