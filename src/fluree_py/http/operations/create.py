@@ -7,6 +7,7 @@ from fluree_py.http.mixin import WithContextMixin
 from fluree_py.http.mixin.commit import CommitableMixin, SupportsCommitable
 from fluree_py.http.mixin.context import HasContextData, SupportsContext
 from fluree_py.http.mixin.insert import HasInsertData, SupportsInsert, WithInsertMixin
+from fluree_py.logging import logger
 from fluree_py.types.common import JsonArray, JsonObject
 
 
@@ -40,6 +41,9 @@ class CreateReadyToCommitImpl(
     ledger: str
     data: JsonObject | JsonArray | None
     context: dict[str, Any] | None = None
+
+    def __post_init__(self) -> None:
+        logger.info("create_ready", endpoint=self.endpoint, ledger=self.ledger, data=self.data)
 
     def get_url(self) -> str:
         """Get the endpoint URL for the create operation."""

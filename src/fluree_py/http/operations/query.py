@@ -7,6 +7,7 @@ from fluree_py.http.mixin import WithContextMixin, WithWhereMixin
 from fluree_py.http.mixin.commit import CommitableMixin, SupportsCommitable
 from fluree_py.http.mixin.context import SupportsContext
 from fluree_py.http.mixin.where import SupportsWhere
+from fluree_py.logging import logger
 from fluree_py.types.query.query import ActiveIdentity, GroupByClause, HavingClause, OrderByClause
 from fluree_py.types.query.select import SelectArray, SelectObject
 from fluree_py.types.query.where import WhereClause
@@ -50,6 +51,20 @@ class QueryBuilderImpl(
     opts: ActiveIdentity | None = None
     select_fields: dict[str, Any] | list[str] | None = None
 
+    def __post_init__(self) -> None:
+        logger.info(
+            "query_builder_initialized",
+            endpoint=self.endpoint,
+            ledger=self.ledger,
+            context=self.context,
+            where=self.where,
+            group_by=self.group_by,
+            having=self.having,
+            order_by=self.order_by,
+            opts=self.opts,
+            select_fields=self.select_fields,
+        )
+
     def with_group_by(self, fields: GroupByClause) -> Self:
         return replace(self, group_by=fields)
 
@@ -85,4 +100,5 @@ class QueryBuilderImpl(
             result["opts"] = self.opts
         if self.select_fields:
             result["select"] = self.select_fields
+        logger.debug("building_query_payload", payload=result)
         return result

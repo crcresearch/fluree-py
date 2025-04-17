@@ -4,6 +4,7 @@ from typing import Protocol
 
 from httpx import Request
 
+from fluree_py.logging import logger
 from fluree_py.types.common import JsonObject
 
 
@@ -42,8 +43,11 @@ class WithRequestMixin(SupportsRequestCreation, HasEndpointURL, HasRequestPayloa
         Exceptions:
             NotImplementedError: If get_url() or build_request_payload() are not implemented.
         """
-        return Request(
+        payload = self.build_request_payload()
+        logger.debug(
+            "building_request",
             method="POST",
             url=self.get_url(),
-            json=self.build_request_payload(),
+            payload=payload,
         )
+        return Request(method="POST", url=self.get_url(), json=payload)

@@ -5,8 +5,8 @@ description = "A Python client library for interacting with FlureeDB, providing 
 readme = "README.md"
 authors = [{ name = "James Sweet", email = "jsweet@nd.edu" }]
 requires-python = ">=3.11"
-dependencies = ["httpx>=0.28.1", "pydantic>=2.10.6"]
-license = { text = "MIT" }
+dependencies = ["httpx>=0.28.1", "pydantic>=2.10.6", "structlog>=23.1.0"]
+license = "MIT"
 license-files = ["LICENSE"]
 keywords = ["fluree", "database", "client", "api", "graph-database"]
 classifiers = [

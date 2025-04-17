@@ -6,6 +6,7 @@ from typing import Any, Protocol, Self
 from fluree_py.http.mixin import WithContextMixin
 from fluree_py.http.mixin.commit import CommitableMixin, SupportsCommitable
 from fluree_py.http.mixin.context import SupportsContext
+from fluree_py.logging import logger
 from fluree_py.types.common import TimeClause
 from fluree_py.types.http.history import HistoryClause
 
@@ -44,6 +45,17 @@ class HistoryBuilderImpl(
     history: HistoryClause | None = None
     t: TimeClause | None = None
     commit_details: bool | None = None
+
+    def __post_init__(self) -> None:
+        logger.info(
+            "history_builder_initialized",
+            endpoint=self.endpoint,
+            ledger=self.ledger,
+            context=self.context,
+            history=self.history,
+            t=self.t,
+            commit_details=self.commit_details,
+        )
 
     def with_history(self, history: HistoryClause) -> "HistoryBuilderImpl":
         return replace(self, history=history)

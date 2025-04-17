@@ -3,6 +3,7 @@ from typing import TypeVar
 
 from httpx import Headers, Response
 
+from fluree_py.logging import logger
 from fluree_py.types.common import JsonArray, JsonObject
 
 T = TypeVar("T")
@@ -16,6 +17,11 @@ class FlureeResponse:
 
     def json(self) -> JsonObject | JsonArray:
         """Parse the response as JSON."""
+        logger.debug(
+            "parsing_response_json",
+            status_code=self.response.status_code,
+            text_snippet=self.response.text[:200],
+        )
         return self.response.json()
 
     @property

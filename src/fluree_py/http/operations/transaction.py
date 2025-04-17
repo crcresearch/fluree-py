@@ -8,6 +8,7 @@ from fluree_py.http.mixin.commit import CommitableMixin, SupportsCommitable
 from fluree_py.http.mixin.context import SupportsContext
 from fluree_py.http.mixin.insert import HasInsertData, SupportsInsert, WithInsertMixin
 from fluree_py.http.mixin.where import SupportsWhere
+from fluree_py.logging import logger
 from fluree_py.types.common import JsonArray, JsonObject
 from fluree_py.types.query.where import WhereClause
 
@@ -78,6 +79,16 @@ class TransactionReadyToCommitImpl(
     data: JsonObject | JsonArray | None
     delete_data: JsonObject | JsonArray | None
 
+    def __post_init__(self) -> None:
+        logger.info(
+            "transaction_ready",
+            endpoint=self.endpoint,
+            ledger=self.ledger,
+            data=self.data,
+            delete_data=self.delete_data,
+            where=self.where,
+        )
+
     def with_delete(self, data: JsonObject | JsonArray) -> "TransactionReadyToCommitImpl":
         """Add delete operation to the transaction."""
         return replace(self, delete_data=data)
@@ -98,4 +109,5 @@ class TransactionReadyToCommitImpl(
             result["delete"] = self.delete_data
         if self.where:
             result["where"] = self.where
+        logger.debug("building_transaction_payload", payload=result)
         return result

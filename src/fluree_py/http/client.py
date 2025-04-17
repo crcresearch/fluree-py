@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 from fluree_py.http.ledger import LedgerSelected, SupportsLedgerOperations
+from fluree_py.logging import logger
 from fluree_py.types.common import LedgerName
 
 
@@ -12,4 +13,5 @@ class FlureeClient:
 
     def with_ledger(self, ledger: LedgerName) -> SupportsLedgerOperations:
         """Select a ledger to operate on."""
+        logger.debug("selecting_ledger", base_url=self.base_url, ledger=ledger)
         return LedgerSelected(base_url=self.base_url, ledger=ledger)

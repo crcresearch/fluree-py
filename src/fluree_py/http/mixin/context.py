@@ -3,6 +3,7 @@
 from typing import Any, Generic, Protocol, TypeVar, cast
 
 from fluree_py.http.mixin.utils import resolve_base_class_reference
+from fluree_py.logging import logger
 
 
 # Protocol definitions for context mixin
@@ -35,6 +36,7 @@ class WithContextMixin(Generic[T_co]):
         Exceptions:
             TypeError: If the type parameter cannot be resolved.
         """
+        logger.debug("with_context", context=context)
         resolved_type = resolve_base_class_reference(self.__class__, "WithContextMixin")
 
         # Manually create a new instance with updated context

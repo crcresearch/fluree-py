@@ -3,6 +3,7 @@
 from typing import Generic, Protocol, TypeVar, cast
 
 from fluree_py.http.mixin.utils import resolve_base_class_reference
+from fluree_py.logging import logger
 from fluree_py.types.common import JsonArray, JsonObject
 
 
@@ -36,6 +37,7 @@ class WithInsertMixin(Generic[T_co]):
         Exceptions:
             TypeError: If the type parameter cannot be resolved.
         """
+        logger.debug("with_insert", data=data)
         resolved_type = resolve_base_class_reference(self.__class__, "WithInsertMixin")
 
         # Create a new instance of the resolved type

@@ -6,6 +6,7 @@ from httpx import AsyncClient, Client
 
 from fluree_py.http.mixin.request import WithRequestMixin
 from fluree_py.http.response import FlureeResponse
+from fluree_py.logging import logger
 
 
 # Protocol definitions for commit mixin
@@ -37,8 +38,10 @@ class CommitMixin(WithRequestMixin, SupportsCommit):
             TypeError: If the type parameter cannot be resolved.
         """
         request = self.get_request()
+        logger.info("commit_request", method=request.method, url=str(request.url))
         with Client() as client:
             response = client.send(request)
+        logger.info("commit_response", status_code=response.status_code, elapsed=response.elapsed)
         return FlureeResponse(response=response)
 
 
@@ -54,8 +57,10 @@ class AsyncCommitMixin(WithRequestMixin, SupportsAsyncCommit):
             TypeError: If the type parameter cannot be resolved.
         """
         request = self.get_request()
+        logger.info("async_commit_request", method=request.method, url=str(request.url))
         async with AsyncClient() as client:
             response = await client.send(request)
+        logger.info("async_commit_response", status_code=response.status_code, elapsed=response.elapsed)
         return FlureeResponse(response=response)
 
 
