@@ -10,6 +10,7 @@ from fluree_py.http.protocol.mixin import (
     SupportsContext,
     SupportsWhere,
 )
+from fluree_py.http.response import FlureeResponse, MissingTransactionError
 from fluree_py.types.query.query import (
     ActiveIdentity,
     GroupByClause,
@@ -22,7 +23,7 @@ from fluree_py.types.query.select import SelectArray, SelectObject
 class QueryBuilder(
     SupportsContext["QueryBuilder"],
     SupportsWhere["QueryBuilder"],
-    SupportsCommitable,
+    SupportsCommitable[FlureeResponse, MissingTransactionError],
     Protocol,
 ):
     """Protocol for building query operations."""

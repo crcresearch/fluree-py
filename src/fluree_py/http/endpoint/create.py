@@ -7,12 +7,13 @@ from fluree_py.http.mixin import (
 )
 from fluree_py.http.mixin.commit import CommitableMixin
 from fluree_py.http.protocol.endpoint.create import CreateBuilder, CreateReadyToCommit
+from fluree_py.http.response import FlureeResponse, MissingTransactionError
 from fluree_py.types.common import JsonArray, JsonObject
 
 
 @dataclass(frozen=True, kw_only=True)
 class CreateReadyToCommitImpl(
-    CommitableMixin,
+    CommitableMixin[FlureeResponse, MissingTransactionError],
     WithContextMixin["CreateReadyToCommitImpl"],
     WithInsertMixin["CreateReadyToCommitImpl"],
     CreateReadyToCommit,

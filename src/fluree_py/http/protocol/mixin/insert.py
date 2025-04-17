@@ -1,4 +1,4 @@
-from typing import Generic, Protocol, TypeVar
+from typing import Protocol, TypeVar
 
 from fluree_py.types.common import JsonArray, JsonObject
 
@@ -12,7 +12,7 @@ class HasInsertData(Protocol):
 T_co = TypeVar("T_co", bound="HasInsertData", covariant=True)
 
 
-class SupportsInsert(Generic[T_co], Protocol):
+class SupportsInsert(Protocol[T_co]):
     """Protocol for objects that support insert operations."""
 
     data: JsonObject | JsonArray | None

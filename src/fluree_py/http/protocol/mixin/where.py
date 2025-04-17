@@ -1,4 +1,4 @@
-from typing import Generic, Protocol, TypeVar
+from typing import Protocol, TypeVar
 
 from fluree_py.types.query.where import WhereClause
 
@@ -12,7 +12,7 @@ class HasWhereData(Protocol):
 T_co = TypeVar("T_co", bound="HasWhereData", covariant=True)
 
 
-class SupportsWhere(Generic[T_co], Protocol):
+class SupportsWhere(Protocol[T_co]):
     """Protocol for objects that support where clause operations."""
 
     where: WhereClause | None = None

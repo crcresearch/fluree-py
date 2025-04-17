@@ -1,12 +1,19 @@
-from typing import Protocol
+from typing import Protocol, TypeVar
 
-from fluree_py.http.response import FlureeResponse
+from fluree_py.http.protocol.mixin.response import (
+    SupportsFromResponse,
+    SupportsRaisingFromResponse,
+    SupportsResponseHandling,
+)
+
+T_Success_co = TypeVar("T_Success_co", bound=SupportsFromResponse, covariant=True)
+T_Failure_co = TypeVar("T_Failure_co", bound=SupportsRaisingFromResponse, covariant=True)
 
 
-class SupportsCommit(Protocol):
+class SupportsCommit(SupportsResponseHandling[T_Success_co, T_Failure_co], Protocol[T_Success_co, T_Failure_co]):
     """Protocol for objects that support synchronous commit operations."""
 
-    def commit(self) -> FlureeResponse:
+    def commit(self) -> T_Success_co:
         """
         Execute the transaction synchronously.
 
@@ -17,10 +24,10 @@ class SupportsCommit(Protocol):
         ...
 
 
-class SupportsAsyncCommit(Protocol):
+class SupportsAsyncCommit(SupportsResponseHandling[T_Success_co, T_Failure_co], Protocol[T_Success_co, T_Failure_co]):
     """Protocol for objects that support asynchronous commit operations."""
 
-    async def acommit(self) -> FlureeResponse:
+    async def acommit(self) -> T_Success_co:
         """
         Execute the transaction asynchronously.
 
@@ -31,5 +38,9 @@ class SupportsAsyncCommit(Protocol):
         ...
 
 
-class SupportsCommitable(SupportsCommit, SupportsAsyncCommit, Protocol):
+class SupportsCommitable(
+    SupportsCommit[T_Success_co, T_Failure_co],
+    SupportsAsyncCommit[T_Success_co, T_Failure_co],
+    Protocol[T_Success_co, T_Failure_co],
+):
     """Protocol for objects that support both sync and async commit operations."""

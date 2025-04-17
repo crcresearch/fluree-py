@@ -1,4 +1,4 @@
-from typing import Any, Generic, Protocol, TypeVar
+from typing import Any, Protocol, TypeVar
 
 
 class HasContextData(Protocol):
@@ -10,7 +10,7 @@ class HasContextData(Protocol):
 T_co = TypeVar("T_co", bound="HasContextData", covariant=True)
 
 
-class SupportsContext(Generic[T_co], Protocol):
+class SupportsContext(Protocol[T_co]):
     """Protocol for objects that support context operations."""
 
     context: dict[str, Any] | None

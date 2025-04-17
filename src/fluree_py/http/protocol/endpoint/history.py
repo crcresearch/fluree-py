@@ -6,12 +6,13 @@ from fluree_py.http.protocol.mixin import (
     SupportsCommitable,
     SupportsContext,
 )
+from fluree_py.http.response import FlureeResponse, MissingTransactionError
 from fluree_py.types.common import TimeClause
 from fluree_py.types.http.history import HistoryClause
 
 
 class HistoryBuilder(
-    SupportsCommitable,
+    SupportsCommitable[FlureeResponse, MissingTransactionError],
     SupportsContext["HistoryBuilder"],
     Protocol,
 ):

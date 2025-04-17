@@ -6,6 +6,7 @@ from testcontainers.core.waiting_utils import wait_for_logs  # type: ignore
 from testcontainers.generic import ServerContainer  # type: ignore
 
 from fluree_py import FlureeClient
+from fluree_py.http.response import FlureeResponse
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -123,6 +124,7 @@ def cookbook_client(
         .commit()
     )
 
+    assert isinstance(resp, FlureeResponse)
     assert resp.status_code == 201
 
     yield fluree_client

@@ -11,6 +11,7 @@ from fluree_py.http.protocol.endpoint import (
     TransactionBuilder,
     TransactionReadyToCommit,
 )
+from fluree_py.http.response import FlureeResponse, MissingTransactionError
 from fluree_py.types.common import JsonArray, JsonObject
 from fluree_py.types.query.where import WhereClause
 
@@ -40,7 +41,7 @@ class TransactionBuilderImpl(
 
 @dataclass(frozen=True, kw_only=True)
 class TransactionReadyToCommitImpl(
-    CommitableMixin,
+    CommitableMixin[FlureeResponse, MissingTransactionError],
     WithContextMixin["TransactionReadyToCommitImpl"],
     WithWhereMixin["TransactionReadyToCommitImpl"],
     TransactionReadyToCommit,

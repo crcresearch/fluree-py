@@ -9,6 +9,7 @@ from fluree_py.http.protocol.mixin import (
     SupportsInsert,
     SupportsWhere,
 )
+from fluree_py.http.response import FlureeResponse, MissingTransactionError
 from fluree_py.types.common import JsonArray, JsonObject
 
 
@@ -26,7 +27,7 @@ class TransactionBuilder(
 
 
 class TransactionReadyToCommit(
-    SupportsCommitable,
+    SupportsCommitable[FlureeResponse, MissingTransactionError],
     SupportsContext["TransactionReadyToCommit"],
     SupportsWhere["TransactionReadyToCommit"],
     HasInsertData,
