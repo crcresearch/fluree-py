@@ -1,13 +1,33 @@
-from dataclasses import dataclass, replace
-from typing import Any
+"""History operation protocols and implementations."""
 
-from fluree_py.http.mixin import (
-    CommitableMixin,
-    WithContextMixin,
-)
-from fluree_py.http.protocol.endpoint import HistoryBuilder
+from dataclasses import dataclass, replace
+from typing import Any, Protocol, Self
+
+from fluree_py.http.mixin import WithContextMixin
+from fluree_py.http.mixin.commit import CommitableMixin, SupportsCommitable
+from fluree_py.http.mixin.context import SupportsContext
 from fluree_py.types.common import TimeClause
 from fluree_py.types.http.history import HistoryClause
+
+
+class HistoryBuilder(
+    SupportsCommitable,
+    SupportsContext["HistoryBuilder"],
+    Protocol,
+):
+    """Protocol for history builders."""
+
+    def with_history(self, history: HistoryClause) -> Self:
+        """Set the history clause for the operation."""
+        ...
+
+    def with_t(self, t: TimeClause) -> Self:
+        """Set the time clause for the operation."""
+        ...
+
+    def with_commit_details(self, commit_details: bool) -> Self:
+        """Include commit details in the response."""
+        ...
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -26,23 +46,18 @@ class HistoryBuilderImpl(
     commit_details: bool | None = None
 
     def with_history(self, history: HistoryClause) -> "HistoryBuilderImpl":
-        """Add history clause to the query."""
         return replace(self, history=history)
 
     def with_t(self, t: TimeClause) -> "HistoryBuilderImpl":
-        """Add time clause to the query."""
         return replace(self, t=t)
 
     def with_commit_details(self, commit_details: bool) -> "HistoryBuilderImpl":
-        """Add commit details flag to the query."""
         return replace(self, commit_details=commit_details)
 
     def get_url(self) -> str:
-        """Get the endpoint URL for the history query operation."""
         return self.endpoint
 
     def build_request_payload(self) -> dict[str, Any]:
-        """Build the request payload for the history query operation."""
         result: dict[str, Any] = {}
         if self.context:
             result["@context"] = self.context

@@ -1,13 +1,30 @@
-from dataclasses import dataclass
-from typing import Any
+"""Create operation protocols and implementations."""
 
-from fluree_py.http.mixin import (
-    WithContextMixin,
-    WithInsertMixin,
-)
-from fluree_py.http.mixin.commit import CommitableMixin
-from fluree_py.http.protocol.endpoint.create import CreateBuilder, CreateReadyToCommit
+from dataclasses import dataclass
+from typing import Any, Protocol
+
+from fluree_py.http.mixin import WithContextMixin
+from fluree_py.http.mixin.commit import CommitableMixin, SupportsCommitable
+from fluree_py.http.mixin.context import HasContextData, SupportsContext
+from fluree_py.http.mixin.insert import HasInsertData, SupportsInsert, WithInsertMixin
 from fluree_py.types.common import JsonArray, JsonObject
+
+
+class CreateBuilder(
+    SupportsContext["CreateBuilder"],
+    SupportsInsert["CreateReadyToCommit"],
+    Protocol,
+):
+    """Protocol for building create operations."""
+
+
+class CreateReadyToCommit(
+    SupportsCommitable,
+    HasInsertData,
+    HasContextData,
+    Protocol,
+):
+    """Protocol for create operations ready to be committed."""
 
 
 @dataclass(frozen=True, kw_only=True)

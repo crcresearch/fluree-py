@@ -1,18 +1,42 @@
-from dataclasses import dataclass, replace
-from typing import Any
+"""Transaction operation protocols and implementations."""
 
-from fluree_py.http.mixin import (
-    WithContextMixin,
-    WithInsertMixin,
-    WithWhereMixin,
-)
-from fluree_py.http.mixin.commit import CommitableMixin
-from fluree_py.http.protocol.endpoint import (
-    TransactionBuilder,
-    TransactionReadyToCommit,
-)
+from dataclasses import dataclass, replace
+from typing import Any, Protocol, Self
+
+from fluree_py.http.mixin import WithContextMixin, WithWhereMixin
+from fluree_py.http.mixin.commit import CommitableMixin, SupportsCommitable
+from fluree_py.http.mixin.context import SupportsContext
+from fluree_py.http.mixin.insert import HasInsertData, SupportsInsert, WithInsertMixin
+from fluree_py.http.mixin.where import SupportsWhere
 from fluree_py.types.common import JsonArray, JsonObject
 from fluree_py.types.query.where import WhereClause
+
+
+class TransactionBuilder(
+    SupportsContext["TransactionBuilder"],
+    SupportsInsert["TransactionReadyToCommit"],
+    SupportsWhere["TransactionBuilder"],
+    Protocol,
+):
+    """Protocol for building transaction operations."""
+
+    def with_delete(self, data: JsonObject | JsonArray) -> "TransactionReadyToCommit":
+        """Set the delete data for the operation."""
+        ...
+
+
+class TransactionReadyToCommit(
+    SupportsCommitable,
+    SupportsContext["TransactionReadyToCommit"],
+    SupportsWhere["TransactionReadyToCommit"],
+    HasInsertData,
+    Protocol,
+):
+    """Protocol for transaction operations ready to be committed."""
+
+    def with_delete(self, data: JsonObject | JsonArray) -> Self:
+        """Set the delete data for the operation."""
+        ...
 
 
 @dataclass(frozen=True, kw_only=True)

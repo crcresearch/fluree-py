@@ -1,18 +1,35 @@
 """Mixin for handling data insertion operations in Fluree."""
 
-from typing import Generic, TypeVar, cast
+from typing import Generic, Protocol, TypeVar, cast
 
 from fluree_py.http.mixin.utils import resolve_base_class_reference
-from fluree_py.http.protocol.mixin import HasInsertData
 from fluree_py.types.common import JsonArray, JsonObject
 
-T = TypeVar("T", bound="HasInsertData")
+
+# Protocol definitions for insert mixin
+class HasInsertData(Protocol):
+    """Protocol for objects that have insert data."""
+
+    data: JsonObject | JsonArray | None
 
 
-class WithInsertMixin(Generic[T]):
+T_co = TypeVar("T_co", bound="HasInsertData", covariant=True)
+
+
+class SupportsInsert(Generic[T_co], Protocol):
+    """Protocol for objects that support insert operations."""
+
+    data: JsonObject | JsonArray | None
+
+    def with_insert(self, data: JsonObject | JsonArray) -> T_co:
+        """Set the insert data for the operation."""
+        ...
+
+
+class WithInsertMixin(Generic[T_co]):
     """Provides data insertion capabilities for Fluree operations."""
 
-    def with_insert(self, data: JsonObject | JsonArray) -> T:
+    def with_insert(self, data: JsonObject | JsonArray) -> T_co:
         """
         Update the operation with new data to be inserted.
 
@@ -24,4 +41,4 @@ class WithInsertMixin(Generic[T]):
         # Create a new instance of the resolved type
         updated_fields = self.__dict__.copy()
         updated_fields["data"] = data
-        return cast("T", resolved_type(**updated_fields))
+        return cast("T_co", resolved_type(**updated_fields))
