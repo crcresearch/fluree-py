@@ -3,34 +3,33 @@
 from dataclasses import dataclass
 from typing import Any, Protocol
 
-from fluree_py.http.mixin import WithContextMixin
+from fluree_py.http.mixin import (
+    WithContextMixin,
+    WithInsertMixin,
+)
 from fluree_py.http.mixin.commit import CommitableMixin, SupportsCommitable
 from fluree_py.http.mixin.context import HasContextData, SupportsContext
-from fluree_py.http.mixin.insert import HasInsertData, SupportsInsert, WithInsertMixin
+from fluree_py.http.mixin.insert import HasInsertData, SupportsInsert
+from fluree_py.http.response import FlureeResponse, MissingTransactionError
 from fluree_py.logging import logger
 from fluree_py.types.common import JsonArray, JsonObject
 
 
-class CreateBuilder(
-    SupportsContext["CreateBuilder"],
-    SupportsInsert["CreateReadyToCommit"],
-    Protocol,
-):
-    """Protocol for building create operations."""
-
-
+# Protocol definitions for create operations
 class CreateReadyToCommit(
-    SupportsCommitable,
-    HasInsertData,
-    HasContextData,
-    Protocol,
+    SupportsCommitable[FlureeResponse, MissingTransactionError], HasInsertData, HasContextData, Protocol
 ):
     """Protocol for create operations ready to be committed."""
 
 
+class CreateBuilder(SupportsContext["CreateBuilder"], SupportsInsert[CreateReadyToCommit], Protocol):
+    """Protocol for building create operations."""
+
+
+# Implementation of create operations
 @dataclass(frozen=True, kw_only=True)
 class CreateReadyToCommitImpl(
-    CommitableMixin,
+    CommitableMixin[FlureeResponse, MissingTransactionError],
     WithContextMixin["CreateReadyToCommitImpl"],
     WithInsertMixin["CreateReadyToCommitImpl"],
     CreateReadyToCommit,
@@ -61,7 +60,7 @@ class CreateReadyToCommitImpl(
 @dataclass(frozen=True, kw_only=True)
 class CreateBuilderImpl(
     WithContextMixin["CreateBuilderImpl"],
-    WithInsertMixin["CreateReadyToCommitImpl"],
+    WithInsertMixin[CreateReadyToCommitImpl],
     CreateBuilder,
 ):
     """Implementation of a create operation builder."""

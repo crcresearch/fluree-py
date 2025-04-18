@@ -7,6 +7,7 @@ from httpx import Response
 from respx import MockRouter
 
 from fluree_py import FlureeClient
+from fluree_py.http.response import FlureeResponse
 
 
 @pytest.fixture
@@ -68,6 +69,7 @@ def test_ledger_history(test_name: str, cookbook_client: FlureeClient) -> None:
         .with_t({"from": 1})
         .commit()
     )
+    assert isinstance(resp, FlureeResponse)
 
     assert resp.status_code == HTTPStatus.OK
     assert resp.headers["Content-Type"] == "application/json;charset=utf-8"

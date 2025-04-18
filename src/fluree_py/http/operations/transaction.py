@@ -3,16 +3,22 @@
 from dataclasses import dataclass, replace
 from typing import Any, Protocol, Self
 
-from fluree_py.http.mixin import WithContextMixin, WithWhereMixin
+from fluree_py.http.mixin import (
+    WithContextMixin,
+    WithInsertMixin,
+    WithWhereMixin,
+)
 from fluree_py.http.mixin.commit import CommitableMixin, SupportsCommitable
 from fluree_py.http.mixin.context import SupportsContext
 from fluree_py.http.mixin.insert import HasInsertData, SupportsInsert, WithInsertMixin
 from fluree_py.http.mixin.where import SupportsWhere
+from fluree_py.http.response import FlureeResponse, MissingTransactionError
 from fluree_py.logging import logger
 from fluree_py.types.common import JsonArray, JsonObject
 from fluree_py.types.query.where import WhereClause
 
 
+# Protocol definitions for transaction operations
 class TransactionBuilder(
     SupportsContext["TransactionBuilder"],
     SupportsInsert["TransactionReadyToCommit"],
@@ -27,7 +33,7 @@ class TransactionBuilder(
 
 
 class TransactionReadyToCommit(
-    SupportsCommitable,
+    SupportsCommitable[FlureeResponse, MissingTransactionError],
     SupportsContext["TransactionReadyToCommit"],
     SupportsWhere["TransactionReadyToCommit"],
     HasInsertData,
@@ -40,6 +46,7 @@ class TransactionReadyToCommit(
         ...
 
 
+# Implementation of transaction operations
 @dataclass(frozen=True, kw_only=True)
 class TransactionBuilderImpl(
     WithContextMixin["TransactionBuilderImpl"],
@@ -65,7 +72,7 @@ class TransactionBuilderImpl(
 
 @dataclass(frozen=True, kw_only=True)
 class TransactionReadyToCommitImpl(
-    CommitableMixin,
+    CommitableMixin[FlureeResponse, MissingTransactionError],
     WithContextMixin["TransactionReadyToCommitImpl"],
     WithWhereMixin["TransactionReadyToCommitImpl"],
     TransactionReadyToCommit,

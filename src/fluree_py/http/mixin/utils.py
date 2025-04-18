@@ -4,6 +4,8 @@ import inspect
 import sys
 from typing import ForwardRef, TypeVar, get_origin
 
+from fluree_py.logging import logger
+
 
 class InvalidArgumentCountError(TypeError):
     """Exception raised when a requested type has an invalid number of generic arguments."""
@@ -130,6 +132,15 @@ def resolve_type_arg(cls: type, type_arg: ForwardRef | type) -> type:
     while frame is not None:
         local_namespace = {**frame.f_locals}
 
+        # Log the available classes in the local and global namespaces
+        logger.info(
+            "forwardref_resolution_attempt",
+            frame=frame.f_code.co_name,
+            local_classes=[k for k, v in local_namespace.items() if isinstance(v, type)],
+            global_classes=[k for k, v in global_namespace.items() if isinstance(v, type)],
+            forwardref=str(type_arg),
+        )
+
         maybe_resolved = evaluate_forward_ref(type_arg, global_namespace, local_namespace)
         if maybe_resolved is not None:
             # If it resolved properly, return it
@@ -159,6 +170,38 @@ def resolve_base_type_args(cls: type, base_name: str | type) -> list[type]:
     return [resolve_type_arg(cls, type_arg) for type_arg in collect_types_for_base(cls, base_name_str)]
 
 
+def _get_typevar_mapping(cls):
+    """
+    Walk the MRO and accumulate a mapping of typevars to their concrete types.
+    Returns a dict mapping TypeVar to its resolved value.
+    """
+    mapping = {}
+    mro = inspect.getmro(cls)
+    for current_cls in mro:
+        if hasattr(current_cls, "__orig_bases__"):
+            for base in current_cls.__orig_bases__:
+                origin = get_origin(base)
+                if origin is None:
+                    continue
+                params = getattr(origin, "__parameters__", ())
+                args = getattr(base, "__args__", ())
+                # Log the mapping process
+                logger.info(
+                    "typevar_mapping_step",
+                    current_cls=current_cls.__name__,
+                    base=str(base),
+                    origin=str(origin),
+                    params=[getattr(p, "__name__", str(p)) for p in params],
+                    args=[str(a) for a in args],
+                    mapping={getattr(k, "__name__", str(k)): str(v) for k, v in mapping.items()},
+                )
+                for param, arg in zip(params, args, strict=False):
+                    # Substitute any typevars in arg using the current map
+                    resolved_arg = mapping.get(arg, arg)
+                    mapping[param] = resolved_arg
+    return mapping
+
+
 def resolve_base_type_arg(
     cls: type,
     base_name: str,
@@ -178,24 +221,31 @@ def resolve_base_type_arg(
     """
     # Normalize argument to a name
     arg_name = argument.__name__ if isinstance(argument, TypeVar) else argument
-    if not hasattr(cls, "__orig_bases__"):
-        return []
-
-    for base in cls.__orig_bases__:
-        if base.__name__ == base_name:
-            params = getattr(base, "__parameters__", None)
-            args = getattr(base, "__args__", None)
-            # If not found, try the origin
-            if (params is None or not any(p.__name__ == arg_name for p in params)) and hasattr(base, "__origin__"):
+    logger.info("resolve_base_type_arg", cls=cls.__name__, base_name=base_name, arg_name=arg_name)
+    # Find the target base in the MRO
+    mro = inspect.getmro(cls)
+    for current_cls in mro:
+        if hasattr(current_cls, "__orig_bases__"):
+            for base in current_cls.__orig_bases__:
                 origin = get_origin(base)
-                params = getattr(origin, "__parameters__", None)
-            if params is not None and args is not None:
-                for idx, param in enumerate(params):
-                    if param.__name__ == arg_name:
-                        return [resolve_type_arg(cls, args[idx])]
-            return [resolve_type_arg(cls, type_arg) for type_arg in args] if args else []
-        if hasattr(base, "__origin__"):
-            result = resolve_base_type_arg(get_origin(base), base_name, argument)
-            if result:
-                return result
+                if origin is None:
+                    continue
+                if origin.__name__ == base_name or getattr(origin, "__name__", None) == base_name:
+                    params = getattr(origin, "__parameters__", ())
+                    args = getattr(base, "__args__", ())
+                    # Build the typevar mapping up to this point
+                    mapping = _get_typevar_mapping(cls)
+                    for idx, param in enumerate(params):
+                        if param.__name__ == arg_name:
+                            resolved = mapping.get(param, param)
+                            # If still a TypeVar, try to resolve recursively
+                            while (
+                                isinstance(resolved, TypeVar) and resolved in mapping and mapping[resolved] != resolved
+                            ):
+                                resolved = mapping[resolved]
+                            if isinstance(resolved, TypeVar):
+                                raise TypeResolutionError(resolved)
+                            if not isinstance(resolved, type):
+                                raise TypeResolutionError(resolved)
+                            return [resolved]
     return []

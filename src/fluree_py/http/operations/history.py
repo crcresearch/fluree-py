@@ -6,13 +6,15 @@ from typing import Any, Protocol, Self
 from fluree_py.http.mixin import WithContextMixin
 from fluree_py.http.mixin.commit import CommitableMixin, SupportsCommitable
 from fluree_py.http.mixin.context import SupportsContext
+from fluree_py.http.response import FlureeResponse, MissingTransactionError
 from fluree_py.logging import logger
 from fluree_py.types.common import TimeClause
 from fluree_py.types.http.history import HistoryClause
 
 
+# Protocol definitions for history operations
 class HistoryBuilder(
-    SupportsCommitable,
+    SupportsCommitable[FlureeResponse, MissingTransactionError],
     SupportsContext["HistoryBuilder"],
     Protocol,
 ):
@@ -31,9 +33,10 @@ class HistoryBuilder(
         ...
 
 
+# Implementation of history operations
 @dataclass(frozen=True, kw_only=True)
 class HistoryBuilderImpl(
-    CommitableMixin,
+    CommitableMixin[FlureeResponse, MissingTransactionError],
     WithContextMixin["HistoryBuilderImpl"],
     HistoryBuilder,
 ):

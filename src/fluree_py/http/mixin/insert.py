@@ -17,7 +17,7 @@ class HasInsertData(Protocol):
 T_co = TypeVar("T_co", bound="HasInsertData", covariant=True)
 
 
-class SupportsInsert(Generic[T_co], Protocol):
+class SupportsInsert(Protocol[T_co]):
     """Protocol for objects that support insert operations."""
 
     data: JsonObject | JsonArray | None

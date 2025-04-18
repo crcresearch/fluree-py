@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from typing import TypeVar
+from http import HTTPStatus
+from typing import Self, TypeVar
 
 from httpx import Headers, Response
 
@@ -48,3 +49,22 @@ class FlureeResponse:
     def is_success(self) -> bool:
         """Check if the response was successful."""
         return self.response.is_success
+
+    @classmethod
+    def from_response(cls, response: Response) -> Self | None:
+        return cls(response=response)
+
+
+class MissingTransactionError(Exception):
+    """Exception raised when a transaction is missing."""
+
+    def __init__(self, ledger: str):
+        self.message = f"Ledger {ledger} does not exist!"
+        super().__init__(self.message)
+
+    @classmethod
+    def raise_from_response(cls, response: Response) -> None:
+        if response.status_code == HTTPStatus.CONFLICT:
+            json = response.json()
+            if "error" in json:
+                raise cls(json["error"])

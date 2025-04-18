@@ -8,6 +8,7 @@ from httpx import Request, Response
 from respx import MockRouter
 
 from fluree_py import FlureeClient
+from fluree_py.http.response import FlureeResponse, MissingTransactionError
 
 
 def transact_side_effect(request: Request) -> Response:
@@ -86,6 +87,8 @@ def test_ledger_transaction_single_record(test_name: str, cookbook_client: Flure
         .commit()
     )
 
+    assert isinstance(resp, FlureeResponse)
+
     assert resp.status_code == HTTPStatus.OK
     assert resp.headers["Content-Type"] == "application/json;charset=utf-8"
 
@@ -127,6 +130,8 @@ def test_ledger_transaction_multiple_records(test_name: str, cookbook_client: Fl
         .commit()
     )
 
+    assert isinstance(resp, FlureeResponse)
+
     assert resp.status_code == HTTPStatus.OK
     assert resp.headers["Content-Type"] == "application/json;charset=utf-8"
 
@@ -147,19 +152,17 @@ def test_ledger_transaction_multiple_records(test_name: str, cookbook_client: Fl
 
 # Transaction Errors
 def test_transaction_on_missing_ledger(test_name: str, cookbook_client: FlureeClient) -> None:
-    resp = (
-        cookbook_client.with_ledger(test_name + "missing")
-        .transaction()
-        .with_context({"ex": "http://example.org/", "schema": "http://schema.org/"})
-        .with_insert(
-            {
-                "@id": "ex:fluree",
-                "@type": "schema:Organization",
-                "schema:description": "We ❤️ Data",
-            },
+    with pytest.raises(MissingTransactionError):
+        (
+            cookbook_client.with_ledger(test_name + "missing")
+            .transaction()
+            .with_context({"ex": "http://example.org/", "schema": "http://schema.org/"})
+            .with_insert(
+                {
+                    "@id": "ex:fluree",
+                    "@type": "schema:Organization",
+                    "schema:description": "We ❤️ Data",
+                },
+            )
+            .commit()
         )
-        .commit()
-    )
-
-    assert resp.status_code == HTTPStatus.CONFLICT
-    assert resp.json() == {"error": f"Ledger {test_name + 'missing'} does not exist!"}
