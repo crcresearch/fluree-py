@@ -2,7 +2,7 @@
 
 from typing import Generic, TypeVar, cast
 
-from fluree_py.http.mixin.utils import find_type_for_base
+from fluree_py.http.mixin.utils import resolve_base_type_arg
 from fluree_py.http.protocol.mixin import HasInsertData
 from fluree_py.types.common import JsonArray, JsonObject
 
@@ -19,9 +19,9 @@ class WithInsertMixin(Generic[T]):
         Exceptions:
             TypeError: If the type parameter cannot be resolved.
         """
-        resolved_type = find_type_for_base(self.__class__, "WithInsertMixin")
+        resolved_type = resolve_base_type_arg(self.__class__, "WithInsertMixin", T)
         if resolved_type is None or len(resolved_type) != 1:
-            raise TypeError("Cannot resolve type for WithContextMixin")
+            raise TypeError("Cannot resolve type for WithInsertMixin")
 
         # Create a new instance of the resolved type
         updated_fields = self.__dict__.copy()

@@ -28,14 +28,11 @@ def collect_types_for_base(cls: type[Any], base_name: str) -> list[type[Any]]:
 
     for base in cls.__orig_bases__:
         if base.__name__ == base_name:
-            print("Base name matches")
             return list(base.__args__)
 
         if hasattr(base, "__origin__"):
             o_types = collect_types_for_base(get_origin(base), base_name)
-            print("Origin types:", o_types)
             if o_types is not None:
-                print("Origin name matches")
                 return list(base.__args__)
 
     return []
@@ -68,7 +65,9 @@ def resolve_type_arg(cls: type[Any], type_arg: Any) -> type[Any]:  # noqa: ANN40
     global_namespace = sys.modules[cls.__module__].__dict__
 
     # Climb up the stack frames, starting from our caller
-    frame = inspect.currentframe().f_back
+    frame = inspect.currentframe()
+    if frame is not None:
+        frame = frame.f_back
     while frame is not None:
         local_namespace = {**frame.f_locals}
 
@@ -84,11 +83,56 @@ def resolve_type_arg(cls: type[Any], type_arg: Any) -> type[Any]:  # noqa: ANN40
     raise TypeResolutionError(f"Could not resolve forward reference {type_arg} in any caller's local scope")
 
 
-def find_type_for_base(cls: type[Any], base_name: str) -> list[type[Any]]:
-    """Locate a base class by name in the class's original bases."""
-    return [resolve_type_arg(cls, type_arg) for type_arg in collect_types_for_base(cls, base_name)]
+def resolve_base_type_args(cls: type[Any], base_name: str | type[Any]) -> list[type[Any]]:
+    """
+    Resolve all concrete type arguments for a given generic base class in the inheritance chain.
+
+    Args:
+        cls: The class whose base's type arguments are to be resolved.
+        base_name: The name (str) or type of the base class.
+
+    Returns:
+        A list of resolved type arguments for the specified base class.
+
+    """
+    # Normalize base_name to a string
+    base_name_str = base_name.__name__ if isinstance(base_name, type) else base_name
+    return [resolve_type_arg(cls, type_arg) for type_arg in collect_types_for_base(cls, base_name_str)]
 
 
-def find_type_for_base_arg(cls: type[Any], base_name: str, argument: TypeVar) -> list[type[Any]]:
-    """Locate a base class by name in the class's original bases."""
-    return [resolve_type_arg(cls, type_arg) for type_arg in collect_types_for_base(cls, base_name)]
+def resolve_base_type_arg(cls: type[Any], base_name: str, argument: TypeVar | str) -> list[type[Any]]:
+    """
+    Resolve the concrete type for a specific type variable of a generic base class in the inheritance chain.
+
+    Args:
+        cls: The class whose base's type argument is to be resolved.
+        base_name: The name of the base class.
+        argument: The TypeVar or its name to resolve.
+
+    Returns:
+        A list containing the resolved type for the specified type variable, or an empty list if not found.
+
+    """
+    # Normalize argument to a name
+    arg_name = argument.__name__ if isinstance(argument, TypeVar) else argument
+    if not hasattr(cls, "__orig_bases__"):
+        return []
+
+    for base in cls.__orig_bases__:
+        if base.__name__ == base_name:
+            params = getattr(base, "__parameters__", None)
+            args = getattr(base, "__args__", None)
+            # If not found, try the origin
+            if (params is None or not any(p.__name__ == arg_name for p in params)) and hasattr(base, "__origin__"):
+                origin = get_origin(base)
+                params = getattr(origin, "__parameters__", None)
+            if params is not None and args is not None:
+                for idx, param in enumerate(params):
+                    if param.__name__ == arg_name:
+                        return [resolve_type_arg(cls, args[idx])]
+            return [resolve_type_arg(cls, type_arg) for type_arg in args] if args else []
+        if hasattr(base, "__origin__"):
+            result = resolve_base_type_arg(get_origin(base), base_name, argument)
+            if result:
+                return result
+    return []

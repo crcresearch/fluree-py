@@ -2,7 +2,7 @@
 
 from typing import Generic, TypeVar, cast
 
-from fluree_py.http.mixin.utils import find_type_for_base
+from fluree_py.http.mixin.utils import resolve_base_type_arg
 from fluree_py.http.protocol.mixin.where import HasWhereData
 from fluree_py.types.query.where import WhereClause
 
@@ -19,7 +19,7 @@ class WithWhereMixin(Generic[T]):
         Exceptions:
             TypeError: If the type parameter cannot be resolved.
         """
-        resolved_type = find_type_for_base(self.__class__, "WithWhereMixin")
+        resolved_type = resolve_base_type_arg(self.__class__, "WithWhereMixin", T)
         if resolved_type is None or len(resolved_type) != 1:
             raise TypeError("Cannot resolve type for WithWhereMixin")
 
