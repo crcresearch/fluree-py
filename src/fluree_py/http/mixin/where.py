@@ -2,7 +2,7 @@
 
 from typing import Generic, Protocol, TypeVar, cast
 
-from fluree_py.http.mixin.utils import resolve_base_class_reference
+from fluree_py.http.mixin.utils import InvalidArgumentCountError, resolve_base_type_arg
 from fluree_py.types.query.where import WhereClause
 
 
@@ -36,9 +36,11 @@ class WithWhereMixin(Generic[T_co]):
         Exceptions:
             TypeError: If the type parameter cannot be resolved.
         """
-        resolved_type = resolve_base_class_reference(self.__class__, "WithWhereMixin")
+        resolved_type = resolve_base_type_arg(self.__class__, "WithWhereMixin", T_co)
+        if len(resolved_type) != 1:
+            raise InvalidArgumentCountError(self.__class__.__name__, "WithWhereMixin", resolved_type)
 
         # Create a new instance of the resolved type
         updated_fields = self.__dict__.copy()
         updated_fields["where"] = clause
-        return cast("T_co", resolved_type(**updated_fields))
+        return cast("T_co", resolved_type[0](**updated_fields))

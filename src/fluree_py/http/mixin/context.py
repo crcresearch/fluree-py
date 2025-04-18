@@ -2,7 +2,7 @@
 
 from typing import Any, Generic, Protocol, TypeVar, cast
 
-from fluree_py.http.mixin.utils import resolve_base_class_reference
+from fluree_py.http.mixin.utils import InvalidArgumentCountError, resolve_base_type_arg
 from fluree_py.logging import logger
 
 
@@ -37,9 +37,11 @@ class WithContextMixin(Generic[T_co]):
             TypeError: If the type parameter cannot be resolved.
         """
         logger.debug("with_context", context=context)
-        resolved_type = resolve_base_class_reference(self.__class__, "WithContextMixin")
+        resolved_type = resolve_base_type_arg(self.__class__, "WithContextMixin", T_co)
+        if len(resolved_type) != 1:
+            raise InvalidArgumentCountError(self.__class__.__name__, "WithContextMixin", resolved_type)
 
         # Manually create a new instance with updated context
         updated_fields = self.__dict__.copy()
         updated_fields["context"] = context
-        return cast("T_co", resolved_type(**updated_fields))
+        return cast("T_co", resolved_type[0](**updated_fields))
