@@ -1,24 +1,20 @@
 """Create operation protocols and implementations."""
 
 from dataclasses import dataclass
-from typing import Any, Protocol
+from typing import Any, ClassVar, Protocol
 
-from fluree_py.http.mixin import (
-    WithContextMixin,
-    WithInsertMixin,
-)
 from fluree_py.http.mixin.commit import CommitableMixin, SupportsCommitable
 from fluree_py.http.mixin.context import HasContextData, SupportsContext
 from fluree_py.http.mixin.insert import HasInsertData, SupportsInsert
+from fluree_py.http.mixin.response import SupportsFromResponse, SupportsRaisingFromResponse
+from fluree_py.http.mixin.utils import make_setter
 from fluree_py.http.response import FlureeResponse, MissingTransactionError
 from fluree_py.logging import logger
 from fluree_py.types.common import JsonArray, JsonObject
 
 
 # Protocol definitions for create operations
-class CreateReadyToCommit(
-    SupportsCommitable[FlureeResponse, MissingTransactionError], HasInsertData, HasContextData, Protocol
-):
+class CreateReadyToCommit(SupportsCommitable, HasInsertData, HasContextData, Protocol):
     """Protocol for create operations ready to be committed."""
 
 
@@ -28,13 +24,11 @@ class CreateBuilder(SupportsContext["CreateBuilder"], SupportsInsert[CreateReady
 
 # Implementation of create operations
 @dataclass(frozen=True, kw_only=True)
-class CreateReadyToCommitImpl(
-    CommitableMixin[FlureeResponse, MissingTransactionError],
-    WithContextMixin["CreateReadyToCommitImpl"],
-    WithInsertMixin["CreateReadyToCommitImpl"],
-    CreateReadyToCommit,
-):
+class CreateReadyToCommitImpl(CommitableMixin[FlureeResponse], CreateReadyToCommit):
     """Implementation of a create operation ready to be committed."""
+
+    __response_errors__: ClassVar[list[type[SupportsRaisingFromResponse]]] = [MissingTransactionError]
+    __response_payload__: ClassVar[type[SupportsFromResponse]] = FlureeResponse
 
     endpoint: str
     ledger: str
@@ -42,7 +36,11 @@ class CreateReadyToCommitImpl(
     context: dict[str, Any] | None = None
 
     def __post_init__(self) -> None:
+        """Log the transition to a ready to commit state."""
         logger.info("create_ready", endpoint=self.endpoint, ledger=self.ledger, data=self.data)
+
+    with_insert = make_setter("with_insert", "data")
+    with_context = make_setter("with_context", "context")
 
     def get_url(self) -> str:
         """Get the endpoint URL for the create operation."""
@@ -58,14 +56,14 @@ class CreateReadyToCommitImpl(
 
 
 @dataclass(frozen=True, kw_only=True)
-class CreateBuilderImpl(
-    WithContextMixin["CreateBuilderImpl"],
-    WithInsertMixin[CreateReadyToCommitImpl],
-    CreateBuilder,
-):
+class CreateBuilderImpl(CreateBuilder):
     """Implementation of a create operation builder."""
 
     endpoint: str
     ledger: str
-    data: JsonObject | JsonArray | None = None
+
     context: dict[str, Any] | None = None
+    with_context = make_setter("with_context", "context")
+
+    data: JsonObject | JsonArray | None = None
+    with_insert = make_setter("with_insert", "data", next_cls=CreateReadyToCommitImpl)

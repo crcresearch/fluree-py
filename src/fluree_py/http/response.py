@@ -1,13 +1,20 @@
+"""
+Response handling utilities for Fluree HTTP interactions.
+
+This module defines the FlureeResponse dataclass, which wraps HTTPX Response objects to provide
+convenient access to response data, status, and headers, as well as logging for JSON parsing.
+It also defines custom exceptions for Fluree-specific error handling, such as missing transactions.
+"""
+
 from dataclasses import dataclass
 from http import HTTPStatus
-from typing import Self, TypeVar
+from typing import Self
 
 from httpx import Headers, Response
 
+from fluree_py.http.mixin.response import SupportsRaisingFromResponse
 from fluree_py.logging import logger
 from fluree_py.types.common import JsonArray, JsonObject
-
-T = TypeVar("T")
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -51,20 +58,24 @@ class FlureeResponse:
         return self.response.is_success
 
     @classmethod
-    def from_response(cls, response: Response) -> Self | None:
+    def from_response(cls, response: Response) -> Self:
+        """Create a FlureeResponse from an HTTP response."""
         return cls(response=response)
 
 
-class MissingTransactionError(Exception):
+class MissingTransactionError(Exception, SupportsRaisingFromResponse):
     """Exception raised when a transaction is missing."""
 
-    def __init__(self, ledger: str):
+    def __init__(self, ledger: str) -> None:
+        """Initialize the based on the response from the ledger."""
         self.message = f"Ledger {ledger} does not exist!"
         super().__init__(self.message)
 
     @classmethod
-    def raise_from_response(cls, response: Response) -> None:
+    def raise_from_response(cls, response: Response) -> Exception | None:
+        """Raise an exception from a response if the status code is a conflict."""
         if response.status_code == HTTPStatus.CONFLICT:
             json = response.json()
             if "error" in json:
                 raise cls(json["error"])
+        return None

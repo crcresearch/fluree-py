@@ -1,66 +1,93 @@
-from typing import Any, Generic, Protocol, TypeVar, cast
+"""
+Response handling mixins and protocols for HTTPX-based API clients.
+
+This module provides a set of protocols and mixins to standardize the handling of HTTP responses in a type-safe and extensible way. It defines interfaces for extracting payloads and errors from HTTPX responses, as well as a reusable mixin for implementing response handling logic in client classes.
+
+Key Concepts:
+- SupportsFromResponse: Protocol for types that can be constructed from an httpx.Response.
+- SupportsRaisingFromResponse: Protocol for types that can raise exceptions from an httpx.Response.
+- HasResponsePayload/HasResponseErrors: Protocols for declaring payload and error types.
+- ResponseHandlingMixin: Mixin providing a handle_response method for consistent response processing.
+"""
+
+from typing import ClassVar, Generic, Protocol, Self, TypeVar, cast, runtime_checkable
 
 import httpx
 
-from fluree_py.http.mixin.utils import resolve_base_type_arg
 from fluree_py.logging import logger
 
 T_co = TypeVar("T_co", covariant=True)
 
 
-class SupportsFromResponse(Protocol[T_co]):
-    """Protocol for objects that support a successful response."""
+@runtime_checkable
+class SupportsFromResponse(Protocol):
+    """Protocol for types constructible from an httpx.Response."""
 
     @classmethod
-    def from_response(cls, response: httpx.Response) -> T_co:
+    def from_response(cls, response: httpx.Response) -> Self:
         """Handle a response."""
         ...
 
 
+@runtime_checkable
 class SupportsRaisingFromResponse(Protocol):
-    """Protocol for objects that support a response error."""
+    """Protocol for types that can raise exceptions from an httpx.Response."""
 
-    def raise_from_response(cls, response: httpx.Response) -> None:
+    @classmethod
+    def raise_from_response(cls, response: httpx.Response) -> Exception | None:
         """Raise an exception from a response."""
         ...
 
 
-T_Success_co = TypeVar("T_Success_co", bound="SupportsFromResponse", covariant=True)
-T_Failure_co = TypeVar("T_Failure_co", bound="SupportsRaisingFromResponse", covariant=True)
+T_Success = TypeVar("T_Success", bound=SupportsFromResponse)
 
 
-class SupportsResponseHandling(Protocol[T_Success_co, T_Failure_co]):
-    """Protocol for objects that support response handling."""
+class HasResponsePayload(Protocol):
+    """Protocol for classes with a response payload type."""
 
-    def handle_response(self, response: httpx.Response) -> T_Success_co:
+    __response_payload__: ClassVar[type[SupportsFromResponse]]
+
+
+class HasResponseErrors(Protocol):
+    """Protocol for classes with response error types."""
+
+    __response_errors__: ClassVar[list[type[SupportsRaisingFromResponse]]]
+
+
+class SupportsResponseHandling(HasResponsePayload, HasResponseErrors, Protocol):
+    """Protocol for objects supporting response handling via handle_response."""
+
+    def handle_response(self, response: httpx.Response) -> SupportsFromResponse:
         """Handle a response."""
         ...
 
 
-class ResponseHandlingMixin(Generic[T_Success_co, T_Failure_co]):
-    def handle_response(self, response: httpx.Response) -> T_Success_co:
-        logger.info("handle_response", cls=self.__class__.__name__)
-        exception_types = resolve_base_type_arg(self.__class__, "ResponseHandlingMixin", "T_Failure_co")
-        logger.info("exception_types", exception_types)
-        for exception_type in exception_types:
-            logger.info("exception_type", exception_type.__class__.__name__)
-            cast("T_Failure_co", exception_type).raise_from_response(response)
+class ResponseHandlingMixin(HasResponsePayload, HasResponseErrors, Generic[T_Success]):
+    """Mixin for handling HTTPX responses: raises errors or returns a payload instance."""
 
-        target_types = resolve_base_type_arg(self.__class__, "ResponseHandlingMixin", T_Success_co)
-        if not target_types:
-            raise TypeError(f"{self.__class__.__name__} must be parameterized with a target type")
+    def handle_response(self, response: httpx.Response) -> T_Success:
+        """
+        Process an HTTPX response, raising an error if detected or returning the payload.
 
-        logger.info("target_types", target_types)
+        This method iterates through the error types defined in __response_errors__, calling their
+        raise_from_response method. If any error type returns an exception, it is raised immediately.
+        If no errors are detected, the method constructs and returns the payload using the type
+        specified in __response_payload__ via its from_response method.
 
-        # For each target type, try different conversion methods
-        for target_type in target_types:
-            # Skip TypeVar or non-concrete types
-            if isinstance(target_type, TypeVar) or target_type is Any:
-                continue
+        Args:
+            response (httpx.Response): The HTTP response to process.
 
-            converted = target_type.from_response(response)
-            if converted is not None:
-                return converted
+        Returns:
+            SupportsFromResponse[T_Success]: An instance of the payload type, constructed from the response.
 
-        # If we get here, no conversion method worked
-        raise ValueError(f"Could not convert response to any of the target types: {target_types}")
+        Raises:
+            Exception: If any error type in __response_errors__ returns an exception.
+
+        """
+        for exception_type in self.__response_errors__:
+            logger.info("handle_response", cls=self.__class__.__name__)
+            exception = exception_type.raise_from_response(response)
+            if exception is not None:
+                raise exception
+
+        return cast("type[T_Success]", self.__response_payload__).from_response(response)

@@ -1,11 +1,12 @@
 """Query operation protocols and implementations."""
 
 from dataclasses import dataclass, replace
-from typing import Any, Protocol, Self
+from typing import Any, ClassVar, Protocol, Self
 
-from fluree_py.http.mixin import WithContextMixin, WithWhereMixin
 from fluree_py.http.mixin.commit import CommitableMixin, SupportsCommitable
 from fluree_py.http.mixin.context import SupportsContext
+from fluree_py.http.mixin.response import SupportsFromResponse, SupportsRaisingFromResponse
+from fluree_py.http.mixin.utils import make_setter
 from fluree_py.http.mixin.where import SupportsWhere
 from fluree_py.http.response import FlureeResponse, MissingTransactionError
 from fluree_py.logging import logger
@@ -18,7 +19,7 @@ from fluree_py.types.query.where import WhereClause
 class QueryBuilder(
     SupportsContext["QueryBuilder"],
     SupportsWhere["QueryBuilder"],
-    SupportsCommitable[FlureeResponse, MissingTransactionError],
+    SupportsCommitable,
     Protocol,
 ):
     """Protocol for building query operations."""
@@ -47,12 +48,13 @@ class QueryBuilder(
 # Implementation of query operations
 @dataclass(frozen=True, kw_only=True)
 class QueryBuilderImpl(
-    CommitableMixin[FlureeResponse, MissingTransactionError],
-    WithContextMixin["QueryBuilderImpl"],
-    WithWhereMixin["QueryBuilderImpl"],
+    CommitableMixin[FlureeResponse],
     QueryBuilder,
 ):
     """Implementation of a query operation builder."""
+
+    __response_errors__: ClassVar[list[type[SupportsRaisingFromResponse]]] = [MissingTransactionError]
+    __response_payload__: ClassVar[type[SupportsFromResponse]] = FlureeResponse
 
     endpoint: str
     ledger: str
@@ -65,6 +67,7 @@ class QueryBuilderImpl(
     select_fields: dict[str, Any] | list[str] | None = None
 
     def __post_init__(self) -> None:
+        """Log the initialization of the query builder."""
         logger.info(
             "query_builder_initialized",
             endpoint=self.endpoint,
@@ -78,25 +81,35 @@ class QueryBuilderImpl(
             select_fields=self.select_fields,
         )
 
+    with_context = make_setter("with_context", "context")
+    with_where = make_setter("with_where", "where")
+
     def with_group_by(self, fields: GroupByClause) -> Self:
+        """Set the group by clause for the operation."""
         return replace(self, group_by=fields)
 
     def with_having(self, condition: HavingClause) -> Self:
+        """Set the having clause for the operation."""
         return replace(self, having=condition)
 
     def with_order_by(self, fields: OrderByClause) -> Self:
+        """Set the order by clause for the operation."""
         return replace(self, order_by=fields)
 
     def with_opts(self, opts: ActiveIdentity) -> Self:
+        """Set the active identity for the operation."""
         return replace(self, opts=opts)
 
     def with_select(self, fields: SelectObject | SelectArray) -> Self:
+        """Set the select clause for the operation."""
         return replace(self, select_fields=fields)
 
     def get_url(self) -> str:
+        """Get the endpoint URL for the query operation."""
         return self.endpoint
 
     def build_request_payload(self) -> dict[str, Any]:
+        """Build the request payload for the query operation."""
         result: dict[str, Any] = {}
         if self.context:
             result["@context"] = self.context
