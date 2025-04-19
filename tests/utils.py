@@ -14,7 +14,7 @@ def create_and_retrieve_random_model(
     model_class: type[T],
     fluree_client: FlureeClient,
     ledger_name: str,
-    extra_context: dict[str, Any] = {},
+    extra_context: dict[str, Any] | None = None,
 ) -> tuple[T, T]:
     """Create a Pydantic model, insert it into Fluree, and retrieve it.
 
@@ -33,7 +33,7 @@ def create_and_retrieve_random_model(
 
     return (
         model,
-        create_and_retrieve_model(model, fluree_client, ledger_name, extra_context),
+        create_and_retrieve_model(model, fluree_client, ledger_name, extra_context or {}),
     )
 
 
@@ -41,7 +41,7 @@ def create_and_retrieve_model(
     model_instance: T,
     fluree_client: FlureeClient,
     ledger_name: str,
-    extra_context: dict[str, Any] = {},
+    extra_context: dict[str, Any] | None = None,
 ) -> T:
     """Create a Pydantic model, insert it into Fluree, and retrieve it.
 
@@ -57,7 +57,8 @@ def create_and_retrieve_model(
     """
     # Create final context
     context = {"id": "@id"}
-    context.update(extra_context)
+    if extra_context is not None:
+        context.update(extra_context)
 
     # Create a new ledger and insert the model
     fluree_client.with_ledger(ledger=ledger_name).create().with_context(context).with_insert(

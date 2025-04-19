@@ -129,7 +129,7 @@ select = [
     "PERF",
     "E",
     "W",
-    "D",
+    # "D",
     "F",
     "PL",
     "UP",
@@ -153,3 +153,13 @@ known-first-party = ["fluree_py"]
 
 [tool.ruff.format]
 docstring-code-format = true
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true
+show_error_codes = true
+pretty = true
+plugins = []
+exclude = "tests/.*"
+

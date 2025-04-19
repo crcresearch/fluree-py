@@ -1,9 +1,12 @@
 import logging
+from collections.abc import Iterable
 
-import structlog  # type: ignore[import]
+import structlog
+from structlog.stdlib import LoggerFactory
+from structlog.types import BindableLogger, Processor
 
 # Default structlog configuration for the fluree_py library
-_DEFAULT_PROCESSORS = [
+_DEFAULT_PROCESSORS: list[Processor] = [
     structlog.contextvars.merge_contextvars,
     structlog.processors.add_log_level,
     structlog.processors.TimeStamper(fmt="iso"),
@@ -18,9 +21,9 @@ _DEFAULT_LOGGER_FACTORY = structlog.stdlib.LoggerFactory()
 
 def configure_logging(
     level: int = logging.INFO,
-    processors: list | None = None,
-    wrapper_class: type | None = None,
-    logger_factory: type | None = None,
+    processors: Iterable[Processor] | None = None,
+    wrapper_class: type[BindableLogger] | None = None,
+    logger_factory: type[LoggerFactory] | None = None,
     cache_logger_on_first_use: bool = True,
 ) -> None:
     """

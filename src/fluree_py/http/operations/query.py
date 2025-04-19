@@ -4,10 +4,10 @@ from dataclasses import dataclass, replace
 from typing import Any, ClassVar, Protocol, Self
 
 from fluree_py.http.mixin.commit import CommitableMixin, SupportsCommitable
-from fluree_py.http.mixin.context import SupportsContext
+from fluree_py.http.mixin.context import HasContextData, SupportsContext
 from fluree_py.http.mixin.response import SupportsFromResponse, SupportsRaisingFromResponse
 from fluree_py.http.mixin.utils import make_setter
-from fluree_py.http.mixin.where import SupportsWhere
+from fluree_py.http.mixin.where import HasWhereData, SupportsWhere
 from fluree_py.http.response import FlureeResponse, MissingTransactionError
 from fluree_py.logging import logger
 from fluree_py.types.query.query import ActiveIdentity, GroupByClause, HavingClause, OrderByClause
@@ -17,7 +17,9 @@ from fluree_py.types.query.where import WhereClause
 
 # Protocol definitions for query operations
 class QueryBuilder(
+    HasContextData,
     SupportsContext["QueryBuilder"],
+    HasWhereData,
     SupportsWhere["QueryBuilder"],
     SupportsCommitable,
     Protocol,
@@ -64,7 +66,7 @@ class QueryBuilderImpl(
     having: HavingClause | None = None
     order_by: OrderByClause | None = None
     opts: ActiveIdentity | None = None
-    select_fields: dict[str, Any] | list[str] | None = None
+    select_fields: SelectObject | SelectArray | None = None
 
     def __post_init__(self) -> None:
         """Log the initialization of the query builder."""

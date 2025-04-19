@@ -40,7 +40,7 @@ Examples:
 TimeCommit: TypeAlias = int
 
 
-def is_time_commit(t: Any) -> TypeGuard[TimeCommit]:  # noqa: ANN401
+def is_time_commit(t: object) -> TypeGuard[TimeCommit]:
     """Check if a value is a valid time commit."""
     return isinstance(t, int) and t >= 0
 
@@ -58,12 +58,13 @@ TimeConstraint = TypedDict(
 )
 
 
-def is_time_constraint(t: Any) -> TypeGuard[TimeConstraint]:  # noqa: ANN401
+def is_time_constraint(t: object) -> TypeGuard[TimeConstraint]:
     """Check if a value is a valid time constraint."""
-    return isinstance(t, dict) and all(
-        is_time_commit(v) or v == "latest"
-        for v in t.values()  # type: ignore
-    )
+    if not isinstance(t, dict):
+        return False
+
+    d: dict[Any, Any] = t  # Needed for pyright type narrowing
+    return all(is_time_commit(v) or v == "latest" for v in d.values())
 
 
 TimeClause: TypeAlias = TimeConstraint | TimeCommit

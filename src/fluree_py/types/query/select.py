@@ -81,9 +81,7 @@ Example Queries:
 
 
 def is_logic_variable(var: str) -> TypeGuard[LogicVariable]:
-    """
-    Type guard to check if a string is a valid logic variable.
-    """
+    """Type guard to check if a string is a valid logic variable."""
     if not all(c.isprintable() for c in var):
         return False
     return LOGIC_VARIABLE_PATTERN.search(var) is not None
@@ -129,13 +127,12 @@ Example Queries:
 """
 
 
-def is_node_object_template(var: Any) -> TypeGuard[NodeObjectTemplate]:
-    """
-    Type guard to check if a value is a valid node object template.
-    """
+def is_node_object_template(var: object) -> TypeGuard[NodeObjectTemplate]:
+    """Type guard to check if a value is a valid node object template."""
     if not isinstance(var, dict):
         return False
-    return all(isinstance(k, str) and isinstance(v, list) for (k, v) in var.items())  # type: ignore
+    d: dict[Any, Any] = var  # Needed for pyright type narrowing
+    return all(isinstance(k, str) and isinstance(v, list) for (k, v) in d.items())
 
 
 SelectObject: TypeAlias = dict[LogicVariable, SelectExpressionList]
@@ -150,13 +147,13 @@ Example Queries:
 """
 
 
-def is_select_object(var: Any) -> TypeGuard[SelectObject]:
-    """
-    Type guard to check if a value is a valid select object.
-    """
+def is_select_object(var: object) -> TypeGuard[SelectObject]:
+    """Type guard to check if a value is a valid select object."""
     if not isinstance(var, dict):
         return False
-    return all(is_logic_variable(k) and isinstance(v, list) for k, v in var.items())  # type: ignore
+
+    d: dict[Any, Any] = var  # Needed for pyright type narrowing
+    return all(is_logic_variable(k) and isinstance(v, list) for k, v in d.items())
 
 
 SelectArrayElement: TypeAlias = LogicVariable | SelectObject
@@ -170,10 +167,8 @@ Example Queries:
 """
 
 
-def is_select_array_element(var: Any) -> TypeGuard[SelectArrayElement]:
-    """
-    Type guard to check if a value is a valid select array element.
-    """
+def is_select_array_element(var: object) -> TypeGuard[SelectArrayElement]:
+    """Type guard to check if a value is a valid select array element."""
     return is_logic_variable(var) if isinstance(var, str) else is_select_object(var)
 
 
@@ -190,14 +185,13 @@ Example Queries:
 """
 
 
-def is_select_array(var: Any) -> TypeGuard[SelectArray]:
-    """
-    Type guard to check if a value is a valid select array.
-    """
+def is_select_array(var: object) -> TypeGuard[SelectArray]:
+    """Type guard to check if a value is a valid select array."""
     if not isinstance(var, list):
         return False
 
-    return all(is_select_array_element(v) for v in var)  # type: ignore
+    d: list[Any] = var  # Needed for pyright type narrowing
+    return all(is_select_array_element(v) for v in d)
 
 
 SelectClause: TypeAlias = SelectObject | SelectArray

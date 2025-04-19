@@ -14,18 +14,16 @@ from fluree_py.http.operations.transaction import (
 )
 
 __all__ = [
-    # Builders
     "CreateBuilder",
-    "CreateReadyToCommit",
-    "HistoryBuilder",
-    "QueryBuilder",
-    "TransactionBuilder",
-    "TransactionReadyToCommit",
-    # Implementation classes
     "CreateBuilderImpl",
-    "HistoryBuilderImpl",
-    "QueryBuilderImpl",
-    "TransactionBuilderImpl",
-    "TransactionReadyToCommitImpl",
+    "CreateReadyToCommit",
     "CreateReadyToCommitImpl",
+    "HistoryBuilder",
+    "HistoryBuilderImpl",
+    "QueryBuilder",
+    "QueryBuilderImpl",
+    "TransactionBuilder",
+    "TransactionBuilderImpl",
+    "TransactionReadyToCommit",
+    "TransactionReadyToCommitImpl",
 ]

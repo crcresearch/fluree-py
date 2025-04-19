@@ -4,7 +4,7 @@ from dataclasses import dataclass, replace
 from typing import Any, ClassVar, Protocol, Self
 
 from fluree_py.http.mixin.commit import CommitableMixin, SupportsCommitable
-from fluree_py.http.mixin.context import SupportsContext
+from fluree_py.http.mixin.context import HasContextData, SupportsContext
 from fluree_py.http.mixin.response import SupportsFromResponse, SupportsRaisingFromResponse
 from fluree_py.http.mixin.utils import make_setter
 from fluree_py.http.response import FlureeResponse, MissingTransactionError
@@ -16,6 +16,7 @@ from fluree_py.types.http.history import HistoryClause
 # Protocol definitions for history operations
 class HistoryBuilder(
     SupportsCommitable,
+    HasContextData,
     SupportsContext["HistoryBuilder"],
     Protocol,
 ):

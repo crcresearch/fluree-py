@@ -25,4 +25,4 @@ class WarningManager:
     def emit_warnings(self) -> None:
         """Emit all collected warnings."""
         for warning_type, message in self.warnings_list:
-            warnings.warn(message, warning_type)
+            warnings.warn(message, warning_type, stacklevel=2)

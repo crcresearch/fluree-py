@@ -18,7 +18,9 @@ class CreateReadyToCommit(SupportsCommitable, HasInsertData, HasContextData, Pro
     """Protocol for create operations ready to be committed."""
 
 
-class CreateBuilder(SupportsContext["CreateBuilder"], SupportsInsert[CreateReadyToCommit], Protocol):
+class CreateBuilder(
+    HasContextData, SupportsContext["CreateBuilder"], HasInsertData, SupportsInsert[CreateReadyToCommit], Protocol
+):
     """Protocol for building create operations."""
 
 

@@ -4,11 +4,11 @@ from dataclasses import dataclass
 from typing import Any, ClassVar, Protocol, Self
 
 from fluree_py.http.mixin.commit import CommitableMixin, SupportsCommitable
-from fluree_py.http.mixin.context import SupportsContext
+from fluree_py.http.mixin.context import HasContextData, SupportsContext
 from fluree_py.http.mixin.insert import HasInsertData, SupportsInsert
 from fluree_py.http.mixin.response import SupportsFromResponse, SupportsRaisingFromResponse
 from fluree_py.http.mixin.utils import make_setter
-from fluree_py.http.mixin.where import SupportsWhere
+from fluree_py.http.mixin.where import HasWhereData, SupportsWhere
 from fluree_py.http.response import FlureeResponse, MissingTransactionError
 from fluree_py.logging import logger
 from fluree_py.types.common import JsonArray, JsonObject
@@ -18,7 +18,9 @@ from fluree_py.types.query.where import WhereClause
 # Protocol definitions for transaction operations
 class TransactionReadyToCommit(
     SupportsCommitable,
+    HasContextData,
     SupportsContext["TransactionReadyToCommit"],
+    HasWhereData,
     SupportsWhere["TransactionReadyToCommit"],
     HasInsertData,
     Protocol,
@@ -31,8 +33,11 @@ class TransactionReadyToCommit(
 
 
 class TransactionBuilder(
+    HasContextData,
     SupportsContext["TransactionBuilder"],
+    HasInsertData,
     SupportsInsert[TransactionReadyToCommit],
+    HasWhereData,
     SupportsWhere["TransactionBuilder"],
     Protocol,
 ):
