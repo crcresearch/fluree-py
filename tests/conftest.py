@@ -31,7 +31,7 @@ def fluree_url(request: pytest.FixtureRequest) -> Generator[str, None, None]:
         return
 
     # Start a new Fluree server container
-    container = ServerContainer(port=8090, image="fluree/server")
+    container = ServerContainer(port=8090, image="fluree/server:189201d41aff911a5176b80465de58bdb0986962")
     container.start()
 
     # Wait for the container to be ready
