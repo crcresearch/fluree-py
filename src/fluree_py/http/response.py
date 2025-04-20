@@ -63,6 +63,48 @@ class FlureeResponse:
         return cls(response=response)
 
 
+@dataclass(frozen=True, kw_only=True)
+class LedgerCreationResponse(FlureeResponse):
+    """A response from the Fluree ledger."""
+
+    ledger: str
+    commit: str
+    t: int
+    tx_id: str
+
+    @classmethod
+    def from_response(cls, response: Response) -> Self:
+        """Create a LedgerCreationResponse from an HTTP response with validations."""
+        if not response.is_success:
+            raise ValueError("Unsuccessful HTTP response")
+
+        data = response.json()
+        if not isinstance(data, dict):
+            raise ValueError("Expected JSON object")
+
+        required_keys = ["ledger", "commit", "t", "tx-id"]
+        for key in required_keys:
+            if key not in data:
+                raise ValueError(f"Missing required key: {key}")
+
+        if not isinstance(data["t"], int):
+            raise ValueError("Invalid type for 't'")
+
+        return cls(response=response, ledger=data["ledger"], commit=data["commit"], t=data["t"], tx_id=data["tx-id"])  # type: ignore[arg-type]
+
+
+@dataclass(frozen=True, kw_only=True)
+class QueryResponse(FlureeResponse):
+    """A response from the Fluree ledger."""
+
+    objects: list[JsonObject]
+
+    @classmethod
+    def from_response(cls, response: Response) -> Self:
+        """Create a QueryResponse from an HTTP response."""
+        return cls(response=response, objects=response.json())
+
+
 class MissingTransactionError(Exception, SupportsRaisingFromResponse):
     """Exception raised when a transaction is missing."""
 

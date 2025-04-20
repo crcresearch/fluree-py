@@ -7,7 +7,7 @@ from httpx import Request, Response
 from respx import MockRouter
 
 from fluree_py import FlureeClient
-from fluree_py.http.response import FlureeResponse
+from fluree_py.http.response import QueryResponse
 
 
 def query_side_effect(request: Request) -> Response:  # noqa: ARG001
@@ -91,12 +91,12 @@ def test_ledger_query_wildcard_example(test_name: str, cookbook_client: FlureeCl
         .with_select({"?s": ["*"]})
         .commit()
     )
-    assert isinstance(resp, FlureeResponse)
+    assert isinstance(resp, QueryResponse)
 
-    assert resp.status_code == HTTPStatus.OK
-    assert resp.headers["Content-Type"] == "application/json;charset=utf-8"
+    assert resp.response.status_code == HTTPStatus.OK
+    assert resp.response.headers["Content-Type"] == "application/json;charset=utf-8"
 
-    assert resp.json() == [
+    assert resp.objects == [
         {
             "@type": "schema:Person",
             "schema:age": 35,

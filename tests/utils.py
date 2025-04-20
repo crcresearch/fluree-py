@@ -4,7 +4,7 @@ from polyfactory.factories.pydantic_factory import ModelFactory as PydanticModel
 from pydantic import BaseModel
 
 from fluree_py.http.client import FlureeClient
-from fluree_py.http.response import FlureeResponse
+from fluree_py.http.response import QueryResponse
 from fluree_py.query.select.pydantic import from_pydantic
 
 T = TypeVar("T", bound=BaseModel)
@@ -76,7 +76,7 @@ def create_and_retrieve_model(
         .commit()
     )
 
-    assert isinstance(resp, FlureeResponse)
+    assert isinstance(resp, QueryResponse)
 
     # Parse the response into a model
-    return model_instance.model_validate_json(resp.text)
+    return model_instance.model_validate(resp.objects[0])

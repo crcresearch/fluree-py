@@ -8,7 +8,7 @@ from fluree_py.http.mixin.context import HasContextData, SupportsContext
 from fluree_py.http.mixin.insert import HasInsertData, SupportsInsert
 from fluree_py.http.mixin.response import SupportsFromResponse, SupportsRaisingFromResponse
 from fluree_py.http.mixin.utils import make_setter
-from fluree_py.http.response import FlureeResponse, MissingTransactionError
+from fluree_py.http.response import LedgerCreationResponse, MissingTransactionError
 from fluree_py.logging import logger
 from fluree_py.types.common import JsonArray, JsonObject
 
@@ -26,11 +26,11 @@ class CreateBuilder(
 
 # Implementation of create operations
 @dataclass(frozen=True, kw_only=True)
-class CreateReadyToCommitImpl(CommitableMixin[FlureeResponse], CreateReadyToCommit):
+class CreateReadyToCommitImpl(CommitableMixin[LedgerCreationResponse], CreateReadyToCommit):
     """Implementation of a create operation ready to be committed."""
 
     __response_errors__: ClassVar[list[type[SupportsRaisingFromResponse]]] = [MissingTransactionError]
-    __response_payload__: ClassVar[type[SupportsFromResponse]] = FlureeResponse
+    __response_payload__: ClassVar[type[SupportsFromResponse]] = LedgerCreationResponse
 
     endpoint: str
     ledger: str

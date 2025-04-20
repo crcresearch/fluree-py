@@ -8,7 +8,7 @@ from fluree_py.http.mixin.context import HasContextData, SupportsContext
 from fluree_py.http.mixin.response import SupportsFromResponse, SupportsRaisingFromResponse
 from fluree_py.http.mixin.utils import make_setter
 from fluree_py.http.mixin.where import HasWhereData, SupportsWhere
-from fluree_py.http.response import FlureeResponse, MissingTransactionError
+from fluree_py.http.response import MissingTransactionError, QueryResponse
 from fluree_py.logging import logger
 from fluree_py.types.query.query import ActiveIdentity, GroupByClause, HavingClause, OrderByClause
 from fluree_py.types.query.select import SelectArray, SelectObject
@@ -50,13 +50,13 @@ class QueryBuilder(
 # Implementation of query operations
 @dataclass(frozen=True, kw_only=True)
 class QueryBuilderImpl(
-    CommitableMixin[FlureeResponse],
+    CommitableMixin[QueryResponse],
     QueryBuilder,
 ):
     """Implementation of a query operation builder."""
 
     __response_errors__: ClassVar[list[type[SupportsRaisingFromResponse]]] = [MissingTransactionError]
-    __response_payload__: ClassVar[type[SupportsFromResponse]] = FlureeResponse
+    __response_payload__: ClassVar[type[SupportsFromResponse]] = QueryResponse
 
     endpoint: str
     ledger: str

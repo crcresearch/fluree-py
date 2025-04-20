@@ -8,6 +8,7 @@ from respx import MockRouter
 
 from fluree_py import FlureeClient
 from fluree_py.http.operations import CreateReadyToCommitImpl
+from fluree_py.http.response import LedgerCreationResponse
 
 
 @pytest.fixture
@@ -85,3 +86,10 @@ def test_create_ledger(
     assert resp_json["commit"].startswith(f"fluree:file://{test_name}/commit/")
 
     assert "tx-id" in resp_json
+
+    # Additional assertions to verify that resp is a LedgerCreationResponse with correct attributes
+    assert isinstance(resp, LedgerCreationResponse)
+    assert resp.ledger == test_name
+    assert resp.commit.startswith(f"fluree:file://{test_name}/commit/")
+    assert resp.t == 1
+    assert isinstance(resp.tx_id, str)
