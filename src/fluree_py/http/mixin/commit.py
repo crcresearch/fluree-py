@@ -12,13 +12,13 @@ from fluree_py.http.mixin.response import (
 )
 from fluree_py.logging import logger
 
-T_Success = TypeVar("T_Success", bound=SupportsFromResponse)
+T_Success_co = TypeVar("T_Success_co", bound=SupportsFromResponse, covariant=True)
 
 
-class SupportsCommit(SupportsResponseHandling, Protocol):
+class SupportsCommit(SupportsResponseHandling, Protocol[T_Success_co]):
     """Protocol for objects that support synchronous commit operations."""
 
-    def commit(self) -> SupportsFromResponse:
+    def commit(self) -> T_Success_co:
         """
         Execute the transaction synchronously.
 
@@ -29,10 +29,10 @@ class SupportsCommit(SupportsResponseHandling, Protocol):
         ...
 
 
-class SupportsAsyncCommit(SupportsResponseHandling, Protocol):
+class SupportsAsyncCommit(SupportsResponseHandling, Protocol[T_Success_co]):
     """Protocol for objects that support asynchronous commit operations."""
 
-    async def acommit(self) -> SupportsFromResponse:
+    async def acommit(self) -> T_Success_co:
         """
         Execute the transaction asynchronously.
 
@@ -43,18 +43,14 @@ class SupportsAsyncCommit(SupportsResponseHandling, Protocol):
         ...
 
 
-class SupportsCommitable(
-    SupportsCommit,
-    SupportsAsyncCommit,
-    Protocol,
-):
+class SupportsCommitable(SupportsCommit[T_Success_co], SupportsAsyncCommit[T_Success_co], Protocol[T_Success_co]):
     """Protocol for objects that support both sync and async commit operations."""
 
 
-class CommitMixin(WithRequestMixin, ResponseHandlingMixin[T_Success], SupportsCommit):
+class CommitMixin(WithRequestMixin, ResponseHandlingMixin[T_Success_co], SupportsCommit[T_Success_co]):
     """Synchronous commit functionality for Fluree transactions."""
 
-    def commit(self) -> T_Success:
+    def commit(self) -> T_Success_co:
         """
         Execute the transaction synchronously.
 
@@ -71,10 +67,10 @@ class CommitMixin(WithRequestMixin, ResponseHandlingMixin[T_Success], SupportsCo
         return self.handle_response(response)
 
 
-class AsyncCommitMixin(WithRequestMixin, ResponseHandlingMixin[T_Success], SupportsAsyncCommit):
+class AsyncCommitMixin(WithRequestMixin, ResponseHandlingMixin[T_Success_co], SupportsAsyncCommit[T_Success_co]):
     """Asynchronous commit functionality for Fluree transactions."""
 
-    async def acommit(self) -> T_Success:
+    async def acommit(self) -> T_Success_co:
         """
         Execute the transaction asynchronously.
 
@@ -91,5 +87,5 @@ class AsyncCommitMixin(WithRequestMixin, ResponseHandlingMixin[T_Success], Suppo
         return self.handle_response(response)
 
 
-class CommitableMixin(CommitMixin[T_Success], AsyncCommitMixin[T_Success]):
+class CommitableMixin(CommitMixin[T_Success_co], AsyncCommitMixin[T_Success_co]):
     """Combines synchronous and asynchronous commit capabilities."""

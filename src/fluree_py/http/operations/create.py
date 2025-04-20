@@ -14,7 +14,7 @@ from fluree_py.types.common import JsonArray, JsonObject
 
 
 # Protocol definitions for create operations
-class CreateReadyToCommit(SupportsCommitable, HasInsertData, HasContextData, Protocol):
+class CreateReadyToCommit(SupportsCommitable[LedgerCreationResponse], HasInsertData, HasContextData, Protocol):
     """Protocol for create operations ready to be committed."""
 
 

@@ -39,7 +39,7 @@ class SupportsRaisingFromResponse(Protocol):
         ...
 
 
-T_Success = TypeVar("T_Success", bound=SupportsFromResponse)
+T_Success_co = TypeVar("T_Success_co", bound=SupportsFromResponse, covariant=True)
 
 
 class HasResponsePayload(Protocol):
@@ -62,10 +62,10 @@ class SupportsResponseHandling(HasResponsePayload, HasResponseErrors, Protocol):
         ...
 
 
-class ResponseHandlingMixin(HasResponsePayload, HasResponseErrors, Generic[T_Success]):
+class ResponseHandlingMixin(HasResponsePayload, HasResponseErrors, Generic[T_Success_co]):
     """Mixin for handling HTTPX responses: raises errors or returns a payload instance."""
 
-    def handle_response(self, response: httpx.Response) -> T_Success:
+    def handle_response(self, response: httpx.Response) -> T_Success_co:
         """
         Process an HTTPX response, raising an error if detected or returning the payload.
 
@@ -78,7 +78,7 @@ class ResponseHandlingMixin(HasResponsePayload, HasResponseErrors, Generic[T_Suc
             response (httpx.Response): The HTTP response to process.
 
         Returns:
-            SupportsFromResponse[T_Success]: An instance of the payload type, constructed from the response.
+            SupportsFromResponse[T_Success_co]: An instance of the payload type, constructed from the response.
 
         Raises:
             Exception: If any error type in __response_errors__ returns an exception.
@@ -90,4 +90,4 @@ class ResponseHandlingMixin(HasResponsePayload, HasResponseErrors, Generic[T_Suc
             if exception is not None:
                 raise exception
 
-        return cast("type[T_Success]", self.__response_payload__).from_response(response)
+        return cast("type[T_Success_co]", self.__response_payload__).from_response(response)

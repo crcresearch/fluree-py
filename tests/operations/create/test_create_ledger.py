@@ -7,7 +7,6 @@ from httpx import Response
 from respx import MockRouter
 
 from fluree_py import FlureeClient
-from fluree_py.http.operations import CreateReadyToCommitImpl
 from fluree_py.http.response import LedgerCreationResponse
 
 
@@ -65,10 +64,7 @@ def test_create_ledger(
         },
     ]
 
-    with_insert = fluree_client.with_ledger(test_name).create().with_context(context).with_insert(data)
-    assert isinstance(with_insert, CreateReadyToCommitImpl)
-
-    resp = with_insert.commit()
+    resp = fluree_client.with_ledger(test_name).create().with_context(context).with_insert(data).commit()
 
     assert resp.status_code == HTTPStatus.CREATED
     assert resp.headers["Content-Type"] == "application/json;charset=utf-8"

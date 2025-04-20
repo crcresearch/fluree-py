@@ -15,7 +15,7 @@ from fluree_py.types.http.history import HistoryClause
 
 # Protocol definitions for history operations
 class HistoryBuilder(
-    SupportsCommitable,
+    SupportsCommitable[FlureeResponse],
     HasContextData,
     SupportsContext["HistoryBuilder"],
     Protocol,

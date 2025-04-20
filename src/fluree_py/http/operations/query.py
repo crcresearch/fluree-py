@@ -21,7 +21,7 @@ class QueryBuilder(
     SupportsContext["QueryBuilder"],
     HasWhereData,
     SupportsWhere["QueryBuilder"],
-    SupportsCommitable,
+    SupportsCommitable[QueryResponse],
     Protocol,
 ):
     """Protocol for building query operations."""

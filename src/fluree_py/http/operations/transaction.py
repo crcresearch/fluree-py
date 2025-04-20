@@ -17,7 +17,7 @@ from fluree_py.types.query.where import WhereClause
 
 # Protocol definitions for transaction operations
 class TransactionReadyToCommit(
-    SupportsCommitable,
+    SupportsCommitable[FlureeResponse],
     HasContextData,
     SupportsContext["TransactionReadyToCommit"],
     HasWhereData,
