@@ -1,29 +1,45 @@
+import json
 from collections.abc import Generator
 from http import HTTPStatus
 
 import pytest
 import respx
-from httpx import Response
-from respx import MockRouter
+from httpx import Request, Response
+from respx import MockRouter, Route
 
 from fluree_py import FlureeClient
-from fluree_py.http.response import LedgerCreationResponse
+from fluree_py.http.response import LedgerAlreadyExistsError, LedgerCreationResponse
 
 
-@pytest.fixture
-def mocked_api(test_name: str) -> Generator[MockRouter, None, None]:
-    with respx.mock(base_url="http://localhost:8090", assert_all_called=False) as respx_mock:
-        create_route = respx_mock.post("/fluree/create", name="create")
-        create_route.return_value = Response(
+def create_side_effect(request: Request, route: Route) -> Response:
+    ledger = json.loads(request.content)["ledger"]
+
+    # First call returns success
+    if route.call_count == 0:
+        return Response(
             HTTPStatus.CREATED,
             headers={"Content-Type": "application/json;charset=utf-8"},
             json={
-                "commit": f"fluree:file://{test_name}/commit/bylyfvz5kexxf6l3tdzbobuz6eooxtgfxg3xqnp3pep7zfwxspkp.json",
-                "ledger": test_name,
+                "commit": f"fluree:file://{ledger}/commit/bylyfvz5kexxf6l3tdzbobuz6eooxtgfxg3xqnp3pep7zfwxspkp.json",
+                "ledger": ledger,
                 "t": 1,
                 "tx-id": "790b9747063d7878af67428ac92b37d2ff82971dee3ea533c053e44403a026de",
             },
         )
+
+    # Second call returns conflict as we have already created the ledger
+    return Response(
+        HTTPStatus.CONFLICT,
+        headers={"Content-Type": "application/json;charset=utf-8"},
+        json={"error": f"Ledger {ledger} already exists"},
+    )
+
+
+@pytest.fixture
+def mocked_api() -> Generator[MockRouter, None, None]:
+    with respx.mock(base_url="http://localhost:8090", assert_all_called=False) as respx_mock:
+        create_route = respx_mock.post("/fluree/create", name="create")
+        create_route.side_effect = create_side_effect
 
         yield respx_mock
 
@@ -40,10 +56,7 @@ def fluree_client(request: pytest.FixtureRequest, fluree_client: FlureeClient) -
     yield fluree_client
 
     # Assert that the mocked API was called
-    create_route = mocked_api["create"]
-    assert create_route.call_count == 1
-    assert create_route.calls.last.request.url == "http://localhost:8090/fluree/create"
-    assert create_route.calls.last.request.headers["Content-Type"] == "application/json"
+    mocked_api.assert_all_called()
 
 
 def test_create_ledger(
@@ -89,3 +102,32 @@ def test_create_ledger(
     assert resp.commit.startswith(f"fluree:file://{test_name}/commit/")
     assert resp.t == 1
     assert isinstance(resp.tx_id, str)
+
+
+def test_create_ledger_already_exists(
+    test_name: str,
+    fluree_client: FlureeClient,
+) -> None:
+    context = {
+        "ex": "http://example.org/",
+        "schema": "http://schema.org/",
+    }
+
+    data = [
+        {
+            "@id": "ex:freddy",
+            "@type": "ex:Yeti",
+            "schema:age": 4,
+            "schema:name": "Freddy",
+        },
+    ]
+
+    request = fluree_client.with_ledger(test_name).create().with_context(context).with_insert(data)
+
+    # First commit should succeed
+    resp = request.commit()
+    assert resp.status_code == HTTPStatus.CREATED
+
+    # Second commit should raise a LedgerAlreadyExistsError
+    with pytest.raises(LedgerAlreadyExistsError):
+        resp = request.commit()

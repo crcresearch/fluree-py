@@ -1,7 +1,16 @@
 ---
 description: 
-globs: *.py
-alwaysApply: false
+globs: 
+alwaysApply: true
 ---
-You SHOULD assume that we are using Python 3.11 as a minimum for this project.
-You SHOULD try and make sure that the code you suggest utilizes Python 3.11 features where possible
+
+You SHOULD prefer running single tests, and not the whole test suite, for performance
+
+Before you implement a solution, you SHOULD:
+  * Explore the codebase for relevent information
+  * Plan and think about how you will attempt to solve the problem
+
+When implementing a solution, you SHOULD:
+  * write a test based on expected inputs and outputs
+  * run the test to confirm that it fails.
+  * write your solution to make the test pass, ensuring that you do not modify the test.

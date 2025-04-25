@@ -7,10 +7,12 @@ from testcontainers.generic import ServerContainer  # type: ignore
 
 from fluree_py import FlureeClient
 from fluree_py.http.response import FlureeResponse
+from fluree_py.logging import logger
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+
+def pytest_configure(config: pytest.Config) -> None:  # noqa: ARG001
+    logger = logging.getLogger("fluree_py")
+    logger.setLevel(logging.DEBUG)
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:

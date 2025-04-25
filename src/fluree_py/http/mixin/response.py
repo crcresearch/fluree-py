@@ -84,6 +84,12 @@ class ResponseHandlingMixin(HasResponsePayload, HasResponseErrors, Generic[T_Suc
             Exception: If any error type in __response_errors__ returns an exception.
 
         """
+        logger.debug(
+            "handle_response",
+            status_code=response.status_code,
+            data=response.text,
+        )
+
         for exception_type in self.__response_errors__:
             logger.info("handle_response", cls=self.__class__.__name__)
             exception = exception_type.raise_from_response(response)

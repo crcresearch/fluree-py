@@ -6,6 +6,7 @@ convenient access to response data, status, and headers, as well as logging for 
 It also defines custom exceptions for Fluree-specific error handling, such as missing transactions.
 """
 
+import re
 from dataclasses import dataclass
 from http import HTTPStatus
 from typing import Self
@@ -116,8 +117,36 @@ class MissingTransactionError(Exception, SupportsRaisingFromResponse):
     @classmethod
     def raise_from_response(cls, response: Response) -> Exception | None:
         """Raise an exception from a response if the status code is a conflict."""
-        if response.status_code == HTTPStatus.CONFLICT:
-            json = response.json()
-            if "error" in json:
-                raise cls(json["error"])
-        return None
+        if response.status_code != HTTPStatus.CONFLICT:
+            return None
+
+        data = response.json()
+        if "error" not in data:
+            return None
+
+        return cls(data["error"])
+
+
+class LedgerAlreadyExistsError(Exception, SupportsRaisingFromResponse):
+    """Exception raised when a ledger already exists."""
+
+    def __init__(self, ledger: str) -> None:
+        """Initialize the based on the response from the ledger."""
+        self.message = f"Ledger {ledger} already exists!"
+        super().__init__(self.message)
+
+    @classmethod
+    def raise_from_response(cls, response: Response) -> Exception | None:
+        """Raise an exception from a response if the status code is a conflict."""
+        if response.status_code != HTTPStatus.CONFLICT:
+            return None
+
+        data = response.json()
+        if "error" not in data:
+            return None
+
+        match = re.match(r"Ledger (\w+) already exists", data["error"])
+        if not match:
+            return None
+
+        return cls(ledger=match.group(1))

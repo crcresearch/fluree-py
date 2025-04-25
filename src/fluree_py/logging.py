@@ -7,12 +7,12 @@ from structlog.types import BindableLogger, Processor
 
 # Default structlog configuration for the fluree_py library
 _DEFAULT_PROCESSORS: list[Processor] = [
-    structlog.contextvars.merge_contextvars,
-    structlog.processors.add_log_level,
+    structlog.stdlib.add_log_level,
+    structlog.stdlib.PositionalArgumentsFormatter(),
     structlog.processors.TimeStamper(fmt="iso"),
     structlog.processors.StackInfoRenderer(),
     structlog.processors.format_exc_info,
-    structlog.processors.JSONRenderer(),
+    structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
 ]
 
 _DEFAULT_WRAPPER_CLASS = structlog.stdlib.BoundLogger
