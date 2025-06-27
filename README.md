@@ -49,7 +49,7 @@ A Python client library for interacting with FlureeDB, providing a type-safe and
 ### Installation
 
 ```bash
-pip install fluree-py
+pip install git+https://github.com/crcresearch/fluree-py.git
 ```
 
 ### Basic Usage
